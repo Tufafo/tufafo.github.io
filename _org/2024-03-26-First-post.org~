@@ -1,0 +1,9 @@
+---
+layout: post
+title: "Using org-mode with Jekyll"
+excerpt: Introduce how to use Emacs's Org-mode with Jekyll to generate GitHub Pages
+---
+
+* test
+
+This is a test.
