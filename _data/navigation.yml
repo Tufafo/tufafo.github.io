@@ -1,9 +1,0 @@
-main:
-  - title: "年份"
-    url: /year-archive/
-  - title: "标签"
-    url: /tags/
-  - title: "归档"
-    url: /page-archive/
-  - title: "Collections"
-    url: /collection-archive/
