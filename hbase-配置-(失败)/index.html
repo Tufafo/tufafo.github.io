@@ -1,0 +1,873 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.24.0 by Michael Rose
+  Copyright 2013-2020 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="zh" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>Hbase 配置 (失败) - 甲与</title>
+<meta name="description" content="目标">
+
+
+  <meta name="author" content="甲与">
+  
+  <meta property="article:author" content="甲与">
+  
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:site_name" content="甲与">
+<meta property="og:title" content="Hbase 配置 (失败)">
+<meta property="og:url" content="http://localhost:4000/hbase-%E9%85%8D%E7%BD%AE-(%E5%A4%B1%E8%B4%A5)/">
+
+
+  <meta property="og:description" content="目标">
+
+
+
+  <meta property="og:image" content="http://localhost:4000/assets/images/wallhaven-o5e1jm.png">
+
+
+
+
+
+  <meta property="article:published_time" content="2024-04-15T00:00:00+08:00">
+
+
+
+
+
+
+<link rel="canonical" href="http://localhost:4000/hbase-%E9%85%8D%E7%BD%AE-(%E5%A4%B1%E8%B4%A5)/">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": "甲与",
+      "url": "http://localhost:4000/"
+    
+  }
+</script>
+
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+
+  <link href="/feed.xml" type="application/atom+xml" rel="alternate" title="甲与 Feed">
+
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css"></noscript>
+
+
+
+    <!-- start custom head snippets -->
+
+<script type="text/javascript" async
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+  </head>
+
+  <body class="layout--single">
+    <nav class="skip-links">
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">转到主导航栏</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">转到内容</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">转到底部</a></li>
+  </ul>
+</nav>
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+        <a class="site-title" href="/">
+          甲与
+          
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/tags/">分类</a>
+            </li><li class="masthead__menu-item">
+              <a href="/year-archive/">归档</a>
+            </li></ul>
+        
+        <button class="search__toggle" type="button">
+          <span class="visually-hidden">切换搜索</span>
+          <i class="fas fa-search"></i>
+        </button>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">切换菜单</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+  
+
+
+
+
+
+
+
+<div class="page__hero"
+  style=" background-image: url('');"
+>
+  
+    <img src="/assets/images/wallhaven-o5e1jm.png" alt="Hbase 配置 (失败)" class="page__hero-image">
+  
+  
+</div>
+
+
+
+
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person" class="h-card">
+
+  
+    <div class="author__avatar">
+      <a href="http://localhost:4000/">
+        <img src="/assets/images/6.png" alt="甲与" itemprop="image" class="u-photo">
+      </a>
+    </div>
+  
+
+  <div class="author__content">
+    <h3 class="author__name p-name" itemprop="name">
+      <a class="u-url" rel="me" href="http://localhost:4000/" itemprop="url">甲与</a>
+    </h3>
+    
+      <div class="author__bio p-note" itemprop="description">
+        <p>记录一些随想。</p>
+
+      </div>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">关注</button>
+    <ul class="author__urls social-icons">
+      
+
+      
+        
+          
+        
+          
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer me">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+
+  <article class="page h-entry" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="Hbase 配置 (失败)">
+    <meta itemprop="description" content="目标">
+    <meta itemprop="datePublished" content="2024-04-15T00:00:00+08:00">
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title p-name" itemprop="headline">
+            <a href="http://localhost:4000/hbase-%E9%85%8D%E7%BD%AE-(%E5%A4%B1%E8%B4%A5)/" class="u-url" itemprop="url">Hbase 配置 (失败)
+</a>
+          </h1>
+          
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2024-04-15T00:00:00+08:00">April 15, 2024</time>
+      </span>
+    
+
+    
+
+    
+  </p>
+
+
+        </header>
+      
+
+      <section class="page__content e-content" itemprop="text">
+        
+          <aside class="sidebar__right ">
+            <nav class="toc">
+              <header><h4 class="nav__title"><i class="fas fa-cog"></i> 目录</h4></header>
+              <ul class="toc__menu"><li><a href="#目标">目标</a></li><li><a href="#集群部署">集群部署</a><ul><li><a href="#环境说明">环境说明</a></li><li><a href="#hadoop">hadoop</a></li><li><a href="#zookeeper">zookeeper</a></li><li><a href="#hbase">hbase</a></li></ul></li><li><a href="#总结">总结</a></li><li><a href="#参考">参考</a></li></ul>
+
+            </nav>
+          </aside>
+        
+        <h2 id="目标">目标</h2>
+
+<p>熟悉hbase配置的基本流程</p>
+
+<h2 id="集群部署">集群部署</h2>
+
+<h3 id="环境说明">环境说明</h3>
+
+<p>两台ubuntu20.04 VPS。</p>
+
+<h3 id="hadoop">hadoop</h3>
+
+<ol>
+  <li>在两个vps中用 <code class="language-plaintext highlighter-rouge">ssh-keygen -t rsa</code> 命令生成密匙文件，复制到另一个vps的 <code class="language-plaintext highlighter-rouge">~/.ssh/authorized_keys</code> 中，实现免密登录。</li>
+  <li>在<code class="language-plaintext highlighter-rouge">/etc/hosts</code> 中修改ip-主机名映射关系。在<code class="language-plaintext highlighter-rouge">/etc/hostname</code>文件中修改主机名，<code class="language-plaintext highlighter-rouge">reboot</code> 使主机名修改生效。</li>
+  <li>下载<a href="https://jdk.java.net/java-se-ri/11">jdk-11</a>并解压，增加JAVA_HOME 到 <code class="language-plaintext highlighter-rouge">~/.bashrc</code> 文件中，用<code class="language-plaintext highlighter-rouge">source</code> 命令使之生效。</li>
+  <li>从官网下载<a href="https://hadoop.apache.org/releases.html">hadoop-3.9.2</a>版本并解压。</li>
+</ol>
+
+<ul>
+  <li>
+    <p>修改文件</p>
+  </li>
+  <li>
+    <p>hadoop-env.sh 增加内容</p>
+  </li>
+</ul>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">export </span><span class="nv">JAVA_HOME</span><span class="o">=</span>/root/src/jdk-11
+<span class="nv">HDFS_DATANODE_USER</span><span class="o">=</span>root
+<span class="nv">HDFS_NAMENODE_USER</span><span class="o">=</span>root
+<span class="nv">HDFS_SECONDARYNAMENODE_USER</span><span class="o">=</span>root
+</code></pre></div></div>
+
+<ul>
+  <li>core-site.xml 修改配置</li>
+</ul>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;configuration&gt;</span>
+	<span class="nt">&lt;property&gt;</span>
+		<span class="nt">&lt;name&gt;</span>fs.defaultFS<span class="nt">&lt;/name&gt;</span>
+		<span class="nt">&lt;value&gt;</span>hdfs://G:9000<span class="nt">&lt;/value&gt;</span>
+	<span class="nt">&lt;/property&gt;</span>
+	<span class="nt">&lt;property&gt;</span>
+		<span class="nt">&lt;name&gt;</span>hadoop.tmp.dir<span class="nt">&lt;/name&gt;</span>
+		<span class="nt">&lt;value&gt;</span>/root/data/tmp<span class="nt">&lt;/value&gt;</span>
+	<span class="nt">&lt;/property&gt;</span>
+<span class="nt">&lt;/configuration&gt;</span>
+</code></pre></div></div>
+
+<ul>
+  <li>hdfs-site.xml 修改配置</li>
+</ul>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;configuration&gt;</span>
+	<span class="nt">&lt;property&gt;</span>
+		<span class="nt">&lt;name&gt;</span>dfs.namenode.name.dir<span class="nt">&lt;/name&gt;</span>
+		<span class="nt">&lt;value&gt;</span>/root/data/namenode<span class="nt">&lt;/value&gt;</span>
+	<span class="nt">&lt;/property&gt;</span>
+	
+	<span class="nt">&lt;property&gt;</span>
+	<span class="nt">&lt;name&gt;</span>dfs.datanode.data.dir<span class="nt">&lt;/name&gt;</span>
+		<span class="nt">&lt;value&gt;</span>/root/data/datanode<span class="nt">&lt;/value&gt;</span>
+	<span class="nt">&lt;/property&gt;</span>
+	<span class="nt">&lt;property&gt;</span>
+	<span class="nt">&lt;name&gt;</span>dfs.replication<span class="nt">&lt;/name&gt;</span>
+		<span class="nt">&lt;value&gt;</span>2<span class="nt">&lt;/value&gt;</span>
+	<span class="nt">&lt;/property&gt;</span>
+<span class="nt">&lt;/configuration&gt;</span>
+</code></pre></div></div>
+
+<ul>
+  <li>workers 修改配置</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>G
+J
+</code></pre></div></div>
+
+<p>用<code class="language-plaintext highlighter-rouge">scp</code> 命令同步VPS文件修改。</p>
+
+<ol>
+  <li>
+    <p>格式化： <code class="language-plaintext highlighter-rouge">/path/to/hadoop/bin/hdfs namenode -format</code></p>
+  </li>
+  <li>
+    <p>启动hdfs：<code class="language-plaintext highlighter-rouge">/path/to/hadoop/sbin/start-dfs.sh</code>，访问9870端口查看hdfs是否正常启动。</p>
+  </li>
+</ol>
+
+<p><img src="/assets/post_images/Pasted image 20240414073338.png" alt="123" /></p>
+<ol>
+  <li>启动yarn：</li>
+</ol>
+
+<ul>
+  <li>hadoop-env.sh 增加内容：</li>
+</ul>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">export </span><span class="nv">YARN_RESOURCEMANAGER_USER</span><span class="o">=</span>root
+<span class="nb">export </span><span class="nv">YARN_NODEMANAGER_USER</span><span class="o">=</span>root
+</code></pre></div></div>
+
+<ul>
+  <li>yarn-site.xml 增加内容：</li>
+</ul>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;property&gt;</span>
+	<span class="nt">&lt;name&gt;</span>yarn.resourcemanager.hostname<span class="nt">&lt;/name&gt;</span>
+	<span class="nt">&lt;value&gt;</span>G<span class="nt">&lt;/value&gt;</span>
+<span class="nt">&lt;/property&gt;</span>
+</code></pre></div></div>
+
+<ul>
+  <li>执行命令：<code class="language-plaintext highlighter-rouge">/path/to/hadoop/sbin/start-yarn.sh</code>，访问8088端口查看yarn是否正常工作：</li>
+</ul>
+
+<p><img src="/assets/post_images/Pasted image 20240414073731.png" alt="123" />
+可以看到，两个节点正常工作。</p>
+
+<h3 id="zookeeper">zookeeper</h3>
+
+<ol>
+  <li><code class="language-plaintext highlighter-rouge">weget</code>命令从官网下载<a href="https://zookeeper.apache.org/releases.html">zookeeper-3.9.2</a>并解压。</li>
+  <li>修改配置文件：</li>
+</ol>
+
+<ul>
+  <li>zoo.cfg in vps1</li>
+</ul>
+
+<pre><code class="language-cfg">tickTime=2000
+dataDir=/var/lib/zookeeper
+clientPort=2181
+initLimit=5
+syncLimit=2
+server.1=0.0.0.0:2888:3888
+server.2=J:2888:3888
+</code></pre>
+<ul>
+  <li>zoo.cfg in vps2</li>
+</ul>
+
+<pre><code class="language-cfg">tickTime=2000
+dataDir=/var/lib/zookeeper
+clientPort=2181
+initLimit=5
+syncLimit=2
+server.1=G:2888:3888
+server.2=0.0.0.0:2888:3888
+</code></pre>
+<ol>
+  <li>在两个vps分别执行<code class="language-plaintext highlighter-rouge">/path/to/zookeeper/bin/zkServer.sh start</code> 启动zookeeper。</li>
+  <li>执行<code class="language-plaintext highlighter-rouge">/path/to/zookeeper/bin/zkCli.sh -server 127.0.0.1:2181</code> <code class="language-plaintext highlighter-rouge">ls /</code> 确保 zookeeper 工作。
+    <h3 id="hbase">hbase</h3>
+  </li>
+  <li>官网下载<a href="https://hbase.apache.org/downloads.html">hbase-2.5.8</a>并解压。</li>
+  <li>修改文件
+    <ul>
+      <li>在hbase-site.xml中
+```xml</li>
+    </ul>
+  </li>
+</ol>
+<property>
+    <name>hbase.cluster.distributed</name>
+    <value>true</value>
+  </property>
+<property>
+    <name>hbase.tmp.dir</name>
+    <value>/root/data/hbase/tmp</value>
+  </property>
+<property>
+    <name>hbase.unsafe.stream.capability.enforce</name>
+    <value>false</value>
+  </property>
+<property>
+    <name>hbase.zookeeper.quorum</name>
+    <value>G,J</value>
+  </property>
+<property>
+    <name>hbase.zookeeper.property.dataDir</name>
+    <value>/root/data/zookeeper</value>
+  </property>
+<property>
+    <name>hbase.zookeeper.property.clientPort</name>
+    <value>2181</value>
+  </property>
+<property>
+    <name>hbase.master.info.port</name>
+    <value>16010</value>
+  </property>
+<p>&lt;/configuration&gt;</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+- 在conf/regionservers文件中增加：
+</code></pre></div></div>
+<p>G
+J</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+- 在conf/文件夹下新建文件backup-masters，内容为：
+</code></pre></div></div>
+<p>J</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- 替换hadoop-jar包
+```bash
+rm /path/to/hbase/lib/hadoop*.jar
+find /path/to/hadoop/share/hadoop -name "hadoop*.jar" | xargs -i cp {} /path/to/hbase/lib/
+</code></pre></div></div>
+
+<ul>
+  <li>scp命令同步文件
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>scp /path/to/hbase root@J:/path/to/habase
+</code></pre></div>    </div>
+  </li>
+  <li>链接文件
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">ln</span> <span class="nt">-s</span> /path/to/hadoop/etc/hadoop/core-site.xml  /path/to/hbase/conf/core-site.xml
+<span class="nb">ln</span> <span class="nt">-s</span> /path/to/hadoop/etc/hadoop/hdfs-site.xml  /path/to/hbase/conf/hdfs-site.xml
+</code></pre></div>    </div>
+    <ol>
+      <li>启动服务：<code class="language-plaintext highlighter-rouge">/path/to/hbase/bin/start-hbase.sh</code></li>
+      <li>访问端口：16010查看hbase是否正常工作。</li>
+    </ol>
+  </li>
+</ul>
+
+<p><img src="/assets/post_images/20240414-b.png" alt="" /></p>
+<ul>
+  <li>jps查看系统状态：</li>
+</ul>
+
+<p>从节点：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>root@J:~# jps
+1314 DataNode
+1843 QuorumPeerMain
+1597 NodeManager
+7454 Jps
+</code></pre></div></div>
+<p>主节点：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>root@G:~/src/hbase-2.5.8/conf# jps
+11009 Jps
+1330 NameNode
+2467 SecondaryNameNode
+3285 QuorumPeerMain
+2845 NodeManager
+2670 ResourceManager
+</code></pre></div></div>
+
+<p>问题：主节点Hmaster 和 HReigonServer 进程丢失，从节点HreigonServer 丢失。</p>
+
+<p>在 Hbase中输入指令，只返回错误：</p>
+
+<p><img src="/assets/post_images/20240414-c.png" alt="" /></p>
+
+<h2 id="总结">总结</h2>
+
+<ul>
+  <li>目前尝试过的解决策略包括：</li>
+</ul>
+
+<ol>
+  <li><a href="https://segmentfault.com/q/1010000000606670">全分布式HBase启动后HMaster和HRegionServer自动消失</a> ：删除<code class="language-plaintext highlighter-rouge">/etc/hosts</code> 中的127.0.0.1行，失败。</li>
+  <li><a href="https://blog.csdn.net/weixin_34238633/article/details/91907325">regionserver.HRegionServer: Failed construction RegionServer</a>：复制<code class="language-plaintext highlighter-rouge">/path/to/hbase/lib/client-facing-thirdparty</code> 下的 <code class="language-plaintext highlighter-rouge">htrace-core-3.1.0</code> 到 <code class="language-plaintext highlighter-rouge">/path/to/hbase/lib</code> 目录中，失败。</li>
+</ol>
+
+<p>hbase 的日志文件<code class="language-plaintext highlighter-rouge">hbase-root-master-G.log</code> 报错如下：</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>2024-04-14T14:47:17,496 ERROR [main] regionserver.HRegionServer: Failed construction RegionServer
+java.lang.StackOverflowError: null
+        at java.util.concurrent.locks.AbstractQueuedSynchronizer.release(AbstractQueuedSynchronizer.java:1302) ~[?:?]
+        at java.util.concurrent.locks.ReentrantLock.unlock(ReentrantLock.java:439) ~[?:?]
+        at java.util.concurrent.LinkedBlockingDeque.offerLast(LinkedBlockingDeque.java:355) ~[?:?]
+        at java.util.concurrent.LinkedBlockingDeque.addLast(LinkedBlockingDeque.java:325) ~[?:?]
+</code></pre></div></div>
+
+<ul>
+  <li>进一步解决策略</li>
+</ul>
+
+<p>关于hbase和zookeeper，由于已经通过shell和web界面验证过，应无配置问题。有可能是hadoop、hbase和zookeeper版本之间的不兼容，或者仍然存在habase的配置错误。一方面可以在查询资料，重新检验配置文件，另一方面可以考虑伪分布式来继续实验。</p>
+
+<h2 id="参考">参考</h2>
+
+<ul>
+  <li><a href="https://blog.csdn.net/qq_27525611/article/details/108114893">CSDN: Hadoop完整搭建过程（四）：完全分布模式（服务器）</a></li>
+  <li><a href="https://zookeeper.apache.org/doc/current/zookeeperStarted.html">ZooKeeper Getting Started Guide</a></li>
+  <li><a href="https://stackoverflow.com/questions/30940981/zookeeper-error-cannot-open-channel-to-x-at-election-address">Zookeeper error: Cannot open channel to X at election address</a></li>
+  <li><a href="https://hbase.apache.org/book.html">Hbase refference guide 2.4:Fully Distributed for Production</a></li>
+  <li><a href="https://segmentfault.com/q/1010000000606670">全分布式HBase启动后HMaster和HRegionServer自动消失</a></li>
+  <li><a href="https://blog.csdn.net/weixin_34238633/article/details/91907325">regionserver.HRegionServer: Failed construction RegionServer</a></li>
+</ul>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+  
+
+
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fas fa-fw fa-tags" aria-hidden="true"></i> 标签: </strong>
+    <span itemprop="keywords">
+    
+      <a href="/tags/#%E5%88%86%E5%B8%83%E5%BC%8F" class="page__taxonomy-item p-category" rel="tag">分布式</a><span class="sep">, </span>
+    
+      <a href="/tags/#%E5%A4%B1%E8%B4%A5" class="page__taxonomy-item p-category" rel="tag">失败</a>
+    
+    </span>
+  </p>
+
+
+
+
+        
+
+  <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> 更新时间:</strong> <time class="dt-published" datetime="2024-04-15T00:00:00+08:00">April 15, 2024</time></p>
+
+      </footer>
+
+      
+
+      
+  <nav class="pagination">
+    
+      <a href="/tlaplus-%E7%94%B5%E6%8A%A5%E9%97%AE%E9%A2%98/" class="pagination--pager" title="Tlaplus：电报问题
+">上一页</a>
+    
+    
+      <a href="#" class="pagination--pager disabled">下一页</a>
+    
+  </nav>
+
+    </div>
+
+    
+  </article>
+
+  
+  
+    <div class="page__related">
+      <h2 class="page__related-title">猜您还喜欢</h2>
+      <div class="grid__wrapper">
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/tlaplus-%E7%94%B5%E6%8A%A5%E9%97%AE%E9%A2%98/" rel="permalink">Tlaplus：电报问题
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2024-03-14T00:00:00+08:00">March 14, 2024</time>
+      </span>
+    
+
+    
+
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">在一个小编程中测试tlaplus。
+</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/tlaplus-Pluscal/" rel="permalink">Tlaplus pluscal
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2024-03-13T00:00:00+08:00">March 13, 2024</time>
+      </span>
+    
+
+    
+
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">探索一下 tlaplus pluscal 的基本功能。
+</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/calibre-server-%E9%85%8D%E7%BD%AE/" rel="permalink">Calibre server 配置
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2024-02-25T00:00:00+08:00">February 25, 2024</time>
+      </span>
+    
+
+    
+
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">calibre-server是一种非常便利的线上电子阅读服务。
+之前的服务器到期了，现在重新配置了calibre-server，整理一下操作步骤。
+</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/lisp%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95-%E4%B8%BB%E8%AF%AD/" rel="permalink">Lisp基础语法：主语
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2024-01-02T00:00:00+08:00">January 2, 2024</time>
+      </span>
+    
+
+    
+
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">介绍一下lisp语言的主语。
+</p>
+  </article>
+</div>
+
+        
+      </div>
+    </div>
+  
+  
+</div>
+
+    </div>
+
+    
+      <div class="search-content">
+        <div class="search-content__inner-wrap"><form class="search-content__form" onkeydown="return event.key != 'Enter';" role="search">
+    <label class="sr-only" for="search">
+      输入您要搜索的关键词...
+    </label>
+    <input type="search" id="search" class="search-input" tabindex="-1" placeholder="输入您要搜索的关键词..." />
+  </form>
+  <div id="results" class="results"></div></div>
+
+      </div>
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+<!-- end custom footer snippets -->
+
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+      <li><strong>关注:</strong></li>
+    
+
+    
+
+    
+      <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+    
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2024 甲与. 技术来自于 <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+
+
+
+
+<script src="/assets/js/lunr/lunr.min.js"></script>
+<script src="/assets/js/lunr/lunr-store.js"></script>
+<script src="/assets/js/lunr/lunr-en.js"></script>
+
+
+
+
+
+
+
+  </body>
+</html>

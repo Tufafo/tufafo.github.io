@@ -1,0 +1,728 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.24.0 by Michael Rose
+  Copyright 2013-2020 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="zh" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>Lisp基础语法：主语 - 甲与</title>
+<meta name="description" content="介绍一下lisp语言的主语。">
+
+
+  <meta name="author" content="甲与">
+  
+  <meta property="article:author" content="甲与">
+  
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:site_name" content="甲与">
+<meta property="og:title" content="Lisp基础语法：主语">
+<meta property="og:url" content="http://localhost:4000/lisp%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95-%E4%B8%BB%E8%AF%AD/">
+
+
+  <meta property="og:description" content="介绍一下lisp语言的主语。">
+
+
+
+  <meta property="og:image" content="http://localhost:4000/assets/images/wallhaven-o5e1jm.png">
+
+
+
+
+
+  <meta property="article:published_time" content="2024-01-02T00:00:00+08:00">
+
+
+
+
+
+
+<link rel="canonical" href="http://localhost:4000/lisp%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95-%E4%B8%BB%E8%AF%AD/">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": "甲与",
+      "url": "http://localhost:4000/"
+    
+  }
+</script>
+
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+
+  <link href="/feed.xml" type="application/atom+xml" rel="alternate" title="甲与 Feed">
+
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css"></noscript>
+
+
+
+    <!-- start custom head snippets -->
+
+<script type="text/javascript" async
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+  </head>
+
+  <body class="layout--single">
+    <nav class="skip-links">
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">转到主导航栏</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">转到内容</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">转到底部</a></li>
+  </ul>
+</nav>
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+        <a class="site-title" href="/">
+          甲与
+          
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/tags/">分类</a>
+            </li><li class="masthead__menu-item">
+              <a href="/year-archive/">归档</a>
+            </li></ul>
+        
+        <button class="search__toggle" type="button">
+          <span class="visually-hidden">切换搜索</span>
+          <i class="fas fa-search"></i>
+        </button>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">切换菜单</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+  
+
+
+
+
+
+
+
+<div class="page__hero"
+  style=" background-image: url('');"
+>
+  
+    <img src="/assets/images/wallhaven-o5e1jm.png" alt="Lisp基础语法：主语" class="page__hero-image">
+  
+  
+</div>
+
+
+
+
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person" class="h-card">
+
+  
+    <div class="author__avatar">
+      <a href="http://localhost:4000/">
+        <img src="/assets/images/6.png" alt="甲与" itemprop="image" class="u-photo">
+      </a>
+    </div>
+  
+
+  <div class="author__content">
+    <h3 class="author__name p-name" itemprop="name">
+      <a class="u-url" rel="me" href="http://localhost:4000/" itemprop="url">甲与</a>
+    </h3>
+    
+      <div class="author__bio p-note" itemprop="description">
+        <p>记录一些随想。</p>
+
+      </div>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">关注</button>
+    <ul class="author__urls social-icons">
+      
+
+      
+        
+          
+        
+          
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer me">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+
+  <article class="page h-entry" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="Lisp基础语法：主语">
+    <meta itemprop="description" content="介绍一下lisp语言的主语。">
+    <meta itemprop="datePublished" content="2024-01-02T00:00:00+08:00">
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title p-name" itemprop="headline">
+            <a href="http://localhost:4000/lisp%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95-%E4%B8%BB%E8%AF%AD/" class="u-url" itemprop="url">Lisp基础语法：主语
+</a>
+          </h1>
+          
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2024-01-02T00:00:00+08:00">January 2, 2024</time>
+      </span>
+    
+
+    
+
+    
+  </p>
+
+
+        </header>
+      
+
+      <section class="page__content e-content" itemprop="text">
+        
+          <aside class="sidebar__right ">
+            <nav class="toc">
+              <header><h4 class="nav__title"><i class="fas fa-cog"></i> 目录</h4></header>
+              <ul class="toc__menu"><li><a href="#前缀表达">前缀表达</a></li><li><a href="#人与数字">人与数字</a></li><li><a href="#child-ref-sky">Child ref sky</a></li><li><a href="#as--to-dobe-done--by-">as … to do/be done … by …</a></li><li><a href="#参考">参考</a></li></ul>
+
+            </nav>
+          </aside>
+        
+        <p>介绍一下lisp语言的主语。</p>
+
+<h2 id="前缀表达">前缀表达</h2>
+
+<p>前缀表达，又称波兰表示法（Polish notation），s表达式，操作符置于操作数前，例如：</p>
+
+\[\text{+ 2 17 = 19}\]
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">+</span> <span class="mi">2</span> <span class="mi">17</span><span class="p">)</span>
+<span class="c1">;;=&gt;19</span>
+</code></pre></div></div>
+
+<p>如果仅仅是数字或者逻辑运算转换了一种表达方式，也许继续使用前缀表达是更好的。
+但是如何在自然语言的角度去理解呢？
+一般的自然语言语句一般有以下三种形式：</p>
+
+<ol>
+  <li>主语－谓语－宾语</li>
+  <li>主语－谓语</li>
+  <li>谓语</li>
+</ol>
+
+<p>试想一个基本的对话场景：</p>
+
+<p>甲：吃饭了吗？
+乙：吃了。</p>
+
+<p>乙的话，说完整了，是：我吃过饭了。</p>
+
+<p>把谓词对应于function，主语和宾语对应于variable，而 <code class="language-plaintext highlighter-rouge">吃了</code> 作为接收我和饭的谓语，以lisp的前缀表达形式，可以表示为：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="err">吃了</span> <span class="err">我</span> <span class="err">饭</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>或者</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="err">吃了</span> <span class="err">饭</span> <span class="err">我</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>问题在于，第几个参数成为主语。前缀表达 <code class="language-plaintext highlighter-rouge">+ 2 19</code> 是不必在意这个问题的。是 <code class="language-plaintext highlighter-rouge">2</code> 努力令自身补充了 <code class="language-plaintext highlighter-rouge">19</code> 这个数值，还是 <code class="language-plaintext highlighter-rouge">19</code> 稍稍增加了 <code class="language-plaintext highlighter-rouge">2</code> 这个数值，因为加法交换律的缘故，只要它们的结果都是 <code class="language-plaintext highlighter-rouge">19</code>，算术者便通通视为等价的。</p>
+
+<p>但是，<code class="language-plaintext highlighter-rouge">饭吃了我</code> 和 <code class="language-plaintext highlighter-rouge">我吃了饭</code> 对于准备吃饭的人来说，意义则尤为不同且重大。</p>
+
+<h2 id="人与数字">人与数字</h2>
+
+<p>那么，存在于在列表中的元素，究竟是真实的人，还是抽象的数字？</p>
+
+<p>对于是人的情况，比如甲把他所有的密码记在一张纸上，那么纸作为列表而单个密码作为元素：当甲访问网站x输入密码时，不是密码凭空地出现在了网站的输入栏，而是乙从他记录的密码中，选择了与网站x匹配的密码，输入到网站x的输入栏中。对于密码列表，是密码列表被选出了与网站x匹配的元素，对于网站，是网站被输入了与用户甲匹配的账户信息。</p>
+
+<p>而对于是数字的情况，会存在一个脱离了人的生命而存在的数字吗？ <code class="language-plaintext highlighter-rouge">13</code> 这个数字或许是普遍存在的，只要这世上有多于 <code class="language-plaintext highlighter-rouge">13</code> 个行星，多于 <code class="language-plaintext highlighter-rouge">13</code> 棵树木，似乎便可认为这世界包含了数字 <code class="language-plaintext highlighter-rouge">13</code> 。但是，存在于世界中的 <code class="language-plaintext highlighter-rouge">13</code> 和存在于我们头脑中的 <code class="language-plaintext highlighter-rouge">13</code> 会是同一种事物吗？有什么理由能够说明，当世界的 <code class="language-plaintext highlighter-rouge">13</code> 个行星遇到第 <code class="language-plaintext highlighter-rouge">14</code> 个行星时，便包含了 <code class="language-plaintext highlighter-rouge">14</code> ？如果这 <code class="language-plaintext highlighter-rouge">13</code> 个行星会因为遇到第 <code class="language-plaintext highlighter-rouge">14</code> 个行星而毁灭，只留下第 <code class="language-plaintext highlighter-rouge">14</code> 个行星，那么这个世界便是不包含 <code class="language-plaintext highlighter-rouge">14</code> 的，对它而言 $13+1=1$。而通常认为 $13+1=14$ 的我们如果既不是被毁灭的十三个行星，也不是被留下的一个行星，那么我们又有什么理由认为，我们对这个世界经历 $13+1=1$的过程是有意义的呢？我们有什么理由认为，我们存在于这个世界呢？</p>
+
+<p>至少对于数字的情况，我们可以理解到，人会因为参与各种事物的交互产生存在于世界的意义，而因为失去同各种事物的交互而失去存在于世界的意义。如果人具有存在于世界的意义，那么人至少要参与到同世界内的某种事物的交互中。</p>
+
+<p>因此，综合元素为人和数字两种情形而言，如果一个列表和别的什么列表发生了交互，从而使自身失去、得到元素或改变了已有的元素，该列表便在程序的世界中产生了意义——它可能影响到其它列表，或被其它列表所影响。并且，提到列表影响其它列表，和它被其它列表所影响，是不同的。</p>
+
+<p>对此，在lisp语言中，我想至少要能区分正在参与到程序中的列表，以及程序所包含的列表，而且以一种足够直观的形式加以表达。例如：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="err">我</span> <span class="err">吃</span> <span class="err">饭</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="err">饭</span> <span class="err">被吃</span> <span class="err">我</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>好像不太通顺，借助一下英文的表达：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nv">Rice</span> <span class="nv">is-eaten-by</span> <span class="nv">me</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>完美。</p>
+
+<h2 id="child-ref-sky">Child ref sky</h2>
+
+<p>然而lisp语言不存在该语序的直接实现，对此，可以设置一个宏语句，把第一个参数设置为主语，其余的参数设置为可能的宾语。而在所有的字母中，我个人认为字母 <code class="language-plaintext highlighter-rouge">o</code> 在形状上是最完美的。</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">defmacro</span> <span class="nv">o</span> <span class="p">(</span><span class="nv">mio</span> <span class="nv">ili</span> <span class="k">&amp;rest</span> <span class="nv">vio</span><span class="p">)</span>
+	<span class="o">`</span><span class="p">(</span><span class="nv">ili</span> <span class="nv">mio</span> <span class="o">,@</span><span class="nv">vio</span><span class="p">))</span>
+</code></pre></div></div>
+<p>暂时称这种倒置了第一个参数和谓词的语句为 <code class="language-plaintext highlighter-rouge">自然语句</code> ，或者 <code class="language-plaintext highlighter-rouge">o语句</code> 吧。</p>
+
+<p>于是重新看一看lisp的基础原语，也许 <code class="language-plaintext highlighter-rouge">set</code> 更换为 <code class="language-plaintext highlighter-rouge">is</code> 更加通顺呢？ <code class="language-plaintext highlighter-rouge">set</code> 的意义是设置，但是对于自然语句 <code class="language-plaintext highlighter-rouge">(o 'x set 1)</code> 而言，<code class="language-plaintext highlighter-rouge">x 设置 1</code> 这种句式是很蹩脚的。或者我们换一个例子 <code class="language-plaintext highlighter-rouge">(o '孩子 set '天空)</code> ：难道我们可以说， <code class="language-plaintext highlighter-rouge">孩子设置天空</code> 吗？天空可以通过向地面降下暴雨或冰雪来抑制生命的繁衍，亦或以阳光雨露滋润生命的成长。但是同样生活在地面的 <code class="language-plaintext highlighter-rouge">孩子</code> 有什么能力去设置这样的 <code class="language-plaintext highlighter-rouge">天空</code> 呢？难道更加自然的画面不是孩子在生命被暴雨或冰雪抑制之余，<code class="language-plaintext highlighter-rouge">望向</code> 了 <code class="language-plaintext highlighter-rouge">天空</code> 吗？或者他们的手 <code class="language-plaintext highlighter-rouge">指向</code> 了 <code class="language-plaintext highlighter-rouge">天空</code> ？</p>
+
+<p>而按照 <code class="language-plaintext highlighter-rouge">s表达式</code> ，自然语句<code class="language-plaintext highlighter-rouge">(o '孩子 set '天空)</code> 对应着 <code class="language-plaintext highlighter-rouge">(set '孩子 '天空)</code> 。 <code class="language-plaintext highlighter-rouge">set</code> 的意义是令第一个符号指向第二个符号，这样在 <code class="language-plaintext highlighter-rouge">s 表达式</code> 中，我们便要说：<code class="language-plaintext highlighter-rouge">设置孩子指向天空</code>，或者 <code class="language-plaintext highlighter-rouge">设置孩子望向天空</code> 。这竟好似一种外在的诱惑，或者某种权威式的强制的命令，以役使孩子以他们期待的形式同天空发生关系一样。难道这外在的程序，还能比真正的 <code class="language-plaintext highlighter-rouge">天空</code> 更加宽广辽远吗？能够被命令着望向的 <code class="language-plaintext highlighter-rouge">天空</code> ，果真会是真正的 <code class="language-plaintext highlighter-rouge">天空</code> 吗？</p>
+
+<p>如果对于每位孩子而言，存在一片真正可供他们自由飞翔的天空，我想这会比那一片片被命令或诱惑了的天空更接近他们自然而然所望向的远方。</p>
+
+<p>不是因为某种外在的诱惑或命令，而是因为它自然而言朝向了什么。英语中有个词组 <code class="language-plaintext highlighter-rouge">refer to sth</code> ，意思是：</p>
+
+<blockquote>
+  <p>to look at, or tell someone else to look at, a book or similar record in order to find information and help</p>
+</blockquote>
+
+<p>为了简便起见，缩写为，<code class="language-plaintext highlighter-rouge">ref</code>。那么刚刚的语句便可以表达为： <code class="language-plaintext highlighter-rouge">(o child ref sky)</code> 。</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">defmacro</span> <span class="nv">ref</span> <span class="p">(</span><span class="nv">var</span> <span class="nv">value</span><span class="p">)</span>
+	<span class="o">`</span><span class="p">(</span><span class="nb">setf</span> <span class="o">,</span><span class="nv">var</span> <span class="o">,</span><span class="nv">value</span><span class="p">))</span>
+</code></pre></div></div>
+
+<h2 id="as--to-dobe-done--by-">as … to do/be done … by …</h2>
+
+<p>而回到 <code class="language-plaintext highlighter-rouge">week</code> 的例子中，试想不是 <code class="language-plaintext highlighter-rouge">(select week 2)</code> 这样，<code class="language-plaintext highlighter-rouge">选择了一周的第二天</code>，而是 <code class="language-plaintext highlighter-rouge">一周作为列表根据数字2被选择出来具有温度的第二天之元素</code>，也就意味着：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nv">week</span> <span class="nv">as-list-be-select-element-by-position</span> <span class="mi">2</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>给予一种实现：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nv">o</span> <span class="nv">as-list-be-select-element-by-position</span> <span class="nv">loy</span> <span class="p">(</span><span class="nb">list</span> <span class="nb">position</span><span class="p">)</span>
+   <span class="s">"列表根据位置被选择元素"</span>
+   <span class="p">(</span><span class="nv">o</span> <span class="p">(</span><span class="nv">o</span> <span class="nb">list</span> <span class="nb">eq</span> <span class="no">nil</span><span class="p">)</span> <span class="nv">then</span> <span class="no">nil</span>
+      <span class="p">(</span><span class="nv">o</span> <span class="p">(</span><span class="nv">o</span> <span class="nb">position</span> <span class="nb">=</span> <span class="mi">1</span><span class="p">)</span> <span class="nv">then</span>
+         <span class="p">(</span><span class="nv">o</span> <span class="nb">list</span> <span class="nv">ri</span><span class="p">)</span>
+         <span class="p">(</span><span class="nv">o</span> <span class="p">(</span><span class="nv">o</span> <span class="nb">list</span> <span class="nv">cori</span><span class="p">)</span> <span class="nv">as-list-be-select-element-by-position</span> <span class="p">(</span><span class="nv">o</span> <span class="nb">position</span> <span class="nb">-</span> <span class="mi">1</span><span class="p">)))))</span>
+<span class="c1">;;(o '(a b c d) as-list-be-select-element-by-position 2)</span>
+<span class="c1">;;=&gt;b</span>
+</code></pre></div></div>
+
+<p>其中，<code class="language-plaintext highlighter-rouge">loy</code> 是 <code class="language-plaintext highlighter-rouge">defun</code> 的倒装，<code class="language-plaintext highlighter-rouge">ri</code> 是 <code class="language-plaintext highlighter-rouge">car</code> 的倒装，<code class="language-plaintext highlighter-rouge">cori</code> 是 <code class="language-plaintext highlighter-rouge">cdr</code> 的倒装，<code class="language-plaintext highlighter-rouge">then</code> 是 <code class="language-plaintext highlighter-rouge">if</code> 的倒装。</p>
+
+<p>在s表达式中，等价于</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">defun</span> <span class="nv">select</span> <span class="p">(</span><span class="nb">list</span> <span class="nb">position</span><span class="p">)</span>
+	<span class="p">(</span><span class="k">if</span> <span class="p">(</span><span class="nb">eq</span> <span class="nb">list</span> <span class="no">nil</span><span class="p">)</span> <span class="no">nil</span>
+		<span class="p">(</span><span class="k">if</span> <span class="p">(</span><span class="nb">=</span> <span class="nb">position</span> <span class="mi">1</span><span class="p">)</span>
+			<span class="p">(</span><span class="nb">car</span> <span class="nb">list</span><span class="p">)</span>
+		 <span class="p">(</span><span class="nv">select</span> <span class="p">(</span><span class="nb">position</span> <span class="nb">cdr</span><span class="p">)</span> <span class="p">(</span><span class="nb">-</span> <span class="nb">position</span> <span class="mi">1</span><span class="p">)))))</span>
+<span class="c1">;;(select '(a b c d) 2)</span>
+<span class="c1">;;=&gt;b</span>
+</code></pre></div></div>
+
+<p>当然，如果需要也可以把 <code class="language-plaintext highlighter-rouge">as-list-be-select-element-by-position</code> 缩写为 <code class="language-plaintext highlighter-rouge">be-select</code>。但是这样要如何区分 <code class="language-plaintext highlighter-rouge">as-string-be-select-substring-by-start-end</code> 以及 <code class="language-plaintext highlighter-rouge">as-number-list-be-select-max-number</code> 这些同样被选择，但是输入和输出类型和选择具体功能不同的函数呢？或者，如何证明，作为列表被选择比作为字串或作为数字列表被选择的优先级更高，以至于要它竟然要占用 <code class="language-plaintext highlighter-rouge">be-select</code> 这样精简的符号？如果不能，那么为什么要冒着浪费 <code class="language-plaintext highlighter-rouge">更精简的符号</code> 的选择空间的风险进行预设呢？既然一切都是 <code class="language-plaintext highlighter-rouge">Child ref sky.</code></p>
+
+<p>那么，<code class="language-plaintext highlighter-rouge">be-select</code> 这样的 <code class="language-plaintext highlighter-rouge">精简符号</code> 又为什么不能根据即时的执行和编写需求，进行灵活的指向关系改变呢？</p>
+
+<p>精简的符号意味着更加快速的思考，而冗长的符号意味着更加精确的语义。对比认知科学中 <code class="language-plaintext highlighter-rouge">系统一</code> 和 <code class="language-plaintext highlighter-rouge">系统二</code> 的概念，也许应当存在一种可以整合这两种符号的编程范式？</p>
+
+<p>如果我们把 <code class="language-plaintext highlighter-rouge">be-select</code> 这样的精简符号的组合称为 <code class="language-plaintext highlighter-rouge">架构类</code> 函数，那么 <code class="language-plaintext highlighter-rouge">as-list-be-select-element-by-position</code> <code class="language-plaintext highlighter-rouge">as-string-be-select-substring-by-start-end</code> <code class="language-plaintext highlighter-rouge">as-number-list-be-select-max-number</code> 无疑都是它的一种实现。一方面，这并不意味着作为 <code class="language-plaintext highlighter-rouge">架构类</code> 函数的 <code class="language-plaintext highlighter-rouge">be-select</code> 不可被执行了，可以根据语境进行设置，特别是对于一次执行且直执行一个函数的单线程而言。比较令人担忧的可能是，会不会出现当高级函数调用多个低级函数时，出现低级函数集合对于 <code class="language-plaintext highlighter-rouge">be-select</code> 的访问冲突？</p>
+
+<p>另外，<code class="language-plaintext highlighter-rouge">as ...</code> 声明了主语的类型，这里的类型不一定是 <code class="language-plaintext highlighter-rouge">cons</code> <code class="language-plaintext highlighter-rouge">number</code> <code class="language-plaintext highlighter-rouge">string</code> 这些基础类型，也可以是 <code class="language-plaintext highlighter-rouge">table</code> <code class="language-plaintext highlighter-rouge">string-list</code> 这些自建类型。换言之 <code class="language-plaintext highlighter-rouge">作为...做/被做...根据...</code> 是自然语句的一种普遍的命名方式，例如：<code class="language-plaintext highlighter-rouge">as-table-be-select-column-by-position-list</code> <code class="language-plaintext highlighter-rouge">as-table-be-select-row-by-position</code> 。如果从主语的角度而言，<code class="language-plaintext highlighter-rouge">架构类函数</code> 和 <code class="language-plaintext highlighter-rouge">实现类函数</code> 之间的关系显然不是单继承的，只要考虑到任何一种作为自然语句主语的对象都有可能 <code class="language-plaintext highlighter-rouge">得到</code> <code class="language-plaintext highlighter-rouge">失去</code> 或 <code class="language-plaintext highlighter-rouge">改变</code> 什么的话。</p>
+
+<h2 id="参考">参考</h2>
+
+<ul>
+  <li><a href="https://zh.m.wikipedia.org/wiki/%E6%B3%A2%E5%85%B0%E8%A1%A8%E7%A4%BA%E6%B3%95">维基百科：波兰表示法</a></li>
+  <li><a href="https://zh.m.wikipedia.org/wiki/%E9%80%86%E6%B3%A2%E5%85%B0%E8%A1%A8%E7%A4%BA%E6%B3%95">维基百科：逆波兰表示法</a></li>
+  <li><a href="https://zh.m.wikipedia.org/wiki/%E9%80%86%E6%B3%A2%E5%85%B0%E8%A1%A8%E7%A4%BA%E6%B3%95">维基百科：S表达式</a></li>
+</ul>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+  
+
+
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fas fa-fw fa-tags" aria-hidden="true"></i> 标签: </strong>
+    <span itemprop="keywords">
+    
+      <a href="/tags/#%E8%AF%AD%E6%B3%95" class="page__taxonomy-item p-category" rel="tag">语法</a>
+    
+    </span>
+  </p>
+
+
+
+
+        
+
+  <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> 更新时间:</strong> <time class="dt-published" datetime="2024-01-02T00:00:00+08:00">January 2, 2024</time></p>
+
+      </footer>
+
+      
+
+      
+  <nav class="pagination">
+    
+      <a href="/lisp%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95-%E5%88%97%E8%A1%A8/" class="pagination--pager" title="Lisp基础语法：列表
+">上一页</a>
+    
+    
+      <a href="/calibre-server-%E9%85%8D%E7%BD%AE/" class="pagination--pager" title="Calibre server 配置
+">下一页</a>
+    
+  </nav>
+
+    </div>
+
+    
+  </article>
+
+  
+  
+    <div class="page__related">
+      <h2 class="page__related-title">猜您还喜欢</h2>
+      <div class="grid__wrapper">
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/hbase-%E9%85%8D%E7%BD%AE-(%E5%A4%B1%E8%B4%A5)/" rel="permalink">Hbase 配置 (失败)
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2024-04-15T00:00:00+08:00">April 15, 2024</time>
+      </span>
+    
+
+    
+
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">目标
+</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/tlaplus-%E7%94%B5%E6%8A%A5%E9%97%AE%E9%A2%98/" rel="permalink">Tlaplus：电报问题
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2024-03-14T00:00:00+08:00">March 14, 2024</time>
+      </span>
+    
+
+    
+
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">在一个小编程中测试tlaplus。
+</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/tlaplus-Pluscal/" rel="permalink">Tlaplus pluscal
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2024-03-13T00:00:00+08:00">March 13, 2024</time>
+      </span>
+    
+
+    
+
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">探索一下 tlaplus pluscal 的基本功能。
+</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/calibre-server-%E9%85%8D%E7%BD%AE/" rel="permalink">Calibre server 配置
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2024-02-25T00:00:00+08:00">February 25, 2024</time>
+      </span>
+    
+
+    
+
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">calibre-server是一种非常便利的线上电子阅读服务。
+之前的服务器到期了，现在重新配置了calibre-server，整理一下操作步骤。
+</p>
+  </article>
+</div>
+
+        
+      </div>
+    </div>
+  
+  
+</div>
+
+    </div>
+
+    
+      <div class="search-content">
+        <div class="search-content__inner-wrap"><form class="search-content__form" onkeydown="return event.key != 'Enter';" role="search">
+    <label class="sr-only" for="search">
+      输入您要搜索的关键词...
+    </label>
+    <input type="search" id="search" class="search-input" tabindex="-1" placeholder="输入您要搜索的关键词..." />
+  </form>
+  <div id="results" class="results"></div></div>
+
+      </div>
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+<!-- end custom footer snippets -->
+
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+      <li><strong>关注:</strong></li>
+    
+
+    
+
+    
+      <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+    
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2024 甲与. 技术来自于 <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+
+
+
+
+<script src="/assets/js/lunr/lunr.min.js"></script>
+<script src="/assets/js/lunr/lunr-store.js"></script>
+<script src="/assets/js/lunr/lunr-en.js"></script>
+
+
+
+
+
+
+
+  </body>
+</html>

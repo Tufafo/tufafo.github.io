@@ -1,0 +1,666 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.24.0 by Michael Rose
+  Copyright 2013-2020 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="zh" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>Clojure配置 - 甲与</title>
+<meta name="description" content="简介">
+
+
+  <meta name="author" content="甲与">
+  
+  <meta property="article:author" content="甲与">
+  
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:site_name" content="甲与">
+<meta property="og:title" content="Clojure配置">
+<meta property="og:url" content="http://localhost:4000/clojure%E9%85%8D%E7%BD%AE/">
+
+
+  <meta property="og:description" content="简介">
+
+
+
+  <meta property="og:image" content="http://localhost:4000/assets/images/wallhaven-o5e1jm.png">
+
+
+
+
+
+  <meta property="article:published_time" content="2023-12-20T00:00:00+08:00">
+
+
+
+
+
+
+<link rel="canonical" href="http://localhost:4000/clojure%E9%85%8D%E7%BD%AE/">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": "甲与",
+      "url": "http://localhost:4000/"
+    
+  }
+</script>
+
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+
+  <link href="/feed.xml" type="application/atom+xml" rel="alternate" title="甲与 Feed">
+
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css"></noscript>
+
+
+
+    <!-- start custom head snippets -->
+
+<script type="text/javascript" async
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+  </head>
+
+  <body class="layout--single">
+    <nav class="skip-links">
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">转到主导航栏</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">转到内容</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">转到底部</a></li>
+  </ul>
+</nav>
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+        <a class="site-title" href="/">
+          甲与
+          
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/tags/">分类</a>
+            </li><li class="masthead__menu-item">
+              <a href="/year-archive/">归档</a>
+            </li></ul>
+        
+        <button class="search__toggle" type="button">
+          <span class="visually-hidden">切换搜索</span>
+          <i class="fas fa-search"></i>
+        </button>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">切换菜单</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+  
+
+
+
+
+
+
+
+<div class="page__hero"
+  style=" background-image: url('');"
+>
+  
+    <img src="/assets/images/wallhaven-o5e1jm.png" alt="Clojure配置" class="page__hero-image">
+  
+  
+</div>
+
+
+
+
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person" class="h-card">
+
+  
+    <div class="author__avatar">
+      <a href="http://localhost:4000/">
+        <img src="/assets/images/6.png" alt="甲与" itemprop="image" class="u-photo">
+      </a>
+    </div>
+  
+
+  <div class="author__content">
+    <h3 class="author__name p-name" itemprop="name">
+      <a class="u-url" rel="me" href="http://localhost:4000/" itemprop="url">甲与</a>
+    </h3>
+    
+      <div class="author__bio p-note" itemprop="description">
+        <p>记录一些随想。</p>
+
+      </div>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">关注</button>
+    <ul class="author__urls social-icons">
+      
+
+      
+        
+          
+        
+          
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer me">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+
+  <article class="page h-entry" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="Clojure配置">
+    <meta itemprop="description" content="简介">
+    <meta itemprop="datePublished" content="2023-12-20T00:00:00+08:00">
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title p-name" itemprop="headline">
+            <a href="http://localhost:4000/clojure%E9%85%8D%E7%BD%AE/" class="u-url" itemprop="url">Clojure配置
+</a>
+          </h1>
+          
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2023-12-20T00:00:00+08:00">December 20, 2023</time>
+      </span>
+    
+
+    
+
+    
+  </p>
+
+
+        </header>
+      
+
+      <section class="page__content e-content" itemprop="text">
+        
+          <aside class="sidebar__right ">
+            <nav class="toc">
+              <header><h4 class="nav__title"><i class="fas fa-cog"></i> 目录</h4></header>
+              <ul class="toc__menu"><li><a href="#简介">简介</a></li><li><a href="#安装clojure">安装Clojure</a></li><li><a href="#emacs环境">Emacs环境</a></li><li><a href="#启动环境">启动环境</a></li><li><a href="#语法">语法</a></li><li><a href="#参考以及相关链接">参考以及相关链接</a></li></ul>
+
+            </nav>
+          </aside>
+        
+        <h2 id="简介">简介</h2>
+
+<p>clojure是一种安装在java虚拟机上的lisp方言。最近想在linux环境上尝试clojure的语言，配合emacs使用。现在记录安装过程。</p>
+
+<p>环境Ubuntu20.04，emacs29。</p>
+
+<h2 id="安装clojure">安装Clojure</h2>
+
+<p>Ubuntu20.04环境下apt中本身就包含Clojure的安装包，所以直接安装clojure即可。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>apt <span class="nb">install </span>clojure
+<span class="nb">sudo </span>apt <span class="nb">install </span>leiningen
+<span class="nb">sudo </span>apt <span class="nb">install </span>default-jre
+</code></pre></div></div>
+
+<h2 id="emacs环境">Emacs环境</h2>
+
+<p>elisp代码如下，保存在配置文档 <code class="language-plaintext highlighter-rouge">/.emacs.d/init.el</code>：</p>
+
+<div class="language-elisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">;;clojure interactive development environment that rocks!</span>
+<span class="p">(</span><span class="nb">use-package</span> <span class="nv">cider</span>
+  <span class="ss">:ensure</span> <span class="no">t</span><span class="p">)</span>
+
+<span class="p">(</span><span class="nb">use-package</span> <span class="nv">lsp-treemacs</span>
+  <span class="ss">:ensure</span> <span class="no">t</span><span class="p">)</span>
+
+<span class="c1">;;语法检查</span>
+<span class="p">(</span><span class="nb">use-package</span> <span class="nv">flycheck</span>
+  <span class="ss">:ensure</span> <span class="no">t</span><span class="p">)</span>
+
+<span class="c1">;;自动补全</span>
+<span class="p">(</span><span class="nb">use-package</span> <span class="nv">company</span>
+  <span class="ss">:ensure</span> <span class="no">t</span><span class="p">)</span>
+
+<span class="c1">;;clojure主模式</span>
+<span class="p">(</span><span class="nb">use-package</span> <span class="nv">clojure-mode</span>
+  <span class="ss">:ensure</span> <span class="no">t</span>
+  <span class="ss">:config</span>
+  <span class="p">(</span><span class="nv">add-hook</span> <span class="ss">'clojure-mode-hook</span> <span class="ss">'lsp</span><span class="p">)</span>
+  <span class="p">(</span><span class="nv">add-hook</span> <span class="ss">'clojurescript-mode-hook</span> <span class="ss">'lsp</span><span class="p">)</span>
+  <span class="p">(</span><span class="nv">add-hook</span> <span class="ss">'clojurec-mode-hok</span> <span class="ss">'lsp</span><span class="p">))</span>
+
+<span class="p">(</span><span class="nb">use-package</span> <span class="nv">lsp-mode</span>
+  <span class="ss">:ensure</span> <span class="no">t</span>
+  <span class="ss">:config</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h2 id="启动环境">启动环境</h2>
+
+<p>在tmux中创建新的clojure工程：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>lein new myapp
+</code></pre></div></div>
+
+<p>启动该工程的repl：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cd myapp
+lein repl
+</code></pre></div></div>
+
+<p>在emacs中接入该工程：</p>
+
+<pre><code class="language-emacs">M-x cider RET
+cider-connect-clj RET
+localhost RET
+TAB RET
+</code></pre>
+
+<p>在repl中进行代码测试</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>myapp.core&gt; <span class="o">(</span>+ 3 5<span class="o">)</span>
+8
+</code></pre></div></div>
+
+<h2 id="语法">语法</h2>
+
+<p>关于语法，可以参考<a href="https://www.w3cschool.cn/clojure/clojure-j5w81wf2.html">W3Cschool, clojure教程</a> 《Programming Clojure》、 《 Web Development with Clojure, Third Edition》 等书籍。</p>
+
+<h2 id="参考以及相关链接">参考以及相关链接</h2>
+<ul>
+  <li><a href="https://www.w3cschool.cn/clojure/clojure-j5w81wf2.html">W3Cschool, clojure教程</a></li>
+  <li><a href="https://clojure.org/guides/install_clojure">clojure官网安装教程</a></li>
+  <li><a href="https://emacs-lsp.github.io/lsp-mode/tutorials/clojure-guide/">Configure Emacs as a Clojure IDE</a></li>
+</ul>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+  
+
+
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fas fa-fw fa-tags" aria-hidden="true"></i> 标签: </strong>
+    <span itemprop="keywords">
+    
+      <a href="/tags/#%E9%85%8D%E7%BD%AE" class="page__taxonomy-item p-category" rel="tag">配置</a>
+    
+    </span>
+  </p>
+
+
+
+
+        
+
+  <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> 更新时间:</strong> <time class="dt-published" datetime="2023-12-20T00:00:00+08:00">December 20, 2023</time></p>
+
+      </footer>
+
+      
+
+      
+  <nav class="pagination">
+    
+      <a href="/emacs%E9%85%8D%E7%BD%AE/" class="pagination--pager" title="Emacs配置
+">上一页</a>
+    
+    
+      <a href="/lisp%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95-%E6%8C%87%E9%92%88%E4%B8%8E%E5%87%BD%E6%95%B0/" class="pagination--pager" title="Lisp基础语法：指针与函数
+">下一页</a>
+    
+  </nav>
+
+    </div>
+
+    
+  </article>
+
+  
+  
+    <div class="page__related">
+      <h2 class="page__related-title">猜您还喜欢</h2>
+      <div class="grid__wrapper">
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/hbase-%E9%85%8D%E7%BD%AE-(%E5%A4%B1%E8%B4%A5)/" rel="permalink">Hbase 配置 (失败)
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2024-04-15T00:00:00+08:00">April 15, 2024</time>
+      </span>
+    
+
+    
+
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">目标
+</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/tlaplus-%E7%94%B5%E6%8A%A5%E9%97%AE%E9%A2%98/" rel="permalink">Tlaplus：电报问题
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2024-03-14T00:00:00+08:00">March 14, 2024</time>
+      </span>
+    
+
+    
+
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">在一个小编程中测试tlaplus。
+</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/tlaplus-Pluscal/" rel="permalink">Tlaplus pluscal
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2024-03-13T00:00:00+08:00">March 13, 2024</time>
+      </span>
+    
+
+    
+
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">探索一下 tlaplus pluscal 的基本功能。
+</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/calibre-server-%E9%85%8D%E7%BD%AE/" rel="permalink">Calibre server 配置
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2024-02-25T00:00:00+08:00">February 25, 2024</time>
+      </span>
+    
+
+    
+
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">calibre-server是一种非常便利的线上电子阅读服务。
+之前的服务器到期了，现在重新配置了calibre-server，整理一下操作步骤。
+</p>
+  </article>
+</div>
+
+        
+      </div>
+    </div>
+  
+  
+</div>
+
+    </div>
+
+    
+      <div class="search-content">
+        <div class="search-content__inner-wrap"><form class="search-content__form" onkeydown="return event.key != 'Enter';" role="search">
+    <label class="sr-only" for="search">
+      输入您要搜索的关键词...
+    </label>
+    <input type="search" id="search" class="search-input" tabindex="-1" placeholder="输入您要搜索的关键词..." />
+  </form>
+  <div id="results" class="results"></div></div>
+
+      </div>
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+<!-- end custom footer snippets -->
+
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+      <li><strong>关注:</strong></li>
+    
+
+    
+
+    
+      <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+    
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2024 甲与. 技术来自于 <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+
+
+
+
+<script src="/assets/js/lunr/lunr.min.js"></script>
+<script src="/assets/js/lunr/lunr-store.js"></script>
+<script src="/assets/js/lunr/lunr-en.js"></script>
+
+
+
+
+
+
+
+  </body>
+</html>

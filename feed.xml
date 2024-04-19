@@ -1,23 +1,2494 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.3">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2024-03-26T15:24:43+08:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">甲与</title><subtitle>用来记录一些编程经验</subtitle><author><name>甲与</name></author><entry><title type="html">测试</title><link href="http://localhost:4000/2024/03/26/first-post.html" rel="alternate" type="text/html" title="测试" /><published>2024-03-26T00:00:00+08:00</published><updated>2024-03-26T00:00:00+08:00</updated><id>http://localhost:4000/2024/03/26/first-post</id><content type="html" xml:base="http://localhost:4000/2024/03/26/first-post.html"><![CDATA[<div id="outline-container-org7d05172" class="outline-2">
-<h2 id="org7d05172"><span class="section-number-2">1.</span> 测试</h2>
-<div class="outline-text-2" id="text-1">
-<p>
-这是一份测试文件。
-</p>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.3">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2024-04-19T08:51:26+08:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">甲与</title><author><name>甲与</name></author><entry><title type="html">Hbase 配置 (失败)</title><link href="http://localhost:4000/hbase-%E9%85%8D%E7%BD%AE-(%E5%A4%B1%E8%B4%A5)/" rel="alternate" type="text/html" title="Hbase 配置 (失败)" /><published>2024-04-15T00:00:00+08:00</published><updated>2024-04-15T00:00:00+08:00</updated><id>http://localhost:4000/hbase%20%E9%85%8D%E7%BD%AE%20(%E5%A4%B1%E8%B4%A5)</id><content type="html" xml:base="http://localhost:4000/hbase-%E9%85%8D%E7%BD%AE-(%E5%A4%B1%E8%B4%A5)/"><![CDATA[<h2 id="目标">目标</h2>
 
-<p>
-第一次的
-</p>
+<p>熟悉hbase配置的基本流程</p>
+
+<h2 id="集群部署">集群部署</h2>
+
+<h3 id="环境说明">环境说明</h3>
+
+<p>两台ubuntu20.04 VPS。</p>
+
+<h3 id="hadoop">hadoop</h3>
+
+<ol>
+  <li>在两个vps中用 <code class="language-plaintext highlighter-rouge">ssh-keygen -t rsa</code> 命令生成密匙文件，复制到另一个vps的 <code class="language-plaintext highlighter-rouge">~/.ssh/authorized_keys</code> 中，实现免密登录。</li>
+  <li>在<code class="language-plaintext highlighter-rouge">/etc/hosts</code> 中修改ip-主机名映射关系。在<code class="language-plaintext highlighter-rouge">/etc/hostname</code>文件中修改主机名，<code class="language-plaintext highlighter-rouge">reboot</code> 使主机名修改生效。</li>
+  <li>下载<a href="https://jdk.java.net/java-se-ri/11">jdk-11</a>并解压，增加JAVA_HOME 到 <code class="language-plaintext highlighter-rouge">~/.bashrc</code> 文件中，用<code class="language-plaintext highlighter-rouge">source</code> 命令使之生效。</li>
+  <li>从官网下载<a href="https://hadoop.apache.org/releases.html">hadoop-3.9.2</a>版本并解压。</li>
+</ol>
+
+<ul>
+  <li>
+    <p>修改文件</p>
+  </li>
+  <li>
+    <p>hadoop-env.sh 增加内容</p>
+  </li>
+</ul>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">export </span><span class="nv">JAVA_HOME</span><span class="o">=</span>/root/src/jdk-11
+<span class="nv">HDFS_DATANODE_USER</span><span class="o">=</span>root
+<span class="nv">HDFS_NAMENODE_USER</span><span class="o">=</span>root
+<span class="nv">HDFS_SECONDARYNAMENODE_USER</span><span class="o">=</span>root
+</code></pre></div></div>
+
+<ul>
+  <li>core-site.xml 修改配置</li>
+</ul>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;configuration&gt;</span>
+	<span class="nt">&lt;property&gt;</span>
+		<span class="nt">&lt;name&gt;</span>fs.defaultFS<span class="nt">&lt;/name&gt;</span>
+		<span class="nt">&lt;value&gt;</span>hdfs://G:9000<span class="nt">&lt;/value&gt;</span>
+	<span class="nt">&lt;/property&gt;</span>
+	<span class="nt">&lt;property&gt;</span>
+		<span class="nt">&lt;name&gt;</span>hadoop.tmp.dir<span class="nt">&lt;/name&gt;</span>
+		<span class="nt">&lt;value&gt;</span>/root/data/tmp<span class="nt">&lt;/value&gt;</span>
+	<span class="nt">&lt;/property&gt;</span>
+<span class="nt">&lt;/configuration&gt;</span>
+</code></pre></div></div>
+
+<ul>
+  <li>hdfs-site.xml 修改配置</li>
+</ul>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;configuration&gt;</span>
+	<span class="nt">&lt;property&gt;</span>
+		<span class="nt">&lt;name&gt;</span>dfs.namenode.name.dir<span class="nt">&lt;/name&gt;</span>
+		<span class="nt">&lt;value&gt;</span>/root/data/namenode<span class="nt">&lt;/value&gt;</span>
+	<span class="nt">&lt;/property&gt;</span>
+	
+	<span class="nt">&lt;property&gt;</span>
+	<span class="nt">&lt;name&gt;</span>dfs.datanode.data.dir<span class="nt">&lt;/name&gt;</span>
+		<span class="nt">&lt;value&gt;</span>/root/data/datanode<span class="nt">&lt;/value&gt;</span>
+	<span class="nt">&lt;/property&gt;</span>
+	<span class="nt">&lt;property&gt;</span>
+	<span class="nt">&lt;name&gt;</span>dfs.replication<span class="nt">&lt;/name&gt;</span>
+		<span class="nt">&lt;value&gt;</span>2<span class="nt">&lt;/value&gt;</span>
+	<span class="nt">&lt;/property&gt;</span>
+<span class="nt">&lt;/configuration&gt;</span>
+</code></pre></div></div>
+
+<ul>
+  <li>workers 修改配置</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>G
+J
+</code></pre></div></div>
+
+<p>用<code class="language-plaintext highlighter-rouge">scp</code> 命令同步VPS文件修改。</p>
+
+<ol>
+  <li>
+    <p>格式化： <code class="language-plaintext highlighter-rouge">/path/to/hadoop/bin/hdfs namenode -format</code></p>
+  </li>
+  <li>
+    <p>启动hdfs：<code class="language-plaintext highlighter-rouge">/path/to/hadoop/sbin/start-dfs.sh</code>，访问9870端口查看hdfs是否正常启动。</p>
+  </li>
+</ol>
+
+<p><img src="/assets/post_images/Pasted image 20240414073338.png" alt="123" /></p>
+<ol>
+  <li>启动yarn：</li>
+</ol>
+
+<ul>
+  <li>hadoop-env.sh 增加内容：</li>
+</ul>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">export </span><span class="nv">YARN_RESOURCEMANAGER_USER</span><span class="o">=</span>root
+<span class="nb">export </span><span class="nv">YARN_NODEMANAGER_USER</span><span class="o">=</span>root
+</code></pre></div></div>
+
+<ul>
+  <li>yarn-site.xml 增加内容：</li>
+</ul>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;property&gt;</span>
+	<span class="nt">&lt;name&gt;</span>yarn.resourcemanager.hostname<span class="nt">&lt;/name&gt;</span>
+	<span class="nt">&lt;value&gt;</span>G<span class="nt">&lt;/value&gt;</span>
+<span class="nt">&lt;/property&gt;</span>
+</code></pre></div></div>
+
+<ul>
+  <li>执行命令：<code class="language-plaintext highlighter-rouge">/path/to/hadoop/sbin/start-yarn.sh</code>，访问8088端口查看yarn是否正常工作：</li>
+</ul>
+
+<p><img src="/assets/post_images/Pasted image 20240414073731.png" alt="123" />
+可以看到，两个节点正常工作。</p>
+
+<h3 id="zookeeper">zookeeper</h3>
+
+<ol>
+  <li><code class="language-plaintext highlighter-rouge">weget</code>命令从官网下载<a href="https://zookeeper.apache.org/releases.html">zookeeper-3.9.2</a>并解压。</li>
+  <li>修改配置文件：</li>
+</ol>
+
+<ul>
+  <li>zoo.cfg in vps1</li>
+</ul>
+
+<pre><code class="language-cfg">tickTime=2000
+dataDir=/var/lib/zookeeper
+clientPort=2181
+initLimit=5
+syncLimit=2
+server.1=0.0.0.0:2888:3888
+server.2=J:2888:3888
+</code></pre>
+<ul>
+  <li>zoo.cfg in vps2</li>
+</ul>
+
+<pre><code class="language-cfg">tickTime=2000
+dataDir=/var/lib/zookeeper
+clientPort=2181
+initLimit=5
+syncLimit=2
+server.1=G:2888:3888
+server.2=0.0.0.0:2888:3888
+</code></pre>
+<ol>
+  <li>在两个vps分别执行<code class="language-plaintext highlighter-rouge">/path/to/zookeeper/bin/zkServer.sh start</code> 启动zookeeper。</li>
+  <li>执行<code class="language-plaintext highlighter-rouge">/path/to/zookeeper/bin/zkCli.sh -server 127.0.0.1:2181</code> <code class="language-plaintext highlighter-rouge">ls /</code> 确保 zookeeper 工作。
+    <h3 id="hbase">hbase</h3>
+  </li>
+  <li>官网下载<a href="https://hbase.apache.org/downloads.html">hbase-2.5.8</a>并解压。</li>
+  <li>修改文件
+    <ul>
+      <li>在hbase-site.xml中
+```xml</li>
+    </ul>
+  </li>
+</ol>
+<property>
+    <name>hbase.cluster.distributed</name>
+    <value>true</value>
+  </property>
+<property>
+    <name>hbase.tmp.dir</name>
+    <value>/root/data/hbase/tmp</value>
+  </property>
+<property>
+    <name>hbase.unsafe.stream.capability.enforce</name>
+    <value>false</value>
+  </property>
+<property>
+    <name>hbase.zookeeper.quorum</name>
+    <value>G,J</value>
+  </property>
+<property>
+    <name>hbase.zookeeper.property.dataDir</name>
+    <value>/root/data/zookeeper</value>
+  </property>
+<property>
+    <name>hbase.zookeeper.property.clientPort</name>
+    <value>2181</value>
+  </property>
+<property>
+    <name>hbase.master.info.port</name>
+    <value>16010</value>
+  </property>
+<p>&lt;/configuration&gt;</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+- 在conf/regionservers文件中增加：
+</code></pre></div></div>
+<p>G
+J</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+- 在conf/文件夹下新建文件backup-masters，内容为：
+</code></pre></div></div>
+<p>J</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- 替换hadoop-jar包
+```bash
+rm /path/to/hbase/lib/hadoop*.jar
+find /path/to/hadoop/share/hadoop -name "hadoop*.jar" | xargs -i cp {} /path/to/hbase/lib/
+</code></pre></div></div>
+
+<ul>
+  <li>scp命令同步文件
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>scp /path/to/hbase root@J:/path/to/habase
+</code></pre></div>    </div>
+  </li>
+  <li>链接文件
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">ln</span> <span class="nt">-s</span> /path/to/hadoop/etc/hadoop/core-site.xml  /path/to/hbase/conf/core-site.xml
+<span class="nb">ln</span> <span class="nt">-s</span> /path/to/hadoop/etc/hadoop/hdfs-site.xml  /path/to/hbase/conf/hdfs-site.xml
+</code></pre></div>    </div>
+    <ol>
+      <li>启动服务：<code class="language-plaintext highlighter-rouge">/path/to/hbase/bin/start-hbase.sh</code></li>
+      <li>访问端口：16010查看hbase是否正常工作。</li>
+    </ol>
+  </li>
+</ul>
+
+<p><img src="/assets/post_images/20240414-b.png" alt="" /></p>
+<ul>
+  <li>jps查看系统状态：</li>
+</ul>
+
+<p>从节点：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>root@J:~# jps
+1314 DataNode
+1843 QuorumPeerMain
+1597 NodeManager
+7454 Jps
+</code></pre></div></div>
+<p>主节点：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>root@G:~/src/hbase-2.5.8/conf# jps
+11009 Jps
+1330 NameNode
+2467 SecondaryNameNode
+3285 QuorumPeerMain
+2845 NodeManager
+2670 ResourceManager
+</code></pre></div></div>
+
+<p>问题：主节点Hmaster 和 HReigonServer 进程丢失，从节点HreigonServer 丢失。</p>
+
+<p>在 Hbase中输入指令，只返回错误：</p>
+
+<p><img src="/assets/post_images/20240414-c.png" alt="" /></p>
+
+<h2 id="总结">总结</h2>
+
+<ul>
+  <li>目前尝试过的解决策略包括：</li>
+</ul>
+
+<ol>
+  <li><a href="https://segmentfault.com/q/1010000000606670">全分布式HBase启动后HMaster和HRegionServer自动消失</a> ：删除<code class="language-plaintext highlighter-rouge">/etc/hosts</code> 中的127.0.0.1行，失败。</li>
+  <li><a href="https://blog.csdn.net/weixin_34238633/article/details/91907325">regionserver.HRegionServer: Failed construction RegionServer</a>：复制<code class="language-plaintext highlighter-rouge">/path/to/hbase/lib/client-facing-thirdparty</code> 下的 <code class="language-plaintext highlighter-rouge">htrace-core-3.1.0</code> 到 <code class="language-plaintext highlighter-rouge">/path/to/hbase/lib</code> 目录中，失败。</li>
+</ol>
+
+<p>hbase 的日志文件<code class="language-plaintext highlighter-rouge">hbase-root-master-G.log</code> 报错如下：</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>2024-04-14T14:47:17,496 ERROR [main] regionserver.HRegionServer: Failed construction RegionServer
+java.lang.StackOverflowError: null
+        at java.util.concurrent.locks.AbstractQueuedSynchronizer.release(AbstractQueuedSynchronizer.java:1302) ~[?:?]
+        at java.util.concurrent.locks.ReentrantLock.unlock(ReentrantLock.java:439) ~[?:?]
+        at java.util.concurrent.LinkedBlockingDeque.offerLast(LinkedBlockingDeque.java:355) ~[?:?]
+        at java.util.concurrent.LinkedBlockingDeque.addLast(LinkedBlockingDeque.java:325) ~[?:?]
+</code></pre></div></div>
+
+<ul>
+  <li>进一步解决策略</li>
+</ul>
+
+<p>关于hbase和zookeeper，由于已经通过shell和web界面验证过，应无配置问题。有可能是hadoop、hbase和zookeeper版本之间的不兼容，或者仍然存在habase的配置错误。一方面可以在查询资料，重新检验配置文件，另一方面可以考虑伪分布式来继续实验。</p>
+
+<h2 id="参考">参考</h2>
+
+<ul>
+  <li><a href="https://blog.csdn.net/qq_27525611/article/details/108114893">CSDN: Hadoop完整搭建过程（四）：完全分布模式（服务器）</a></li>
+  <li><a href="https://zookeeper.apache.org/doc/current/zookeeperStarted.html">ZooKeeper Getting Started Guide</a></li>
+  <li><a href="https://stackoverflow.com/questions/30940981/zookeeper-error-cannot-open-channel-to-x-at-election-address">Zookeeper error: Cannot open channel to X at election address</a></li>
+  <li><a href="https://hbase.apache.org/book.html">Hbase refference guide 2.4:Fully Distributed for Production</a></li>
+  <li><a href="https://segmentfault.com/q/1010000000606670">全分布式HBase启动后HMaster和HRegionServer自动消失</a></li>
+  <li><a href="https://blog.csdn.net/weixin_34238633/article/details/91907325">regionserver.HRegionServer: Failed construction RegionServer</a></li>
+</ul>]]></content><author><name>甲与</name></author><category term="失败" /><category term="分布式" /><summary type="html"><![CDATA[目标]]></summary></entry><entry><title type="html">Tlaplus：电报问题</title><link href="http://localhost:4000/tlaplus-%E7%94%B5%E6%8A%A5%E9%97%AE%E9%A2%98/" rel="alternate" type="text/html" title="Tlaplus：电报问题" /><published>2024-03-14T00:00:00+08:00</published><updated>2024-03-14T00:00:00+08:00</updated><id>http://localhost:4000/tlaplus%EF%BC%9A%E7%94%B5%E6%8A%A5%E9%97%AE%E9%A2%98</id><content type="html" xml:base="http://localhost:4000/tlaplus-%E7%94%B5%E6%8A%A5%E9%97%AE%E9%A2%98/"><![CDATA[<p>在一个小编程中测试tlaplus。</p>
+
+<h2 id="电报问题描述">电报问题描述</h2>
+
+<p>现在请你设计一个电报交换系统，包括以下几个条件：</p>
+
+<ul>
+  <li>每一个电报只能在银行中两个不同的人间进行传递，而且每个电报至少一美元。</li>
+  <li>如果电报是成功的，那么电报的值便会从发送者方减去，而加在接收方的账户中。</li>
+  <li>如果电报失败，两个账户将没有任何改变。</li>
+  <li>电报不能让任何一个账户是负值。</li>
+  <li>多个电报可能同时发生。</li>
+</ul>
+
+<h2 id="单进程建模">单进程建模</h2>
+
+<h3 id="单进程代码">单进程代码</h3>
+
+<pre><code class="language-PlusCal">EXTENDS Integers
+
+(*--algorithm wire
+variables
+    people = {"Zhang", "Wang"},
+    acc = [p \in people |-&gt; 5],
+    sender = "Zhang",
+    reciver = "Wang",
+    amount \in 1..4;
+        
+define
+        NoOverdrafts == \A p \in people: acc[p] &gt;= 0
+end define;
+
+begin
+    Withdraw:
+        acc[sender] := acc[sender] - amount;
+    Deposite:
+        acc[reciver] := acc[reciver] + amount;
+end algorithm;**)
+</code></pre>
+
+<h3 id="报错情况设置">报错情况设置</h3>
+
+<p>其中，如果修改 amount 的值为 范围 1..6，则会报错。</p>
+
+<p>因为小张和小王的初始金额都是5，如果一次电报发送6美元，无论谁发都会出现负值。</p>
+
+<p>不过有意思的是错误数量。</p>
+
+<p>分别试试把 <code class="language-plaintext highlighter-rouge">amount</code> 设为 1..7，1..9看看吧。</p>
+
+<p>可以看到的是，错误检测始终只报出一个错误，似乎是检测到错误就停止了。但是可区分的状态却有所不同。</p>
+
+<ul>
+  <li>Diameter，States Found，Distinct State，Queue Size分别是什么？有什么方法可以在无错状态下查看执行路径？</li>
+</ul>
+
+<h2 id="多进程处理">多进程处理</h2>
+
+<h3 id="多进程代码">多进程代码</h3>
+
+<pre><code class="language-PlusCal">EXTENDS Integers
+
+(*--algorithm wire
+variables
+    people = {"Zhang", "Wang"},
+    acc = [p \in people |-&gt; 5];
+        
+define
+        NoOverdrafts == \A p \in people: acc[p] &gt;= 0
+end define;
+
+process Wire \in 1..2
+    variables
+        sender = "Zhang",
+        reciver = "Wang",
+        amount \in 1..acc[sender];
+
+begin
+    CheckFonds:
+        if amount &lt;= acc[sender] then
+            Withdraw:
+                acc[sender] := acc[sender] - amount;
+            Deposit:
+                acc[reciver] := acc[reciver] + amount;
+        end if;
+end process;
+
+end algorithm;**)
+
+</code></pre>
+
+<h3 id="error-trace">Error Trace</h3>
+
+<p>执行上述代码，我们来看看 Error Trace 是什么样的吧。</p>
+
+<p>看完这些，你会发现，pc代表机器所处的状态。</p>
+
+<p>里面的两个值分别代表两个机器本身处于什么状态。</p>
+
+<p>那么这整个堆栈显示了什么错误呢？</p>
+
+<p>我们可以看到 amount 的值为<code class="language-plaintext highlighter-rouge">&lt;1, 5&gt;</code>，这意味着在该情形下，第一个进程要发1美元，第二个进程要发5美元过去。</p>
+
+<p>而错误发生在第四步到第五步之间。发生了什么呢？</p>
+
+<p>小张想给小王寄5美元钱，但是只有4美元，减去后发现账户余额变成负一美元。这种错误超过了<code class="language-plaintext highlighter-rouge">acc[p]&gt;0</code> 的约束条件。</p>
+
+<p>而这五个步骤中整体发生了什么呢？</p>
+
+<p>小张想给小王寄钱，在小王还没有收到钱时，小张第一次寄一美元，第二次寄五美元，账户变成负值。</p>
+
+<h3 id="把-check-和-withdraw-放在一起">把 Check 和 Withdraw 放在一起</h3>
+
+<p>那我们要怎样规避这些错误呢？</p>
+
+<p>来看看教材给出的方案吧。</p>
+
+<p>它把检查和账户减发送金额的步骤合在了一起。这样，当小张发送一美元完成检查时，由于金额一并被减去了，所以进程二检查时发送的金额不会再超过现有金额四美元。</p>
+
+<pre><code class="language-tla+">EXTENDS Integers
+
+(*--algorithm wire
+variables
+    people = {"Zhang", "Wang"},
+    acc = [p \in people |-&gt; 5];
+        
+define
+        NoOverdrafts == \A p \in people: acc[p] &gt;= 0
+end define;
+
+process Wire \in 1..2
+    variables
+        sender = "Zhang",
+        reciver = "Wang",
+        amount \in 1..acc[sender];
+
+begin
+    CheckAndWithDraw:
+        if amount &lt;= acc[sender] then
+                acc[sender] := acc[sender] - amount;
+            Deposit:
+                acc[reciver] := acc[reciver] + amount;
+        end if;
+end process;
+
+end algorithm;**)
 
 
-<div class="org-src-container">
-<pre class="src src-clojure">(defn a [])
-</pre>
-</div>
+\* BEGIN TRANSLATION
+</code></pre>
+
+<p>现在没有问题了。</p>
+
+<h2 id="temporal-properties-时间属性">Temporal Properties 时间属性</h2>
+
+<p>之后要做什么？</p>
+
+<p>整体金额不变的部分称为 <code class="language-plaintext highlighter-rouge">Temporal Properties</code> ，世俗的属性，时间的属性。而每次金额不变的属性称为 <code class="language-plaintext highlighter-rouge">invariants</code> ，也就是不变量。两者最大的区别目前看来是是否需要跨越不同的系统状态进行检查。 <code class="language-plaintext highlighter-rouge">invariants</code> 只需要在状态内检查属性就可以了。不过 <code class="language-plaintext highlighter-rouge">Temporal Properties</code> 则需要综合不同的系统状态考虑约束条件。</p>
+
+<p>语法格式变得奇怪了。</p>
+
+<p><code class="language-plaintext highlighter-rouge">EventuallyConsistent</code> ，最终不变的。</p>
+
+<ul>
+  <li>问题是在 <code class="language-plaintext highlighter-rouge">PlusCal</code> 中，<code class="language-plaintext highlighter-rouge">&lt;&gt;[]()</code> 是什么表达？</li>
+</ul>
+
+<p>来看看DuckDuckgo上有什么答案吧。</p>
+
+<p>首先来解释 <code class="language-plaintext highlighter-rouge">&lt;&gt;[]P</code> 这个表达的含义吧。</p>
+
+<p>根据<a href="https://www.learntla.com/core/temporal-logic.html">TLC手册</a>的表达，</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">语法</th>
+      <th>含义</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">[]P</code></td>
+      <td>P总为真</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">&lt;&gt;P</code></td>
+      <td>P最终为真</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">[]~P</code></td>
+      <td>P总为假</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">~[]P</code></td>
+      <td>P不总为真，有假的情况</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">&lt;&gt;[]P</code></td>
+      <td>最终P总为真（中间状态可以为假，但首尾状态应为真）</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">[]&lt;&gt;P</code></td>
+      <td>P总最终为真</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>看起来真是相当复杂的表述。</p>
+
+<p>那么这种可能性中发生了什么呢？</p>
+
+<p><img src="/assets/post_images/image-20240415192831616.png" alt="" /></p>
+
+<ul>
+  <li>恩……为什么小王没有收到最后一元呢？</li>
+</ul>
+
+<p>系统进行到第五步的时候出错了。</p>
+
+<p>大概意思可能是，在状态4，进程2停止时，按照 <code class="language-plaintext highlighter-rouge">EventuallyConsistent</code> 的声明，系统总金额应该“最终”等于10。不过由于另一个进程的1元还没有送到，所以系统状态违反了时间属性的约束，就报错了。</p>
+
+<ul>
+  <li>那有什么处理方法吗？</li>
+</ul>
+
+<p>作者说，可以放松 <code class="language-plaintext highlighter-rouge">NoOverdrafts</code>或 <code class="language-plaintext highlighter-rouge">EventuallyConsistent</code>  条件，尝试不同的执行，告诉TLCplus在 <code class="language-plaintext highlighter-rouge">withdraw</code> 和 <code class="language-plaintext highlighter-rouge">deposit</code> 之间不能 <code class="language-plaintext highlighter-rouge">stutter</code>，或者干脆把 <code class="language-plaintext highlighter-rouge">check</code>，<code class="language-plaintext highlighter-rouge">withdraw</code> 和 <code class="language-plaintext highlighter-rouge">deposit</code> 三个步骤组成一个原子。</p>
+
+<h2 id="参考书籍">参考书籍</h2>
+
+<ul>
+  <li>Pratical TLA+, by Hilllel Wayne</li>
+</ul>]]></content><author><name>甲与</name></author><category term="形式化验证" /><summary type="html"><![CDATA[在一个小编程中测试tlaplus。]]></summary></entry><entry><title type="html">Tlaplus pluscal</title><link href="http://localhost:4000/tlaplus-Pluscal/" rel="alternate" type="text/html" title="Tlaplus pluscal" /><published>2024-03-13T00:00:00+08:00</published><updated>2024-03-13T00:00:00+08:00</updated><id>http://localhost:4000/tlaplus%20Pluscal</id><content type="html" xml:base="http://localhost:4000/tlaplus-Pluscal/"><![CDATA[<p>探索一下 tlaplus pluscal 的基本功能。</p>
+
+<h2 id="q1pluscal代码的基本格式是怎样的">Q1：Pluscal代码的基本格式是怎样的？</h2>
+
+<p>一个标准的Pluscal代码由以下几部分组成。</p>
+
+<pre><code class="language-tla+">---- (1) MODULE wire ----
+EXTENDS Integers \* (2)
+(*--algorithm wire \* (3)
+    variables (4)
+        people = {"alice", "bob"},
+        acc = [alice |-&gt; 5, bob |-&gt; 5];
+begin \* (5)
+    skip;
+end algorithm;*) (3)
+==== \* (1)
+</code></pre>
+
+<p>可以看到，一个标准的 Pluscal 代码由上述五部分组成。</p>
+
+<h3 id="1首尾标识和模型名">（1）首尾标识和模型名</h3>
+
+<pre><code class="language-tla+">---- MODULE name ----
+contents of pluscal
+====
+</code></pre>
+
+<h3 id="2导入的包名">（2）导入的包名</h3>
+
+<pre><code class="language-tla+">EXTENDS Package-names
+</code></pre>
+
+<p>常用的包有：Integers, …</p>
+
+<h3 id="3算法的起止声明用注释声明形式">（3）算法的起止声明，用注释+声明形式</h3>
+<pre><code class="language-tla+">(*--algorithm name
+...
+end algorithm;*)
+</code></pre>
+
+<h3 id="4变量声明">（4）变量声明</h3>
+<pre><code class="language-tla+">variables
+	var_1 = value_1,
+	var_2 = value_2,
+	...
+	var_n = value_n;
+</code></pre>
+
+<h3 id="5算法声明">（5）算法声明</h3>
+
+<pre><code class="language-tla+">begin
+	...;
+</code></pre>
+
+<h2 id="q2能不能在tla中测试语句">Q2：能不能在TLA+中测试语句？</h2>
+
+<p>tla+中的表达要么是 <strong>值</strong>（value），要么是 <strong>操作符</strong>（operator）。</p>
+
+<p>在 <code class="language-plaintext highlighter-rouge">Module Checking Results</code> 栏目下可以看到 <code class="language-plaintext highlighter-rouge">Evaluate Constant Expression</code> 选项。在Expression 文本框中输入 tla+ 表达式，按 <code class="language-plaintext highlighter-rouge">F11</code> 即可在 Value 窗口查看语句执行结果。</p>
+
+<h2 id="q3tla-的基本操作符operators有哪些">Q3：tla+ 的基本操作符（operators）有哪些？</h2>
+
+<h3 id="1基础操作符">（1）基础操作符</h3>
+
+<p>直接看表好了：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>表达式</th>
+      <th>意义</th>
+      <th>例子</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">x = y</code></td>
+      <td>等于（Equal）</td>
+      <td><code class="language-plaintext highlighter-rouge">1 = 3</code> =&gt; <code class="language-plaintext highlighter-rouge">FALSE</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">x /= y</code></td>
+      <td>不等于（Not Equal）</td>
+      <td><code class="language-plaintext highlighter-rouge">1 /= 3</code> =&gt; <code class="language-plaintext highlighter-rouge">TRUE</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">x # y</code></td>
+      <td>不等于（Not Equal）</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">x /\ y</code></td>
+      <td>且（and）</td>
+      <td><code class="language-plaintext highlighter-rouge">TRUE /\ FALSE</code> =&gt; <code class="language-plaintext highlighter-rouge">FALSE</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">x \/ y</code></td>
+      <td>或（or）</td>
+      <td><code class="language-plaintext highlighter-rouge">TRUE \/ FALSE</code> =&gt; <code class="language-plaintext highlighter-rouge">TRUE</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">x := y</code></td>
+      <td>设置（Assignment）</td>
+      <td>only in pluscal</td>
+    </tr>
+  </tbody>
+</table>
+
+<blockquote>
+  <p><code class="language-plaintext highlighter-rouge">=</code> 和 <code class="language-plaintext highlighter-rouge">:=</code> 的区别是什么？</p>
+</blockquote>
+
+<p>在Pluscal 中，<code class="language-plaintext highlighter-rouge">x = y</code> 如果不是第一次声明x，意味着相等判断。如果是第一次声明x，则意味着初始化x的值。<code class="language-plaintext highlighter-rouge">x := y</code> 则意味着重新给 x 设定值。</p>
+
+<p>而在tla+中，<code class="language-plaintext highlighter-rouge">x = y</code> 的功能和Pluscal相同。但是重新赋值选项则以 <code class="language-plaintext highlighter-rouge">x' = new_vlue</code> 方式进行。</p>
+
+<h3 id="2集合">（2）集合</h3>
+
+<p>除了整数（Integers）之外，tla+还包括集合（set）、元组（tuples/sequences）、结构体（structures）和函数（functions）。</p>
+
+<blockquote>
+  <p><strong>集合</strong>的所有的元素都必须有相同的类型。
+例如 <code class="language-plaintext highlighter-rouge">A = {1, 2, 3}</code> 是合法的，因为所有元素都是整数。
+但是 <code class="language-plaintext highlighter-rouge">A = {1, 2, "3"}</code> 则是非法的，因为集合 A 中同时包含了整数和字符串两种数据类型。</p>
+</blockquote>
+
+<h4 id="集合操作符">集合操作符</h4>
+
+<p>那么在tla+中集合的基本操作符有那些呢？</p>
+
+<p>来看看表格吧：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>表达式</th>
+      <th>意义</th>
+      <th>例子</th>
+      <th>备注</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">x \in set</code></td>
+      <td>x 是集合set的元素</td>
+      <td><code class="language-plaintext highlighter-rouge">1 \in 1..3</code> =&gt; <code class="language-plaintext highlighter-rouge">TRUE</code></td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">x \notin set</code></td>
+      <td>x不是集合set的元素</td>
+      <td><code class="language-plaintext highlighter-rouge">1 \notin 1..3</code> =&gt; <code class="language-plaintext highlighter-rouge">FALSE</code></td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">set1 \subsetq set2</code></td>
+      <td>set1是集合set2的子集</td>
+      <td><code class="language-plaintext highlighter-rouge">{1, 3} \subsetq 1..3</code> =&gt; <code class="language-plaintext highlighter-rouge">TRUE</code></td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">set1 \union set2</code></td>
+      <td>求set1和set2的并集</td>
+      <td><code class="language-plaintext highlighter-rouge">{1, 3} \union {2}</code> =&gt; <code class="language-plaintext highlighter-rouge">{1, 2, 3}</code></td>
+      <td>其它表达：<code class="language-plaintext highlighter-rouge">\cup</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">set1 \intersect set2</code></td>
+      <td>求set1和set2的交集</td>
+      <td><code class="language-plaintext highlighter-rouge">{1, 3} \intersect {1, 4}</code> =&gt; <code class="language-plaintext highlighter-rouge">{1}</code></td>
+      <td>其它表达：<code class="language-plaintext highlighter-rouge">\cap</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">set1 \ set2</code></td>
+      <td>求set1和set2的差集</td>
+      <td><code class="language-plaintext highlighter-rouge">{1, 3} \ {3}</code> =&gt; <code class="language-plaintext highlighter-rouge">{1}</code></td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Cardinality(set)</code></td>
+      <td>求set的长度</td>
+      <td><code class="language-plaintext highlighter-rouge">Cardinality({1..8)</code> =&gt; 8</td>
+      <td>需要导入包 <code class="language-plaintext highlighter-rouge">FiniteSets</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>还有两种集合的遍历和映射表达方式。</p>
+
+<h4 id="集合过滤filter方式">集合过滤（filter）方式</h4>
+
+<p>集合过滤的基本表达方式为：<code class="language-plaintext highlighter-rouge">{x \in set: conditional}</code> ，意义是根据条件筛选集合中的元素。</p>
+
+<p>比如说：</p>
+
+<p><code class="language-plaintext highlighter-rouge">{x \in 1..8: x + 2 &gt; 3}</code> =&gt; <code class="language-plaintext highlighter-rouge">{2, 3, 4, 5, 6, 7, 8}</code></p>
+
+<blockquote>
+  <p>[!faq] 不过为什么 <code class="language-plaintext highlighter-rouge">1..8</code> 加上括号就会非法呢？</p>
+</blockquote>
+
+<p><code class="language-plaintext highlighter-rouge">{x \in {1..8}: x + 2 &gt; 3}</code> =&gt; wrong</p>
+
+<blockquote>
+  <p>[!bug] The `Evaluate Constant Expression� section�s evaluation failed.</p>
+
+  <p>Attempted to apply the operator overridden by the Java method
+public static tlc2.value.IntValue
+tlc2.module.Integers.Plus(tlc2.value.IntValue,tlc2.value.IntValue), but it produced the following error:
+argument type mismatch</p>
+</blockquote>
+
+<p>类型不匹配……java写的。</p>
+
+<p>如果在外面赋值的时候呢？</p>
+
+<p><code class="language-plaintext highlighter-rouge">1 \in {1..3}</code> 不会返回 <code class="language-plaintext highlighter-rouge">TRUE</code> 。</p>
+
+<p>换言之 <code class="language-plaintext highlighter-rouge">1..3</code> 本身就是一个集合。</p>
+
+<p>验证一下吧：</p>
+
+<p><code class="language-plaintext highlighter-rouge">Cardinality({1..3})</code> =&gt; 1</p>
+
+<p><code class="language-plaintext highlighter-rouge">Cardinality(1..3)</code> =&gt; 3</p>
+
+<p>果然如此。</p>
+
+<p>所以实际上 <code class="language-plaintext highlighter-rouge">{x \in {1..8}: ...}</code> 中 x的遍历实际上会遍历到 <code class="language-plaintext highlighter-rouge">{1, 2, 3, 4, 5, 6, 7, 8}</code> 这个集合本身。</p>
+
+<p>而在后面的 <code class="language-plaintext highlighter-rouge">x + 2 &gt; 3</code> 这个判断中， <code class="language-plaintext highlighter-rouge">&gt;</code> 需要两个参数为整数，第一个为集合，所以出现类型错误。</p>
+
+<p>好吧。</p>
+
+<h4 id="集合映射map方式">集合映射（map）方式</h4>
+
+<p>集合映射的表达方式是：<code class="language-plaintext highlighter-rouge">{expression: x \in set}</code>，意义是对集合中每个元素进行指定动作的处理。</p>
+
+<p>测试一下：</p>
+
+<p><code class="language-plaintext highlighter-rouge">{x + 1 : x \in 1..3}</code> =&gt; <code class="language-plaintext highlighter-rouge">{4, 5, 6}</code></p>
+
+<h4 id="对比rif和tla的集合操作">对比rif和tla+的集合操作</h4>
+
+<blockquote>
+  <p>[!faq] 那么集合过滤与集合映射与rif的区别何在呢？</p>
+</blockquote>
+
+<p>之前我曾经编写过rif函数，大概格式是：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nv">rlb-rif</span> <span class="o">'</span><span class="p">(</span><span class="mi">1</span><span class="o">,</span> <span class="mi">2</span><span class="o">,</span> <span class="mi">3</span><span class="p">)</span> <span class="o">'</span><span class="p">()</span>
+		 <span class="p">(</span><span class="nv">rlb-fip</span> <span class="p">(</span><span class="nv">r</span> <span class="nv">f</span><span class="p">)</span> <span class="p">(</span><span class="nb">&gt;</span> <span class="p">(</span><span class="nb">car</span> <span class="nv">r</span><span class="p">)</span> <span class="mi">2</span><span class="p">))</span>
+		 <span class="p">(</span><span class="nv">rlb-ted</span> <span class="p">(</span><span class="nv">r</span> <span class="nv">f</span><span class="p">)</span> <span class="p">(</span><span class="nb">+</span> <span class="mi">1</span> <span class="p">(</span><span class="nb">car</span> <span class="nv">r</span><span class="p">))))</span>
+<span class="c1">;;=&gt;'(1)</span>
+</code></pre></div></div>
+
+<p>tla+中的过滤和映射在我这里则是fip和ted。</p>
+
+<p>不过我还能找到之前的代码吗？</p>
+
+<p>找到了：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">;;动作执行局部函数</span>
+  <span class="p">(</span><span class="nb">defvar</span> <span class="nv">rlb-tedo</span> <span class="mi">0</span><span class="p">)</span>
+  <span class="p">(</span><span class="nv">rlb-solimi</span> <span class="nv">rlb-ted</span> <span class="p">(</span><span class="nv">hisos</span> <span class="k">&amp;rest</span> <span class="nv">body</span><span class="p">)</span>
+              <span class="o">`</span><span class="p">(</span><span class="k">progn</span>
+                 <span class="p">(</span><span class="nb">setf</span> <span class="nv">rlb-tedo</span> <span class="p">(</span><span class="nb">+</span> <span class="mi">1</span> <span class="nv">rlb-tedo</span><span class="p">))</span>
+                 <span class="p">(</span><span class="nb">setf</span> <span class="nv">rlb-rinafo</span> <span class="p">(</span><span class="nb">+</span> <span class="mi">1</span> <span class="nv">rlb-rinafo</span><span class="p">))</span>
+                 <span class="p">(</span><span class="k">lambda</span> <span class="o">,</span><span class="nv">hisos</span> <span class="o">,@</span><span class="nv">body</span><span class="p">)))</span>
+
+<span class="p">(</span><span class="nv">rlb-solimi</span> <span class="err">态势</span> <span class="p">(</span><span class="nv">hisos</span> <span class="k">&amp;rest</span> <span class="nv">body</span><span class="p">)</span>
+            <span class="o">`</span><span class="p">(</span><span class="nv">rlb-ted</span> <span class="o">,</span><span class="nv">hisos</span> <span class="o">,@</span><span class="nv">body</span><span class="p">))</span>
+
+<span class="c1">;;条件判断局部函数</span>
+  <span class="p">(</span><span class="nb">defvar</span> <span class="nv">rlb-fipo</span> <span class="mi">0</span><span class="p">)</span>
+  <span class="p">(</span><span class="nv">rlb-solimi</span> <span class="nv">rlb-fip</span> <span class="p">(</span><span class="nv">hisos</span> <span class="k">&amp;rest</span> <span class="nv">body</span><span class="p">)</span>
+              <span class="o">`</span><span class="p">(</span><span class="k">progn</span>
+                 <span class="p">(</span><span class="nb">setf</span> <span class="nv">rlb-fcipo</span> <span class="p">(</span><span class="nb">+</span> <span class="mi">1</span> <span class="nv">rlb-fipo</span><span class="p">))</span>
+                 <span class="p">(</span><span class="nb">setf</span> <span class="nv">rlb-rinafo</span> <span class="p">(</span><span class="nb">+</span> <span class="mi">1</span> <span class="nv">rlb-rinafo</span><span class="p">))</span>
+                 <span class="p">(</span><span class="k">lambda</span> <span class="o">,</span><span class="nv">hisos</span> <span class="o">,@</span><span class="nv">body</span><span class="p">)))</span>
+
+<span class="p">(</span><span class="nv">rlb-solimi</span> <span class="err">情境</span> <span class="p">(</span><span class="nv">hisos</span> <span class="k">&amp;rest</span> <span class="nv">body</span><span class="p">)</span>
+            <span class="o">`</span><span class="p">(</span><span class="nv">rlb-fip</span> <span class="o">,</span><span class="nv">hisos</span> <span class="o">,@</span><span class="nv">body</span><span class="p">))</span>
+
+<span class="c1">;;自此而彼按照指定条件和动作处理列表</span>
+  <span class="p">(</span><span class="nb">defvar</span> <span class="nv">rlb-rifo</span> <span class="mi">0</span><span class="p">)</span>
+  <span class="p">(</span><span class="nb">defun</span> <span class="nv">rlb-rifa_loyo</span> <span class="p">(</span><span class="nv">rino</span> <span class="nv">famo</span> <span class="nv">fipo</span> <span class="nv">tedo</span><span class="p">)</span>
+    <span class="p">(</span><span class="k">if</span> <span class="p">(</span><span class="nb">equal</span> <span class="no">nil</span> <span class="p">(</span><span class="nb">equal</span> <span class="p">(</span><span class="nb">car</span> <span class="nv">rino</span><span class="p">)</span> <span class="no">nil</span><span class="p">))</span>
+        <span class="p">(</span><span class="nv">rlb-rif</span> <span class="p">(</span><span class="nb">cdr</span> <span class="nv">rino</span><span class="p">)</span>
+                 <span class="p">(</span><span class="k">if</span> <span class="p">(</span><span class="nb">funcall</span> <span class="nv">fipo</span> <span class="nv">rino</span> <span class="nv">famo</span><span class="p">)</span>
+                     <span class="p">(</span><span class="nb">append</span>
+                      <span class="p">(</span><span class="nb">list</span> <span class="p">(</span><span class="nb">funcall</span> <span class="nv">tedo</span> <span class="nv">rino</span> <span class="nv">famo</span><span class="p">))</span> <span class="nv">famo</span><span class="p">)</span>
+                     <span class="nv">famo</span><span class="p">)</span>
+                 <span class="nv">fipo</span> <span class="nv">tedo</span><span class="p">)</span>
+        <span class="p">(</span><span class="k">progn</span>
+          <span class="p">(</span><span class="nb">setf</span> <span class="nv">rlb-rifo</span> <span class="p">(</span><span class="nb">+</span> <span class="mi">1</span> <span class="nv">rlb-rifo</span><span class="p">))</span>
+          <span class="p">(</span><span class="nb">setf</span> <span class="nv">rlb-rinafo</span> <span class="p">(</span><span class="nb">+</span> <span class="mi">1</span> <span class="nv">rlb-rinafo</span><span class="p">))</span>
+          <span class="nv">famo</span><span class="p">)))</span>
+  <span class="p">(</span><span class="nv">rlb-solimi</span> <span class="nv">rlb-rif</span> <span class="p">(</span><span class="nv">rino</span> <span class="nv">famo</span> <span class="nv">fipo</span> <span class="nv">tedo</span><span class="p">)</span>
+    <span class="o">`</span><span class="p">(</span><span class="nv">rlb-rifa_loyo</span> <span class="o">,</span><span class="nv">rino</span> <span class="o">,</span><span class="nv">famo</span> <span class="o">,</span><span class="nv">fipo</span> <span class="o">,</span><span class="nv">tedo</span><span class="p">))</span>
+
+<span class="p">(</span><span class="nv">rlb-solimi</span> <span class="err">迈进</span> <span class="p">(</span><span class="nv">rino</span> <span class="nv">famo</span> <span class="nv">fipo</span> <span class="nv">tedo</span><span class="p">)</span>
+            <span class="o">`</span><span class="p">(</span><span class="nv">rlb-rif</span> <span class="o">,</span><span class="nv">rino</span> <span class="o">,</span><span class="nv">famo</span> <span class="o">,</span><span class="nv">fipo</span> <span class="o">,</span><span class="nv">tedo</span><span class="p">))</span>
+
+</code></pre></div></div>
+
+<p>那么tla+能不能把遍历和过滤结合在一起呢？</p>
+
+<p><code class="language-plaintext highlighter-rouge">{e + 3 : e \in {e \in 1..9 : e &gt; 3}}</code> =&gt; <code class="language-plaintext highlighter-rouge">{7, 8, 9, 10, 11, 12}</code></p>
+
+<p>同样的功能，在rlisp中则要表达为：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nv">rlb-rif</span> <span class="o">'</span><span class="p">(</span><span class="mi">1</span><span class="o">,</span> <span class="mi">2</span><span class="o">,</span> <span class="mi">3</span><span class="o">,</span> <span class="mi">4</span><span class="o">,</span> <span class="mi">5</span><span class="o">,</span> <span class="mi">6</span><span class="o">,</span> <span class="mi">7</span><span class="o">,</span> <span class="mi">8</span><span class="o">,</span> <span class="mi">9</span><span class="p">)</span> <span class="o">'</span><span class="p">()</span>
+		 <span class="p">(</span><span class="nv">rlb-fip</span> <span class="p">(</span><span class="nv">r</span> <span class="nv">f</span><span class="p">)</span> <span class="p">(</span><span class="nb">&gt;</span> <span class="p">(</span><span class="nb">car</span> <span class="nv">r</span><span class="p">)</span> <span class="mi">3</span><span class="p">))</span>
+		 <span class="p">(</span><span class="nv">rlb-ted</span> <span class="p">(</span><span class="nv">r</span> <span class="nv">f</span><span class="p">)</span> <span class="p">(</span><span class="nb">+</span> <span class="p">(</span><span class="nb">car</span> <span class="nv">r</span><span class="p">)</span> <span class="mi">3</span><span class="p">)))</span>
+<span class="c1">;;=&gt;'(7, 8, 9, 10, 11, 12)</span>
+</code></pre></div></div>
+
+<p>不过最大的区别也许在于，tla+中集合要求所有元素都是相同的类型。但是，rlisp中的元素则是任意的。</p>
+
+<h3 id="3元组">（3）元组</h3>
+
+<h4 id="元组表达式">元组表达式</h4>
+
+<p>tla+中的元组表达形式为：<code class="language-plaintext highlighter-rouge">&lt;&lt;element_1, element_2, ...&gt;&gt;</code>。</p>
+
+<p>和集合不同，tla+的元组不需要所有元素都为相同的类型。</p>
+
+<p>可以通过 <code class="language-plaintext highlighter-rouge">元组名[位置]</code> 的方式来访问元组中的元素。例如：</p>
+
+<p>先进行简单测试来看看吧。</p>
+
+<p><code class="language-plaintext highlighter-rouge">&lt;&lt;1, 2, 1..3&gt;&gt;[3]</code> =&gt; <code class="language-plaintext highlighter-rouge">1..3</code>
+<code class="language-plaintext highlighter-rouge">&lt;&lt;1, {1, 3}, 2&gt;&gt;[2]</code> =&gt; <code class="language-plaintext highlighter-rouge">{1, 3}</code></p>
+
+<p>然后在模型中测试：</p>
+
+<pre><code class="language-tla+">
+(*--algorithm t2
+    variables
+        a = &lt;&lt;1, 2, {1, 4}&gt;&gt;;
+        
+define
+    Famo == &lt;&gt;(a = {1, 4})
+end define;
+
+begin
+    test:
+        a := a[3];
+end algorithm;*)   
+
+</code></pre>
+
+<blockquote>
+  <p>类型匹配错误！
+Attempted to check equality of the function «1, 2, {1, 4}» with the value:
+{1, 4}
+While working on the initial state:
+/\ a = «1, 2, {1, 4}»
+/\ pc = “test”</p>
+</blockquote>
+
+<p><del>也就是说，在test执行前，a仍为元组时，对于时间属性Famo的检测要求元组和元素通过 <code class="language-plaintext highlighter-rouge">=</code> 相匹配，结果报错。</del> 因为 <code class="language-plaintext highlighter-rouge">&lt;&gt;P</code> 这种表达要求时间属性首尾状态为真，所以a一开始赋值为 <code class="language-plaintext highlighter-rouge">&lt;&lt;1, 2, {1, 4}&gt;&gt;</code> 注定了它的错误。</p>
+
+<p>另一种检测方式：</p>
+
+<pre><code class="language-tla+">(*--algorithm t2
+    variables
+        a = &lt;&lt;1, 2, 3&gt;&gt;;
+        b = 3;
+        
+define
+    Famo == &lt;&gt;(b = 3)
+end define;
+
+begin
+    p1: b := a[1];
+    p2: b := a[2];
+    p3: b := a[3];
+end algorithm;*) 
+</code></pre>
+
+<h4 id="元组操作符">元组操作符</h4>
+
+<p>tla+ 提供了 <code class="language-plaintext highlighter-rouge">Sequences</code> 扩展包，包括以下操作符：</p>
+
+<p>| 操作符              | 意义            | 例子  |
+| —————- | ————- | — |
+| <code class="language-plaintext highlighter-rouge">Head(sequence)</code> | 获取序列的第一个元素    |     |
+| <code class="language-plaintext highlighter-rouge">Tail(sequence)</code> |               |     |
+| <code class="language-plaintext highlighter-rouge">Append(seq, x)</code> |               |     |
+| <code class="language-plaintext highlighter-rouge">seq1 \o seq2</code>   | 将序列1和序列2结合在一起 |     |
+| <code class="language-plaintext highlighter-rouge">Len(seq)</code>       | 获取序列长度        |     |</p>
+<h3 id="4结构体structs">（4）结构体（Structs）</h3>
+
+<p>在tla中，结构体的表达方式为：<code class="language-plaintext highlighter-rouge">[key_1 |-&gt; val_1, key_2 |-&gt; val_2, ...]</code></p>
+
+<p>结构体中的元素可以通过 <code class="language-plaintext highlighter-rouge">结构体名称.键名</code> 进行访问。</p>
+
+<p>例如：</p>
+
+<pre><code class="language-tla+">(*--algorithm t2
+    variables
+        Alice = [name |-&gt; "Alice", age |-&gt; 23];
+        See = 0;
+        
+define
+    Famo == &lt;&gt;(Alice.name = "Alice")
+end define;
+
+begin
+    p1: See := Alice.name;
+    p2: See := Alice.age;
+    p3: See := Alice.name;
+end algorithm;*)  
+</code></pre>
+
+<p>测试通过，Alice的名字自始至终是”Alice”。</p>
+
+<h2 id="q3算法主体">Q3：算法主体</h2>
+
+<h3 id="1assignment">（1）assignment</h3>
+
+<p>Pluscal 通过 <code class="language-plaintext highlighter-rouge">x := value</code> 表达来为变量赋新值。</p>
+
+<h3 id="2assert">（2）assert</h3>
+
+<p>使用assert语句需要导入 <code class="language-plaintext highlighter-rouge">TLC</code> 扩展包。</p>
+
+<p>assert可以通过假定某个变量的值来判断系统状态，用于begin之后的部分。例如我认为在p2状态Alice的名字是bob，结果出错：</p>
+
+<pre><code class="language-tla+">
+EXTENDS Integers, FiniteSets, TLC
+
+(*--algorithm t2
+    variables
+        Alice = [name |-&gt; "Alice", age |-&gt; 23];
+        See = 0;
+        
+define
+    Famo == &lt;&gt;(Alice.name = "Alice")
+end define;
+
+begin
+    p1: See := Alice.name;
+    p2: See := Alice.age;
+    assert Alice.name = "bob";
+    p3: See := Alice.name;
+end algorithm;*)   
+</code></pre>
+
+<p><img src="/img/user/%E5%9B%BE%E7%89%87/Pasted%20image%2020240318154452.png" alt="Pasted image 20240318154452.png" /></p>
+
+<h3 id="3skip">（3）skip</h3>
+
+<p>在函数主体中，skip表示什么都不做。例如：</p>
+
+<pre><code class="language-tla+">
+EXTENDS Integers, FiniteSets, TLC
+
+(*--algorithm t2
+    variables
+        Alice = [name |-&gt; "Alice", age |-&gt; 23];
+        
+define
+    Famo == &lt;&gt;(Alice.name = "Alice")
+end define;
+
+begin
+    AfterOneYear: Alice.age := Alice.age + 1;
+    AfterThreeYear: Alice.age := Alice.age + 3;
+    AfterTenYear: Alice.age := Alice.age + 10;
+    assert Alice.age = 27;
+end algorithm;*)   
+</code></pre>
+
+<p><img src="/img/user/%E5%9B%BE%E7%89%87/Pasted%20image%2020240318155412.png" alt="Pasted image 20240318155412.png" /></p>
+
+<p>在经过十年时，Alice的年龄由于+10而成为37，不同于假定。但是如果在经过十年时使用skip的话——却可以通过测试。</p>
+
+<h3 id="4if">（4）if</h3>
+
+<p>基本格式：</p>
+
+<pre><code class="language-tla+">if condition1 then
+  body
+elsif condition2 then
+  body
+else
+  body
+end if;
+</code></pre>
+
+<h3 id="5while">（5）while</h3>
+
+<p>基本格式：</p>
+
+<pre><code class="language-tla+">while condition do
+  body
+end while;
+</code></pre>
+
+<h3 id="6macros">（6）macros</h3>
+
+<p>tla+的macro感觉很像函数。需要注意的是，macro的定义在define之后。</p>
+
+<pre><code class="language-tla+">macro name(arg1, arg2) begin
+  \* assignments
+end macro;
+begin
+  name(x, y);
+end algorithm;
+</code></pre>
+
+<p>那么可不可以通过 macro 来定义fovis呢？</p>
+
+<p>先定义 IMMP（IsMiaMoviaPimo，此集处在维系位图中）吧：</p>
+
+<pre><code class="language-tla+">(*--algorithm t2
+    variables
+        Moko = [mio |-&gt; {1, 2, 3, 8}, vio |-&gt; {1, 2}, ilio |-&gt; {1, 2, 3, 4, 8}];
+        Judgement = FALSE
+
+define
+    Famo == &lt;&gt;(Judgement = FALSE)
+end define;
+
+macro IMMP(Moko) begin
+    Judgement := \A m \in Moko.mio : m \in Moko.ilio
+end macro;
+
+begin
+P1: IMMP(Moko);
+end algorithm;*)  
+</code></pre>
+
+<p><code class="language-plaintext highlighter-rouge">Moko.mio</code>中的元素都在 <code class="language-plaintext highlighter-rouge">Moko.ilio</code> 中，IMMP应为假，测试通过。接下来换几组数据试试看吧。</p>
+
+<p>| Moko.mio       | Moko.ilio      | Judgement | 解释          |
+| ————– | ————– | ——— | ———– |
+| <code class="language-plaintext highlighter-rouge">{1, 2, 3, 8}</code> | <code class="language-plaintext highlighter-rouge">{1, 2, 3, 4}</code> | <code class="language-plaintext highlighter-rouge">FALSE</code>   | 此集的8不在域中    |
+| <code class="language-plaintext highlighter-rouge">{1, 2, 3}</code>    | <code class="language-plaintext highlighter-rouge">{1, 2, 3, 4}</code> | <code class="language-plaintext highlighter-rouge">TRUE</code>    | 此集的所有元素都在域中 |
+由此得到 IMMP的宏定义：</p>
+
+<pre><code class="language-tla+">macro IMMP(Moko) begin
+    Judgement := \A m \in Moko.mio : m \in Moko.ilio
+end macro;
+</code></pre>
+
+<p>那么同样可以得到IVMP的宏定义：</p>
+
+<pre><code class="language-tla+">macro IVMP(Moko) begin
+    Judgement := \A m \in Moko.vio : m \in Moko.ilio
+end macro;
+</code></pre>
+
+<p>现在可以得到IFVP的宏定义：</p>
+
+<pre><code class="language-tla+">macro IFVP(Moko) begin
+    Judgement := IMMP(Moko) /\ IVMP(Moko)
+end macro;
+</code></pre>
+
+<p>不对，这样会出现错误，因为IMMP和IVMP都会修改Judgement的值。</p>
+
+<p>为什么不能让宏命令本身返回值呢？</p>
+
+<p>不能，Plucal的宏命令只能是 <code class="language-plaintext highlighter-rouge">:=</code> 的形式。</p>
+
+<p>那么为什么不把IVMP之类的语句放在定义里呢？</p>
+
+<pre><code class="language-tla+">EXTENDS Integers, FiniteSets, TLC
+
+(*--algorithm t2
+    variables
+        Mok = [mio |-&gt; {1, 2, 3, 8}, vio |-&gt; {1, 2}, ilio |-&gt; {1, 2, 3, 4}],
+        Judgement = TRUE;
+
+define
+    IMMP(Moko) == \A m \in Moko.mio : m \in Moko.ilio
+    IVMP(Moko) == \A m \in Moko.vio : m \in Moko.ilio
+end define;
+
+begin
+P1: Judgement := IMMP(Mok);
+
+end algorithm;*)   
+</code></pre>
+
+<p>不变量设置为Judgement，测试数据如下：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Moko.mio</th>
+      <th>Moko.ilio</th>
+      <th>Judgement</th>
+      <th>解释</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">{1, 2, 3, 8}</code></td>
+      <td><code class="language-plaintext highlighter-rouge">{1, 2, 3, 4}</code></td>
+      <td><code class="language-plaintext highlighter-rouge">FALSE</code></td>
+      <td>此集的8不在域中</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">{1, 2, 3}</code></td>
+      <td><code class="language-plaintext highlighter-rouge">{1, 2, 3, 4}</code></td>
+      <td><code class="language-plaintext highlighter-rouge">TRUE</code></td>
+      <td>此集的所有元素都在域中</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>这样定义要比集合差之类的简单多了。</p>
+
+<h2 id="q4多种开始状态">Q4：多种开始状态</h2>
+
+<p>代码格式：</p>
+
+<pre><code class="language-tla+">variables x in set
+</code></pre>
+
+<h2 id="q5with-和-either">Q5：With 和 Either</h2>
+
+<p>Either 语法格式</p>
+
+<pre><code class="language-tla+">either
+  \* branch 1
+or
+  \* branch 2
+  \* ...
+or
+  \* branch n
+end either;
+</code></pre>
+
+<p>With 语法格式</p>
+
+<pre><code class="language-tla+">with var = value do
+  \* body
+end with;
+\* or
+with var \in set do
+  \* body
+end with;
+</code></pre>
+
+<h2 id="参考">参考</h2>
+<ul>
+  <li>Pratical TLA+</li>
+</ul>]]></content><author><name>甲与</name></author><category term="TLAplus" /><summary type="html"><![CDATA[探索一下 tlaplus pluscal 的基本功能。]]></summary></entry><entry><title type="html">Calibre server 配置</title><link href="http://localhost:4000/calibre-server-%E9%85%8D%E7%BD%AE/" rel="alternate" type="text/html" title="Calibre server 配置" /><published>2024-02-25T00:00:00+08:00</published><updated>2024-02-25T00:00:00+08:00</updated><id>http://localhost:4000/calibre%20server%20%E9%85%8D%E7%BD%AE</id><content type="html" xml:base="http://localhost:4000/calibre-server-%E9%85%8D%E7%BD%AE/"><![CDATA[<p>calibre-server是一种非常便利的线上电子阅读服务。
+之前的服务器到期了，现在重新配置了calibre-server，整理一下操作步骤。</p>
+
+<h2 id="calibre-安装">calibre 安装</h2>
+
+<p>操作系统，debian <code class="language-plaintext highlighter-rouge">12 * 64</code></p>
+
+<p>安装依赖项。除了参考中列出的，本环境还缺少libxcb-cursor0：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>apt update <span class="o">&amp;&amp;</span> <span class="nb">sudo </span>apt <span class="nb">install</span> <span class="nt">-y</span> libfontconfig libgl1-mesa-glx libxcb-cursor0
+</code></pre></div></div>
+
+<p>从官网安装 calibre：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>wget https://download.calibre-ebook.com/linux-installer.sh
+</code></pre></div></div>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sh linux-installer.sh
+</code></pre></div></div>
+
+<p>书库安装在/opt/calibre目录下。</p>
+<h2 id="启动-calibre">启动 calibre</h2>
+
+<p>如果之前没有创建过书库的话，可以通过 <code class="language-plaintext highlighter-rouge">calibre-db</code> 命令创建新的电子书库。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>calibredb create_database <span class="o">[</span>path to booklib]
+</code></pre></div></div>
+
+<p>不过我现在的任务是恢复之前的书库。</p>
+
+<p>calibre server从8080端口进行网络服务，而vultr默认打开防火墙。现在需要开放服务器端口8080以允许流量通过：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ufw allow 8080
+</code></pre></div></div>
+
+<p>从备份书库启动 calibre-server：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>calibre-server <span class="o">[</span>booklib name]
+</code></pre></div></div>
+
+<p>从浏览器访问服务器 <code class="language-plaintext highlighter-rouge">http://ip:8080</code> <code class="language-plaintext highlighter-rouge">https://domain:8080</code> 以验证服务运行是否成功。</p>
+
+<h2 id="配置系统服务">配置系统服务</h2>
+
+<p>如果能成功从浏览器访问书库，进入下一步。创建系统配置文件 <code class="language-plaintext highlighter-rouge">/etc/systemd/system/calibre</code></p>
+
+<p>输入以下配置：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>## startup service
+[Unit]
+Description=calibre content server
+After=network.target
 
 
-<p>
-[123123]{: .notice&#x2013;info}
-</p>
-</div>
-</div>]]></content><author><name>甲与</name></author><category term="测试" /><summary type="html"><![CDATA[一份测试文件]]></summary></entry></feed>
+[Service]
+Type=simple
+User=[user-name]
+Group=[group-name]
+ExecStart=/opt/calibre/calibre-server [booklib-names]
+
+[Install]
+WantedBy=multi-user.target
+</code></pre></div></div>
+
+<p>其中 <code class="language-plaintext highlighter-rouge">user-name</code>、<code class="language-plaintext highlighter-rouge">group-name</code>、<code class="language-plaintext highlighter-rouge">booklib-names</code> 更换为本系统下用户名，用户组，书库名即可。如果有多个书库，以空格分开。</p>
+
+<p>保存该文件，应用和启动系统服务。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>systemctl <span class="nb">enable </span>calibre-server
+systemctl start calibre-server
+</code></pre></div></div>
+
+<p>calibre-server 支持用户认证。在系统服务文件的启动命令后增加 <code class="language-plaintext highlighter-rouge">--enable-auth</code> 配置</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>...
+ExecStart=/opt/calibre/calibre-server [booklib-names] --enable-auth
+...
+</code></pre></div></div>
+
+<p>现在，增加新的用户。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>calibre-server <span class="nt">--manage-users</span>
+</code></pre></div></div>
+
+<p>根据提示选择增加用户并输入用户名密码即可。</p>
+
+<p>重新启动 <code class="language-plaintext highlighter-rouge">calibre-server</code></p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>systemctl restart calibre-server
+</code></pre></div></div>
+
+<p>浏览服务端查看是否需要用户认证。</p>
+
+<h2 id="ssl配置">SSL配置</h2>
+
+<h3 id="应用apache2">应用apache2</h3>
+
+<p>认证成功后，现在为 <code class="language-plaintext highlighter-rouge">calibre-server</code> 增加SSL配置。</p>
+
+<p>首先安装 <code class="language-plaintext highlighter-rouge">apache2</code> 。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>apt <span class="nb">install </span>apache2
+</code></pre></div></div>
+
+<p>启动 <code class="language-plaintext highlighter-rouge">apache2</code> 代理模块。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>a2enmod proxy proxy_http
+</code></pre></div></div>
+
+<p>增加网络配置文件 <code class="language-plaintext highlighter-rouge">etc/apache2/sites-available/[domain].conf</code> ，输入以下内容：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>LoadModule proxy_module modules/mod_proxy.so
+LoadModule proxy_http_module modules/mod_proxy_http.so
+
+&lt;VirtualHost *:80&gt;
+    ServerName your_domain
+    AllowEncodedSlashes O
+    ProxyPreserveHost On
+    ProxyPass "/"  "http://localhost:8080/"
+&lt;/VirtualHost&gt;
+</code></pre></div></div>
+
+<p>重新设置防火墙。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ufw delete allow 8080
+ufw allow 80
+</code></pre></div></div>
+
+<p>删除默认网站并启动calibre网站。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>a2dissite 000-default
+a2ensite <span class="o">[</span>domian].conf
+systemctl reload apache2
+</code></pre></div></div>
+
+<p>通过访问 <code class="language-plaintext highlighter-rouge">http://[domain]</code> 验证网站是否配置成功。</p>
+
+<h3 id="增加ssl">增加SSL</h3>
+
+<p>现在利用 <code class="language-plaintext highlighter-rouge">certbot</code> 增加 SSL 认证。</p>
+
+<p>安装 <code class="language-plaintext highlighter-rouge">certbot</code> 依赖和 <code class="language-plaintext highlighter-rouge">certbot</code> 本体。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>apt <span class="nb">install </span>python3-certbot-apache
+apt <span class="nb">install </span>certbot
+</code></pre></div></div>
+
+<p>利用 <code class="language-plaintext highlighter-rouge">certbot</code> 进行apache SSL 证书申请和安装。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>certbot apache
+</code></pre></div></div>
+
+<p>依次输入有效的邮件地址，同意注册邮箱到ACME 服务器，选择是否和 Electronic Frontier Foundation 分享邮件地址，输入域名。</p>
+
+<p>注册好后，证书文件保存在 <code class="language-plaintext highlighter-rouge">/etc/letsencrypt/live/[domain]/</code> 目录下。
+证书文件名为：<code class="language-plaintext highlighter-rouge">fullchain.pem</code> ，密匙文件名为： <code class="language-plaintext highlighter-rouge">privkey.pem</code> 。</p>
+
+<p>证书默认生效日期是三个月。</p>
+
+<p>SSL默认同过443端口实现用户端和服务器的交互，现在打开防火墙的 443 端口。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ufw allow 443
+</code></pre></div></div>
+
+<p>最后，通过 <code class="language-plaintext highlighter-rouge">https://[domain]</code> 查看是否可以访问 <code class="language-plaintext highlighter-rouge">calibre-server</code> 进行书籍阅读。</p>
+<h2 id="参考">参考</h2>
+
+<p><a href="https://www.digitalocean.com/community/tutorials/how-to-create-a-calibre-ebook-server-on-ubuntu-20-04">How To Create a calibre Ebook Server on Ubuntu 20.04</a></p>
+
+<p><a href="https://www.systutorials.com/docs/linux/man/8-a2ensite/">a2ensite (8) - Linux Manuals</a></p>
+
+<p><a href="https://github.com/certbot/certbot/issues/3854">github: “The requested apache plugin does not appear to be installed” on raspbian</a></p>]]></content><author><name>甲与</name></author><category term="配置" /><summary type="html"><![CDATA[calibre-server是一种非常便利的线上电子阅读服务。 之前的服务器到期了，现在重新配置了calibre-server，整理一下操作步骤。]]></summary></entry><entry><title type="html">Lisp基础语法：主语</title><link href="http://localhost:4000/lisp%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95-%E4%B8%BB%E8%AF%AD/" rel="alternate" type="text/html" title="Lisp基础语法：主语" /><published>2024-01-02T00:00:00+08:00</published><updated>2024-01-02T00:00:00+08:00</updated><id>http://localhost:4000/lisp%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95%EF%BC%9A%E4%B8%BB%E8%AF%AD</id><content type="html" xml:base="http://localhost:4000/lisp%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95-%E4%B8%BB%E8%AF%AD/"><![CDATA[<p>介绍一下lisp语言的主语。</p>
+
+<h2 id="前缀表达">前缀表达</h2>
+
+<p>前缀表达，又称波兰表示法（Polish notation），s表达式，操作符置于操作数前，例如：</p>
+
+\[\text{+ 2 17 = 19}\]
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">+</span> <span class="mi">2</span> <span class="mi">17</span><span class="p">)</span>
+<span class="c1">;;=&gt;19</span>
+</code></pre></div></div>
+
+<p>如果仅仅是数字或者逻辑运算转换了一种表达方式，也许继续使用前缀表达是更好的。
+但是如何在自然语言的角度去理解呢？
+一般的自然语言语句一般有以下三种形式：</p>
+
+<ol>
+  <li>主语－谓语－宾语</li>
+  <li>主语－谓语</li>
+  <li>谓语</li>
+</ol>
+
+<p>试想一个基本的对话场景：</p>
+
+<p>甲：吃饭了吗？
+乙：吃了。</p>
+
+<p>乙的话，说完整了，是：我吃过饭了。</p>
+
+<p>把谓词对应于function，主语和宾语对应于variable，而 <code class="language-plaintext highlighter-rouge">吃了</code> 作为接收我和饭的谓语，以lisp的前缀表达形式，可以表示为：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="err">吃了</span> <span class="err">我</span> <span class="err">饭</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>或者</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="err">吃了</span> <span class="err">饭</span> <span class="err">我</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>问题在于，第几个参数成为主语。前缀表达 <code class="language-plaintext highlighter-rouge">+ 2 19</code> 是不必在意这个问题的。是 <code class="language-plaintext highlighter-rouge">2</code> 努力令自身补充了 <code class="language-plaintext highlighter-rouge">19</code> 这个数值，还是 <code class="language-plaintext highlighter-rouge">19</code> 稍稍增加了 <code class="language-plaintext highlighter-rouge">2</code> 这个数值，因为加法交换律的缘故，只要它们的结果都是 <code class="language-plaintext highlighter-rouge">19</code>，算术者便通通视为等价的。</p>
+
+<p>但是，<code class="language-plaintext highlighter-rouge">饭吃了我</code> 和 <code class="language-plaintext highlighter-rouge">我吃了饭</code> 对于准备吃饭的人来说，意义则尤为不同且重大。</p>
+
+<h2 id="人与数字">人与数字</h2>
+
+<p>那么，存在于在列表中的元素，究竟是真实的人，还是抽象的数字？</p>
+
+<p>对于是人的情况，比如甲把他所有的密码记在一张纸上，那么纸作为列表而单个密码作为元素：当甲访问网站x输入密码时，不是密码凭空地出现在了网站的输入栏，而是乙从他记录的密码中，选择了与网站x匹配的密码，输入到网站x的输入栏中。对于密码列表，是密码列表被选出了与网站x匹配的元素，对于网站，是网站被输入了与用户甲匹配的账户信息。</p>
+
+<p>而对于是数字的情况，会存在一个脱离了人的生命而存在的数字吗？ <code class="language-plaintext highlighter-rouge">13</code> 这个数字或许是普遍存在的，只要这世上有多于 <code class="language-plaintext highlighter-rouge">13</code> 个行星，多于 <code class="language-plaintext highlighter-rouge">13</code> 棵树木，似乎便可认为这世界包含了数字 <code class="language-plaintext highlighter-rouge">13</code> 。但是，存在于世界中的 <code class="language-plaintext highlighter-rouge">13</code> 和存在于我们头脑中的 <code class="language-plaintext highlighter-rouge">13</code> 会是同一种事物吗？有什么理由能够说明，当世界的 <code class="language-plaintext highlighter-rouge">13</code> 个行星遇到第 <code class="language-plaintext highlighter-rouge">14</code> 个行星时，便包含了 <code class="language-plaintext highlighter-rouge">14</code> ？如果这 <code class="language-plaintext highlighter-rouge">13</code> 个行星会因为遇到第 <code class="language-plaintext highlighter-rouge">14</code> 个行星而毁灭，只留下第 <code class="language-plaintext highlighter-rouge">14</code> 个行星，那么这个世界便是不包含 <code class="language-plaintext highlighter-rouge">14</code> 的，对它而言 $13+1=1$。而通常认为 $13+1=14$ 的我们如果既不是被毁灭的十三个行星，也不是被留下的一个行星，那么我们又有什么理由认为，我们对这个世界经历 $13+1=1$的过程是有意义的呢？我们有什么理由认为，我们存在于这个世界呢？</p>
+
+<p>至少对于数字的情况，我们可以理解到，人会因为参与各种事物的交互产生存在于世界的意义，而因为失去同各种事物的交互而失去存在于世界的意义。如果人具有存在于世界的意义，那么人至少要参与到同世界内的某种事物的交互中。</p>
+
+<p>因此，综合元素为人和数字两种情形而言，如果一个列表和别的什么列表发生了交互，从而使自身失去、得到元素或改变了已有的元素，该列表便在程序的世界中产生了意义——它可能影响到其它列表，或被其它列表所影响。并且，提到列表影响其它列表，和它被其它列表所影响，是不同的。</p>
+
+<p>对此，在lisp语言中，我想至少要能区分正在参与到程序中的列表，以及程序所包含的列表，而且以一种足够直观的形式加以表达。例如：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="err">我</span> <span class="err">吃</span> <span class="err">饭</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="err">饭</span> <span class="err">被吃</span> <span class="err">我</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>好像不太通顺，借助一下英文的表达：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nv">Rice</span> <span class="nv">is-eaten-by</span> <span class="nv">me</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>完美。</p>
+
+<h2 id="child-ref-sky">Child ref sky</h2>
+
+<p>然而lisp语言不存在该语序的直接实现，对此，可以设置一个宏语句，把第一个参数设置为主语，其余的参数设置为可能的宾语。而在所有的字母中，我个人认为字母 <code class="language-plaintext highlighter-rouge">o</code> 在形状上是最完美的。</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">defmacro</span> <span class="nv">o</span> <span class="p">(</span><span class="nv">mio</span> <span class="nv">ili</span> <span class="k">&amp;rest</span> <span class="nv">vio</span><span class="p">)</span>
+	<span class="o">`</span><span class="p">(</span><span class="nv">ili</span> <span class="nv">mio</span> <span class="o">,@</span><span class="nv">vio</span><span class="p">))</span>
+</code></pre></div></div>
+<p>暂时称这种倒置了第一个参数和谓词的语句为 <code class="language-plaintext highlighter-rouge">自然语句</code> ，或者 <code class="language-plaintext highlighter-rouge">o语句</code> 吧。</p>
+
+<p>于是重新看一看lisp的基础原语，也许 <code class="language-plaintext highlighter-rouge">set</code> 更换为 <code class="language-plaintext highlighter-rouge">is</code> 更加通顺呢？ <code class="language-plaintext highlighter-rouge">set</code> 的意义是设置，但是对于自然语句 <code class="language-plaintext highlighter-rouge">(o 'x set 1)</code> 而言，<code class="language-plaintext highlighter-rouge">x 设置 1</code> 这种句式是很蹩脚的。或者我们换一个例子 <code class="language-plaintext highlighter-rouge">(o '孩子 set '天空)</code> ：难道我们可以说， <code class="language-plaintext highlighter-rouge">孩子设置天空</code> 吗？天空可以通过向地面降下暴雨或冰雪来抑制生命的繁衍，亦或以阳光雨露滋润生命的成长。但是同样生活在地面的 <code class="language-plaintext highlighter-rouge">孩子</code> 有什么能力去设置这样的 <code class="language-plaintext highlighter-rouge">天空</code> 呢？难道更加自然的画面不是孩子在生命被暴雨或冰雪抑制之余，<code class="language-plaintext highlighter-rouge">望向</code> 了 <code class="language-plaintext highlighter-rouge">天空</code> 吗？或者他们的手 <code class="language-plaintext highlighter-rouge">指向</code> 了 <code class="language-plaintext highlighter-rouge">天空</code> ？</p>
+
+<p>而按照 <code class="language-plaintext highlighter-rouge">s表达式</code> ，自然语句<code class="language-plaintext highlighter-rouge">(o '孩子 set '天空)</code> 对应着 <code class="language-plaintext highlighter-rouge">(set '孩子 '天空)</code> 。 <code class="language-plaintext highlighter-rouge">set</code> 的意义是令第一个符号指向第二个符号，这样在 <code class="language-plaintext highlighter-rouge">s 表达式</code> 中，我们便要说：<code class="language-plaintext highlighter-rouge">设置孩子指向天空</code>，或者 <code class="language-plaintext highlighter-rouge">设置孩子望向天空</code> 。这竟好似一种外在的诱惑，或者某种权威式的强制的命令，以役使孩子以他们期待的形式同天空发生关系一样。难道这外在的程序，还能比真正的 <code class="language-plaintext highlighter-rouge">天空</code> 更加宽广辽远吗？能够被命令着望向的 <code class="language-plaintext highlighter-rouge">天空</code> ，果真会是真正的 <code class="language-plaintext highlighter-rouge">天空</code> 吗？</p>
+
+<p>如果对于每位孩子而言，存在一片真正可供他们自由飞翔的天空，我想这会比那一片片被命令或诱惑了的天空更接近他们自然而然所望向的远方。</p>
+
+<p>不是因为某种外在的诱惑或命令，而是因为它自然而言朝向了什么。英语中有个词组 <code class="language-plaintext highlighter-rouge">refer to sth</code> ，意思是：</p>
+
+<blockquote>
+  <p>to look at, or tell someone else to look at, a book or similar record in order to find information and help</p>
+</blockquote>
+
+<p>为了简便起见，缩写为，<code class="language-plaintext highlighter-rouge">ref</code>。那么刚刚的语句便可以表达为： <code class="language-plaintext highlighter-rouge">(o child ref sky)</code> 。</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">defmacro</span> <span class="nv">ref</span> <span class="p">(</span><span class="nv">var</span> <span class="nv">value</span><span class="p">)</span>
+	<span class="o">`</span><span class="p">(</span><span class="nb">setf</span> <span class="o">,</span><span class="nv">var</span> <span class="o">,</span><span class="nv">value</span><span class="p">))</span>
+</code></pre></div></div>
+
+<h2 id="as--to-dobe-done--by-">as … to do/be done … by …</h2>
+
+<p>而回到 <code class="language-plaintext highlighter-rouge">week</code> 的例子中，试想不是 <code class="language-plaintext highlighter-rouge">(select week 2)</code> 这样，<code class="language-plaintext highlighter-rouge">选择了一周的第二天</code>，而是 <code class="language-plaintext highlighter-rouge">一周作为列表根据数字2被选择出来具有温度的第二天之元素</code>，也就意味着：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nv">week</span> <span class="nv">as-list-be-select-element-by-position</span> <span class="mi">2</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>给予一种实现：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nv">o</span> <span class="nv">as-list-be-select-element-by-position</span> <span class="nv">loy</span> <span class="p">(</span><span class="nb">list</span> <span class="nb">position</span><span class="p">)</span>
+   <span class="s">"列表根据位置被选择元素"</span>
+   <span class="p">(</span><span class="nv">o</span> <span class="p">(</span><span class="nv">o</span> <span class="nb">list</span> <span class="nb">eq</span> <span class="no">nil</span><span class="p">)</span> <span class="nv">then</span> <span class="no">nil</span>
+      <span class="p">(</span><span class="nv">o</span> <span class="p">(</span><span class="nv">o</span> <span class="nb">position</span> <span class="nb">=</span> <span class="mi">1</span><span class="p">)</span> <span class="nv">then</span>
+         <span class="p">(</span><span class="nv">o</span> <span class="nb">list</span> <span class="nv">ri</span><span class="p">)</span>
+         <span class="p">(</span><span class="nv">o</span> <span class="p">(</span><span class="nv">o</span> <span class="nb">list</span> <span class="nv">cori</span><span class="p">)</span> <span class="nv">as-list-be-select-element-by-position</span> <span class="p">(</span><span class="nv">o</span> <span class="nb">position</span> <span class="nb">-</span> <span class="mi">1</span><span class="p">)))))</span>
+<span class="c1">;;(o '(a b c d) as-list-be-select-element-by-position 2)</span>
+<span class="c1">;;=&gt;b</span>
+</code></pre></div></div>
+
+<p>其中，<code class="language-plaintext highlighter-rouge">loy</code> 是 <code class="language-plaintext highlighter-rouge">defun</code> 的倒装，<code class="language-plaintext highlighter-rouge">ri</code> 是 <code class="language-plaintext highlighter-rouge">car</code> 的倒装，<code class="language-plaintext highlighter-rouge">cori</code> 是 <code class="language-plaintext highlighter-rouge">cdr</code> 的倒装，<code class="language-plaintext highlighter-rouge">then</code> 是 <code class="language-plaintext highlighter-rouge">if</code> 的倒装。</p>
+
+<p>在s表达式中，等价于</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">defun</span> <span class="nv">select</span> <span class="p">(</span><span class="nb">list</span> <span class="nb">position</span><span class="p">)</span>
+	<span class="p">(</span><span class="k">if</span> <span class="p">(</span><span class="nb">eq</span> <span class="nb">list</span> <span class="no">nil</span><span class="p">)</span> <span class="no">nil</span>
+		<span class="p">(</span><span class="k">if</span> <span class="p">(</span><span class="nb">=</span> <span class="nb">position</span> <span class="mi">1</span><span class="p">)</span>
+			<span class="p">(</span><span class="nb">car</span> <span class="nb">list</span><span class="p">)</span>
+		 <span class="p">(</span><span class="nv">select</span> <span class="p">(</span><span class="nb">position</span> <span class="nb">cdr</span><span class="p">)</span> <span class="p">(</span><span class="nb">-</span> <span class="nb">position</span> <span class="mi">1</span><span class="p">)))))</span>
+<span class="c1">;;(select '(a b c d) 2)</span>
+<span class="c1">;;=&gt;b</span>
+</code></pre></div></div>
+
+<p>当然，如果需要也可以把 <code class="language-plaintext highlighter-rouge">as-list-be-select-element-by-position</code> 缩写为 <code class="language-plaintext highlighter-rouge">be-select</code>。但是这样要如何区分 <code class="language-plaintext highlighter-rouge">as-string-be-select-substring-by-start-end</code> 以及 <code class="language-plaintext highlighter-rouge">as-number-list-be-select-max-number</code> 这些同样被选择，但是输入和输出类型和选择具体功能不同的函数呢？或者，如何证明，作为列表被选择比作为字串或作为数字列表被选择的优先级更高，以至于要它竟然要占用 <code class="language-plaintext highlighter-rouge">be-select</code> 这样精简的符号？如果不能，那么为什么要冒着浪费 <code class="language-plaintext highlighter-rouge">更精简的符号</code> 的选择空间的风险进行预设呢？既然一切都是 <code class="language-plaintext highlighter-rouge">Child ref sky.</code></p>
+
+<p>那么，<code class="language-plaintext highlighter-rouge">be-select</code> 这样的 <code class="language-plaintext highlighter-rouge">精简符号</code> 又为什么不能根据即时的执行和编写需求，进行灵活的指向关系改变呢？</p>
+
+<p>精简的符号意味着更加快速的思考，而冗长的符号意味着更加精确的语义。对比认知科学中 <code class="language-plaintext highlighter-rouge">系统一</code> 和 <code class="language-plaintext highlighter-rouge">系统二</code> 的概念，也许应当存在一种可以整合这两种符号的编程范式？</p>
+
+<p>如果我们把 <code class="language-plaintext highlighter-rouge">be-select</code> 这样的精简符号的组合称为 <code class="language-plaintext highlighter-rouge">架构类</code> 函数，那么 <code class="language-plaintext highlighter-rouge">as-list-be-select-element-by-position</code> <code class="language-plaintext highlighter-rouge">as-string-be-select-substring-by-start-end</code> <code class="language-plaintext highlighter-rouge">as-number-list-be-select-max-number</code> 无疑都是它的一种实现。一方面，这并不意味着作为 <code class="language-plaintext highlighter-rouge">架构类</code> 函数的 <code class="language-plaintext highlighter-rouge">be-select</code> 不可被执行了，可以根据语境进行设置，特别是对于一次执行且直执行一个函数的单线程而言。比较令人担忧的可能是，会不会出现当高级函数调用多个低级函数时，出现低级函数集合对于 <code class="language-plaintext highlighter-rouge">be-select</code> 的访问冲突？</p>
+
+<p>另外，<code class="language-plaintext highlighter-rouge">as ...</code> 声明了主语的类型，这里的类型不一定是 <code class="language-plaintext highlighter-rouge">cons</code> <code class="language-plaintext highlighter-rouge">number</code> <code class="language-plaintext highlighter-rouge">string</code> 这些基础类型，也可以是 <code class="language-plaintext highlighter-rouge">table</code> <code class="language-plaintext highlighter-rouge">string-list</code> 这些自建类型。换言之 <code class="language-plaintext highlighter-rouge">作为...做/被做...根据...</code> 是自然语句的一种普遍的命名方式，例如：<code class="language-plaintext highlighter-rouge">as-table-be-select-column-by-position-list</code> <code class="language-plaintext highlighter-rouge">as-table-be-select-row-by-position</code> 。如果从主语的角度而言，<code class="language-plaintext highlighter-rouge">架构类函数</code> 和 <code class="language-plaintext highlighter-rouge">实现类函数</code> 之间的关系显然不是单继承的，只要考虑到任何一种作为自然语句主语的对象都有可能 <code class="language-plaintext highlighter-rouge">得到</code> <code class="language-plaintext highlighter-rouge">失去</code> 或 <code class="language-plaintext highlighter-rouge">改变</code> 什么的话。</p>
+
+<h2 id="参考">参考</h2>
+
+<ul>
+  <li><a href="https://zh.m.wikipedia.org/wiki/%E6%B3%A2%E5%85%B0%E8%A1%A8%E7%A4%BA%E6%B3%95">维基百科：波兰表示法</a></li>
+  <li><a href="https://zh.m.wikipedia.org/wiki/%E9%80%86%E6%B3%A2%E5%85%B0%E8%A1%A8%E7%A4%BA%E6%B3%95">维基百科：逆波兰表示法</a></li>
+  <li><a href="https://zh.m.wikipedia.org/wiki/%E9%80%86%E6%B3%A2%E5%85%B0%E8%A1%A8%E7%A4%BA%E6%B3%95">维基百科：S表达式</a></li>
+</ul>]]></content><author><name>甲与</name></author><category term="语法" /><summary type="html"><![CDATA[介绍一下lisp语言的主语。]]></summary></entry><entry><title type="html">Lisp基础语法：列表</title><link href="http://localhost:4000/lisp%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95-%E5%88%97%E8%A1%A8/" rel="alternate" type="text/html" title="Lisp基础语法：列表" /><published>2023-12-24T00:00:00+08:00</published><updated>2023-12-24T00:00:00+08:00</updated><id>http://localhost:4000/lisp%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95%EF%BC%9A%E5%88%97%E8%A1%A8</id><content type="html" xml:base="http://localhost:4000/lisp%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95-%E5%88%97%E8%A1%A8/"><![CDATA[<p>在上一篇博客中，我们试图说明，lisp的一切对象都可以视为一种符号对于另一种符号的指向，同时介绍了指针型指向和函数型指向的基本语法。这一片笔记记录列表类型。</p>
+
+<h2 id="列表cons-car-cdr">列表：cons, car ,cdr</h2>
+
+<p>列表是由括号 <code class="language-plaintext highlighter-rouge">()</code> 包裹的符号，符号之间用空格分开。每一个符号指向另一个列表或符号。</p>
+
+<p><code class="language-plaintext highlighter-rouge">3</code> 和 <code class="language-plaintext highlighter-rouge">(+ 1 1 1)</code> 在数量上的返回结果是相同的。如果我们仅仅想要标示一种物品的数量，我们更习惯用 <code class="language-plaintext highlighter-rouge">3</code> 。这是因为，每次提到该物品的数量时， <code class="language-plaintext highlighter-rouge">3</code> 就读写意义上的能量消耗更小。
+我们姑且把这类能量消耗更小的符号称为<code class="language-plaintext highlighter-rouge">更精简的符号</code>。</p>
+
+<p>例如，当我们记录了一周的体温后，便可以用 <code class="language-plaintext highlighter-rouge">本周体温.txt</code> 来替代该文件中的体温数据本身。这时候，每一天的体温和本周体温便形成以下一对多的映射关系：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">set</span> <span class="ss">'week</span> <span class="o">'</span><span class="p">(</span><span class="nv">Mon</span> <span class="nv">Tue</span> <span class="nv">Wed</span> <span class="nv">Thr</span> <span class="nv">Fir</span> <span class="nv">Sat</span> <span class="nv">Sun</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p><img src="/assets/post_images/image-20240415212855550.png" alt="" /></p>
+
+<p>例如，设37.4~37.8摄氏度是低度发烧，而我们想要从一周中寻找低度发烧的 <code class="language-plaintext highlighter-rouge">Monday</code> ，那么我们不得不从 <code class="language-plaintext highlighter-rouge">week</code> 整体中选择 <code class="language-plaintext highlighter-rouge">Monday</code> 这一部分。</p>
+
+<p>如果存在一个函数如下所示的返回制定位置的符号便好了：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nv">select</span> <span class="o">'</span><span class="err">低烧</span><span class="o">'</span> <span class="nv">from</span> <span class="nv">week</span><span class="p">)</span>
+<span class="c1">;;we expecte: =&gt; Mon</span>
+<span class="c1">;;Actually: =&gt; Symbol's function definition is void: select</span>
+</code></pre></div></div>
+
+<p>遗憾的是，这是一个过于“高级”的函数，elisp并不会提供它的直接实现。我们要从一些更加低层的函数出发组装它。</p>
+
+<p>我们可能想象着：</p>
+
+<p><img src="/assets/post_images/image-20240415212914805.png" alt="" /></p>
+
+<p>然而实际上，在lisp语言中，<code class="language-plaintext highlighter-rouge">week</code> 是通过一种被称为 <code class="language-plaintext highlighter-rouge">cell</code> 的二元组来构成的。</p>
+
+<blockquote>
+  <p>The smallest basic unit of a plant or animal.</p>
+
+  <p>细胞</p>
+
+  <p>A small room with not much furniture, especially in a prison or a monastery or convent</p>
+
+  <p>小房间；单间牢房</p>
+</blockquote>
+
+<p>根据剑桥辞典的解释，我们暂称这种 <code class="language-plaintext highlighter-rouge">cell</code> 为小房间。每一个小房间有且仅有两个小孔（slot），左侧的小孔记录符号，右侧的小孔负责指向。每一个小房间可以通过右侧的小孔连到下一个房间中。</p>
+
+<p>例如：</p>
+
+<p><img src="assets/post_images/image-20240415212946114.png" alt="" /></p>
+
+<p>其lisp语言表达为：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">cons</span> <span class="nv">Mon</span> <span class="p">(</span><span class="nb">cons</span> <span class="nv">Tue</span> <span class="no">nil</span><span class="p">))</span>
+</code></pre></div></div>
+<p>类似地，我们可以构成要构成一周的体温数据：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">set</span> <span class="ss">'week</span> <span class="p">(</span><span class="nb">cons</span> <span class="ss">'Mon</span> <span class="p">(</span><span class="nb">cons</span> <span class="ss">'Tue</span> <span class="p">(</span><span class="nb">cons</span> <span class="ss">'Wed</span> 
+	<span class="p">(</span><span class="nb">cons</span> <span class="ss">'Thr</span> <span class="p">(</span><span class="nb">cons</span> <span class="ss">'Fri</span> <span class="p">(</span><span class="nb">cons</span> <span class="ss">'Sat</span>
+		<span class="p">(</span><span class="nb">cons</span> <span class="ss">'Sun</span> <span class="no">nil</span><span class="p">))))))))</span>
+</code></pre></div></div>
+
+<p><img src="/assets/post_images/image-20240415213050619.png" alt="" /></p>
+
+<p>这就是week列表的构成方式。便构成了我们直观意义上的列表，</p>
+
+<p>现在如果我们要访问其中的某个cell，lisp为我们提供了两种操作，选择当前列表的首项 <code class="language-plaintext highlighter-rouge">car</code> 或者选择当前列表首项以外的元素 <code class="language-plaintext highlighter-rouge">cdr</code> 。</p>
+
+<p>例如，如果我们要选区周三 <code class="language-plaintext highlighter-rouge">Wed</code> ，可以通过以下代码实现：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">car</span> <span class="p">(</span><span class="nb">cdr</span> <span class="p">(</span><span class="nb">cdr</span> <span class="nv">week</span><span class="p">)))</span>
+</code></pre></div></div>
+
+<p>对于访问列表 $x$ 的第 $n$ 个元素，只需要 $n-1$ 个表达式调用<code class="language-plaintext highlighter-rouge">cdr</code>原语，最后用 <code class="language-plaintext highlighter-rouge">car</code> 访问当前 <code class="language-plaintext highlighter-rouge">cell</code> 的列表数据即可。</p>
+
+<p>为了更方便访问列表任意位置元素，我们可以编写一个高级函数 <code class="language-plaintext highlighter-rouge">select</code>：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">set</span> <span class="ss">'select</span> <span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="nb">list</span> <span class="nb">position</span><span class="p">)</span>
+	<span class="p">(</span><span class="k">if</span> <span class="p">(</span><span class="nb">eq</span> <span class="nb">position</span> <span class="mi">1</span><span class="p">)</span>
+		<span class="p">(</span><span class="nb">car</span> <span class="nb">list</span><span class="p">)</span>
+		<span class="p">(</span><span class="k">if</span> <span class="p">(</span><span class="nb">&gt;</span> <span class="nb">position</span> <span class="mi">1</span><span class="p">)</span>
+			<span class="p">(</span><span class="nb">funcall</span> <span class="nv">select</span> <span class="p">(</span><span class="nb">cdr</span> <span class="nb">list</span><span class="p">)</span> <span class="p">(</span><span class="nb">-</span> <span class="nb">position</span> <span class="mi">1</span><span class="p">))</span>
+			<span class="p">(</span><span class="k">if</span> <span class="p">(</span><span class="nb">&lt;</span> <span class="nb">position</span> <span class="mi">1</span><span class="p">)</span>
+				<span class="no">nil</span><span class="p">)))))</span>
+</code></pre></div></div>
+<p>原理很简单，如果位置 <code class="language-plaintext highlighter-rouge">position</code> 的值不为一，便继续使用 <code class="language-plaintext highlighter-rouge">cdr</code> 原语同时令 <code class="language-plaintext highlighter-rouge">position</code> 减一。直到 <code class="language-plaintext highlighter-rouge">position</code> 的值为一，返回当前列表首项。</p>
+
+<p>有两个小问题。</p>
+
+<ol>
+  <li>
+    <p>如果 <code class="language-plaintext highlighter-rouge">position</code> 是非正整数，无论减多少次一，都不会抵达递归的结束条件 <code class="language-plaintext highlighter-rouge">position</code> 为一。这种情况下，为了避免陷入死循环，需要增加 <code class="language-plaintext highlighter-rouge">position</code> 为负数返回 <code class="language-plaintext highlighter-rouge">nil</code> 的分支。</p>
+  </li>
+  <li>
+    <p>如果 <code class="language-plaintext highlighter-rouge">position</code> 大于列表长度，由于 <code class="language-plaintext highlighter-rouge">position</code> 一定可以在有限步内减小至一，以及 <code class="language-plaintext highlighter-rouge">nil</code> 的 <code class="language-plaintext highlighter-rouge">cdr</code> 依然是<code class="language-plaintext highlighter-rouge">cdr</code>，所以该情形下不会陷入死循环。</p>
+  </li>
+</ol>
+
+<p>测试一下，选择 <code class="language-plaintext highlighter-rouge">week</code> 第五个元素 <code class="language-plaintext highlighter-rouge">Fri</code>：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">funcall</span> <span class="nv">select</span> <span class="nv">week</span> <span class="mi">5</span><span class="p">)</span>
+<span class="c1">;;=&gt;Fri</span>
+</code></pre></div></div>
+<p>选择一个负位置或超长位置，比如 <code class="language-plaintext highlighter-rouge">-3</code>和<code class="language-plaintext highlighter-rouge">8</code></p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">funcall</span> <span class="nv">select</span> <span class="nv">week</span> <span class="mi">-3</span><span class="p">)</span>
+<span class="c1">;;=&gt;nil</span>
+<span class="p">(</span><span class="nb">funcall</span> <span class="nv">select</span> <span class="nv">week</span> <span class="mi">8</span><span class="p">)</span>
+<span class="c1">;;=&gt;nil</span>
+</code></pre></div></div>
+
+<p>那么如果我怀疑 <code class="language-plaintext highlighter-rouge">week</code> 的长度到底是不是7天呢？（我担心之前创建数组时忘记了一天。）</p>
+
+<p>设置一个长度函数 <code class="language-plaintext highlighter-rouge">length</code>：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">set</span> <span class="ss">'length</span>
+     <span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+       <span class="p">(</span><span class="k">if</span> <span class="p">(</span><span class="nb">eq</span> <span class="p">(</span><span class="nb">eq</span> <span class="nb">list</span> <span class="no">nil</span><span class="p">)</span> <span class="no">nil</span><span class="p">)</span>
+	   <span class="p">(</span><span class="nb">+</span> <span class="mi">1</span> <span class="p">(</span><span class="nb">funcall</span> <span class="nb">length</span> <span class="p">(</span><span class="nb">cdr</span> <span class="nb">list</span><span class="p">)))</span>
+	 <span class="mi">0</span>
+	 <span class="p">)))</span>
+</code></pre></div></div>
+
+<p>原理是，直到空为止，每遍历一个元素，便让返回值加一。</p>
+
+<p>测试：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">funcall</span> <span class="nb">length</span> <span class="nv">week</span><span class="p">)</span>
+<span class="c1">;;=&gt;7</span>
+</code></pre></div></div>
+<p>现在赋予 week 中的每一天以一个温度的数值，但是一个一个赋值太麻烦了，能不能为
+<code class="language-plaintext highlighter-rouge">week</code> 中包含的每个元素一次性赋值呢？</p>
+
+<p>创建一个 <code class="language-plaintext highlighter-rouge">multi-set</code> 函数，我想给它两个参数，一个是变量列表，一个是值列表，然后利用 <code class="language-plaintext highlighter-rouge">set</code> 将变量指向相应值。
+这首先要求变量列表和值列表的长度相同。</p>
+
+<p>那么先设置一个判断长度相同的函数：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">set</span> <span class="ss">'length-eq</span>
+       <span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="nv">list-a</span> <span class="nv">list-b</span><span class="p">)</span>
+	 <span class="p">(</span><span class="k">if</span> <span class="p">(</span><span class="nb">eq</span> <span class="p">(</span><span class="nb">funcall</span> <span class="nb">length</span> <span class="nv">list-a</span><span class="p">)</span> <span class="p">(</span><span class="nb">funcall</span> <span class="nb">length</span> <span class="nv">list-b</span><span class="p">))</span>
+	     <span class="no">t</span> <span class="no">nil</span><span class="p">)))</span>
+<span class="c1">;;(funcall length-eq '(a b c) '(1 2 3))</span>
+<span class="c1">;;=&gt;t</span>
+<span class="c1">;;(funcall length-eq '(a b c) '(1 2 3 4))</span>
+<span class="c1">;;=&gt;nil</span>
+</code></pre></div></div>
+<p>变量列表和值列表相同的条件下，用 <code class="language-plaintext highlighter-rouge">set</code> 赋值。</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">set</span> <span class="ss">'multi-set</span>
+     <span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="nv">variables</span> <span class="nb">values</span><span class="p">)</span>
+       <span class="p">(</span><span class="k">if</span> <span class="p">(</span><span class="nb">funcall</span> <span class="nv">length-eq</span> <span class="nv">variables</span> <span class="nb">values</span><span class="p">)</span>
+	   <span class="p">(</span><span class="k">if</span> <span class="p">(</span><span class="nb">eq</span> <span class="p">(</span><span class="nb">eq</span> <span class="nv">variables</span> <span class="no">nil</span><span class="p">)</span> <span class="no">nil</span><span class="p">)</span>
+	       <span class="p">(</span><span class="nb">cons</span> <span class="p">(</span><span class="nb">set</span> <span class="p">(</span><span class="nb">car</span> <span class="nv">variables</span><span class="p">)</span> <span class="p">(</span><span class="nb">car</span> <span class="nb">values</span><span class="p">))</span>
+		     <span class="p">(</span><span class="nb">funcall</span> <span class="nv">multi-set</span> <span class="p">(</span><span class="nb">cdr</span> <span class="nv">variables</span><span class="p">)</span> <span class="p">(</span><span class="nb">cdr</span> <span class="nb">values</span><span class="p">)))</span>
+	     <span class="no">nil</span><span class="p">)</span>
+	 <span class="no">nil</span><span class="p">)))</span>
+<span class="c1">;;(funcall multi-set `(a b c) '(1 2 3))</span>
+<span class="c1">;;(list a b c)</span>
+<span class="c1">;;=&gt;(1 2 3)</span>
+</code></pre></div></div>
+
+<p>现在尝试为一天记录一个体温。</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">funcall</span> <span class="nv">multi-set</span> <span class="nv">week</span> <span class="o">'</span><span class="p">(</span><span class="mf">36.5</span> <span class="mf">36.4</span> <span class="mf">37.2</span> <span class="mf">36.8</span> <span class="mf">36.9</span> <span class="mf">36.7</span> <span class="mf">36.4</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p>既然可以一次性访设置多个指针，那么为什么不能一次性访问多个指针呢？</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">set</span> <span class="ss">'multi-eval</span>
+     <span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="nv">var-list</span><span class="p">)</span>
+       <span class="p">(</span><span class="k">if</span> <span class="p">(</span><span class="nb">eq</span> <span class="p">(</span><span class="nb">eq</span> <span class="nv">var-list</span> <span class="no">nil</span><span class="p">)</span> <span class="no">nil</span><span class="p">)</span>
+	   <span class="p">(</span><span class="nb">cons</span> <span class="p">(</span><span class="nb">eval</span> <span class="p">(</span><span class="nb">car</span> <span class="nv">var-list</span><span class="p">))</span> <span class="p">(</span><span class="nb">funcall</span> <span class="nv">multi-eval</span> <span class="p">(</span><span class="nb">cdr</span> <span class="nv">var-list</span><span class="p">)))</span>
+	 <span class="no">nil</span><span class="p">)))</span>
+<span class="c1">;;(funcall multi-eval week)</span>
+<span class="c1">;;=&gt;(36.5 36.4 37.2 36.8 36.9 36.7 36.4)</span>
+</code></pre></div></div>
+
+<p>从中我们看到一种更加普遍的形式， <code class="language-plaintext highlighter-rouge">multi</code> ，对于列表中的每一项执行某个函数：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">set</span> <span class="ss">'multi</span>
+       <span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="nv">fun</span> <span class="nv">vars</span><span class="p">)</span>
+	 <span class="p">(</span><span class="k">if</span> <span class="p">(</span><span class="nb">eq</span> <span class="p">(</span><span class="nb">eq</span> <span class="nv">vars</span> <span class="no">nil</span><span class="p">)</span> <span class="no">nil</span><span class="p">)</span>
+	     <span class="p">(</span><span class="nb">cons</span> <span class="p">(</span><span class="nb">funcall</span> <span class="nv">fun</span> <span class="p">(</span><span class="nb">car</span> <span class="nv">vars</span><span class="p">))</span> <span class="p">(</span><span class="nb">funcall</span> <span class="nv">multi</span> <span class="nv">fun</span> <span class="p">(</span><span class="nb">cdr</span> <span class="nv">vars</span><span class="p">)))</span>
+	   <span class="no">nil</span><span class="p">)))</span>
+<span class="c1">;;(funcall multi length '((1 2) (2 3 4)))</span>
+<span class="c1">;;=&gt;(2 3)</span>
+</code></pre></div></div>
+
+<p>这和 <code class="language-plaintext highlighter-rouge">mapcar</code> 的功能是一致的。</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">mapcar</span> <span class="nb">length</span> <span class="o">'</span><span class="p">((</span><span class="mi">1</span> <span class="mi">2</span><span class="p">)</span> <span class="p">(</span><span class="mi">2</span> <span class="mi">3</span> <span class="mi">4</span><span class="p">)))</span>
+<span class="c1">;;=&gt;(2 3)</span>
+</code></pre></div></div>
+
+<p>但是对于 <code class="language-plaintext highlighter-rouge">select</code> 这样具有两个参数输入的函数，<code class="language-plaintext highlighter-rouge">multi</code> 是无法处理的。
+例如，我想选择 <code class="language-plaintext highlighter-rouge">week</code> 中第二天和第三天温度构成一个新的列表。</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">set</span> <span class="ss">'multii</span>
+       <span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="nv">fun</span> <span class="nb">list</span> <span class="nv">vars</span><span class="p">)</span>
+	 <span class="p">(</span><span class="k">if</span> <span class="p">(</span><span class="nb">eq</span> <span class="p">(</span><span class="nb">eq</span> <span class="nv">vars</span> <span class="no">nil</span><span class="p">)</span> <span class="no">nil</span><span class="p">)</span>
+	     <span class="p">(</span><span class="nb">cons</span> <span class="p">(</span><span class="nb">funcall</span> <span class="nv">fun</span> <span class="nb">list</span> <span class="p">(</span><span class="nb">car</span> <span class="nv">vars</span><span class="p">))</span> <span class="p">(</span><span class="nb">funcall</span> <span class="nv">multii</span> <span class="nv">fun</span> <span class="nb">list</span> <span class="p">(</span><span class="nb">cdr</span> <span class="nv">vars</span><span class="p">)))</span>
+	   <span class="no">nil</span><span class="p">)))</span>
+<span class="c1">;;(funcall multii select '(a b c d e) '(2 3 1))</span>
+<span class="c1">;;=&gt;(b c a)</span>
+<span class="c1">;;(funcall multi-eval (funcall multii select week '(2 3)))</span>
+<span class="c1">;;=&gt;(36.4 37.2)</span>
+</code></pre></div></div>
+
+<p>是时候区分一下函数列表和变量（指针）列表了。</p>
+
+<p>如果我想单独设置七个函数，分别用于选择列表的1~7个元素如何？
+我完全可以在 <code class="language-plaintext highlighter-rouge">select</code> 函数的基础之上加以选择</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">set</span> <span class="nb">first</span> <span class="o">'</span><span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="nv">x</span><span class="p">)</span> <span class="p">(</span><span class="nv">select</span> <span class="nv">x</span> <span class="mi">1</span><span class="p">)))</span>
+<span class="p">(</span><span class="nb">set</span> <span class="nb">second</span> <span class="o">'</span><span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="nv">x</span><span class="p">)</span> <span class="p">(</span><span class="nv">select</span> <span class="nv">x</span> <span class="mi">2</span><span class="p">)))</span>
+<span class="p">(</span><span class="nb">set</span> <span class="nb">second</span> <span class="o">'</span><span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="nv">x</span><span class="p">)</span> <span class="p">(</span><span class="nv">select</span> <span class="nv">x</span> <span class="mi">3</span><span class="p">)))</span>
+
+<span class="o">...</span>
+</code></pre></div></div>
+<p>这样一来，从 <code class="language-plaintext highlighter-rouge">week</code> 中选取第二天和第三天就可以从多个参数输入一个函数，转向多个函数处理一个参数：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">set</span> <span class="ss">'multiii</span>
+	<span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="nv">funs</span> <span class="nv">var</span><span class="p">)</span>
+		<span class="p">(</span><span class="k">if</span> <span class="p">(</span><span class="nb">eq</span> <span class="p">(</span><span class="nb">eq</span> <span class="nv">funs</span> <span class="no">nil</span><span class="p">)</span> <span class="no">nil</span><span class="p">)</span>
+		<span class="p">(</span><span class="nb">cons</span> <span class="p">(</span><span class="nb">funcall</span> <span class="p">(</span><span class="nb">car</span> <span class="nv">funs</span><span class="p">)</span> <span class="nv">var</span><span class="p">)</span> <span class="p">(</span><span class="nb">funcall</span> <span class="nv">multiii</span> <span class="p">(</span><span class="nb">cdr</span> <span class="nv">funs</span><span class="p">)</span> <span class="nv">var</span><span class="p">))</span>
+	<span class="no">nil</span><span class="p">)))</span>
+<span class="c1">;;(funcall multiii (list first second third) week)</span>
+<span class="c1">;;=&gt;(Mon Tue Wed)</span>
+<span class="c1">;;(funcall multiii `(first second third) week)</span>
+<span class="c1">;;=&gt;wrong!</span>
+</code></pre></div></div>
+
+<p>这里的 <code class="language-plaintext highlighter-rouge">first</code> <code class="language-plaintext highlighter-rouge">second</code> <code class="language-plaintext highlighter-rouge">third</code> 都是对单一参数进行处理的函数，它们共同组成了函数列表。
+另一种列表是<code class="language-plaintext highlighter-rouge">Mon</code> <code class="language-plaintext highlighter-rouge">Tue</code> 等温度数据组成的参数（指针）列表，
+参数列表和函数列表并不能如表达式 <code class="language-plaintext highlighter-rouge">(+ 1 1)</code> 一样被直接运行。
+但是将参数列表和函数列表分开，用 <code class="language-plaintext highlighter-rouge">multi</code> 这样的函数再把它们结合在一起，例如 <code class="language-plaintext highlighter-rouge">todo</code>。</p>
+
+<p>现在我们不在用 <code class="language-plaintext highlighter-rouge">week</code> 记录温度，而记录日程表。</p>
+
+<p>例如：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">set</span> <span class="ss">'Mon</span> <span class="o">'</span><span class="p">(</span><span class="nv">task-1</span> <span class="nv">task-2</span><span class="p">))</span>
+<span class="o">...</span>
+</code></pre></div></div>
+
+<p>那么，利用 <code class="language-plaintext highlighter-rouge">multiii</code> 同具体周脱离的特性便可以制定面向一般周 <code class="language-plaintext highlighter-rouge">week-x</code> 的习惯：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">set</span> <span class="ss">'habits</span> <span class="o">'</span><span class="p">(</span><span class="nv">habit-1</span> <span class="nv">habit-2</span> <span class="o">...</span><span class="p">))</span>
+<span class="p">(</span><span class="nb">funcall</span> <span class="nv">multiii</span> <span class="nv">habits</span> <span class="nv">week-x</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>当需要调整习惯时，只需要利用 <code class="language-plaintext highlighter-rouge">car</code> <code class="language-plaintext highlighter-rouge">cdr</code> <code class="language-plaintext highlighter-rouge">cons</code> 调整函数列表 <code class="language-plaintext highlighter-rouge">habits</code> 即可，而不必牵涉到每天的具体任务。
+同理，调整习惯保持的时间段，只需要修改参数列表 <code class="language-plaintext highlighter-rouge">week-x</code> 即可，而不必牵涉到习惯的具体内容。</p>
+
+<h2 id="总结">总结</h2>
+
+<p>本篇笔记以温度记录为例，分析了列表的而基础结构和操作，区分了函数列表，参数列表和表达式三种不同的列表，同时对 <code class="language-plaintext highlighter-rouge">multi</code> 函数加以探索以结合参数列表和函数列表。</p>
+
+<h2 id="参考">参考</h2>
+
+<ul>
+  <li><a href="https://www.gnu.org/software/emacs/manual/elisp.html">GNU: Emacs Lisp Reference Manual</a></li>
+</ul>]]></content><author><name>甲与</name></author><category term="lisp" /><summary type="html"><![CDATA[在上一篇博客中，我们试图说明，lisp的一切对象都可以视为一种符号对于另一种符号的指向，同时介绍了指针型指向和函数型指向的基本语法。这一片笔记记录列表类型。]]></summary></entry><entry><title type="html">Clojure配置</title><link href="http://localhost:4000/clojure%E9%85%8D%E7%BD%AE/" rel="alternate" type="text/html" title="Clojure配置" /><published>2023-12-20T00:00:00+08:00</published><updated>2023-12-20T00:00:00+08:00</updated><id>http://localhost:4000/clojure%E9%85%8D%E7%BD%AE</id><content type="html" xml:base="http://localhost:4000/clojure%E9%85%8D%E7%BD%AE/"><![CDATA[<h2 id="简介">简介</h2>
+
+<p>clojure是一种安装在java虚拟机上的lisp方言。最近想在linux环境上尝试clojure的语言，配合emacs使用。现在记录安装过程。</p>
+
+<p>环境Ubuntu20.04，emacs29。</p>
+
+<h2 id="安装clojure">安装Clojure</h2>
+
+<p>Ubuntu20.04环境下apt中本身就包含Clojure的安装包，所以直接安装clojure即可。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>apt <span class="nb">install </span>clojure
+<span class="nb">sudo </span>apt <span class="nb">install </span>leiningen
+<span class="nb">sudo </span>apt <span class="nb">install </span>default-jre
+</code></pre></div></div>
+
+<h2 id="emacs环境">Emacs环境</h2>
+
+<p>elisp代码如下，保存在配置文档 <code class="language-plaintext highlighter-rouge">/.emacs.d/init.el</code>：</p>
+
+<div class="language-elisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">;;clojure interactive development environment that rocks!</span>
+<span class="p">(</span><span class="nb">use-package</span> <span class="nv">cider</span>
+  <span class="ss">:ensure</span> <span class="no">t</span><span class="p">)</span>
+
+<span class="p">(</span><span class="nb">use-package</span> <span class="nv">lsp-treemacs</span>
+  <span class="ss">:ensure</span> <span class="no">t</span><span class="p">)</span>
+
+<span class="c1">;;语法检查</span>
+<span class="p">(</span><span class="nb">use-package</span> <span class="nv">flycheck</span>
+  <span class="ss">:ensure</span> <span class="no">t</span><span class="p">)</span>
+
+<span class="c1">;;自动补全</span>
+<span class="p">(</span><span class="nb">use-package</span> <span class="nv">company</span>
+  <span class="ss">:ensure</span> <span class="no">t</span><span class="p">)</span>
+
+<span class="c1">;;clojure主模式</span>
+<span class="p">(</span><span class="nb">use-package</span> <span class="nv">clojure-mode</span>
+  <span class="ss">:ensure</span> <span class="no">t</span>
+  <span class="ss">:config</span>
+  <span class="p">(</span><span class="nv">add-hook</span> <span class="ss">'clojure-mode-hook</span> <span class="ss">'lsp</span><span class="p">)</span>
+  <span class="p">(</span><span class="nv">add-hook</span> <span class="ss">'clojurescript-mode-hook</span> <span class="ss">'lsp</span><span class="p">)</span>
+  <span class="p">(</span><span class="nv">add-hook</span> <span class="ss">'clojurec-mode-hok</span> <span class="ss">'lsp</span><span class="p">))</span>
+
+<span class="p">(</span><span class="nb">use-package</span> <span class="nv">lsp-mode</span>
+  <span class="ss">:ensure</span> <span class="no">t</span>
+  <span class="ss">:config</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h2 id="启动环境">启动环境</h2>
+
+<p>在tmux中创建新的clojure工程：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>lein new myapp
+</code></pre></div></div>
+
+<p>启动该工程的repl：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cd myapp
+lein repl
+</code></pre></div></div>
+
+<p>在emacs中接入该工程：</p>
+
+<pre><code class="language-emacs">M-x cider RET
+cider-connect-clj RET
+localhost RET
+TAB RET
+</code></pre>
+
+<p>在repl中进行代码测试</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>myapp.core&gt; <span class="o">(</span>+ 3 5<span class="o">)</span>
+8
+</code></pre></div></div>
+
+<h2 id="语法">语法</h2>
+
+<p>关于语法，可以参考<a href="https://www.w3cschool.cn/clojure/clojure-j5w81wf2.html">W3Cschool, clojure教程</a> 《Programming Clojure》、 《 Web Development with Clojure, Third Edition》 等书籍。</p>
+
+<h2 id="参考以及相关链接">参考以及相关链接</h2>
+<ul>
+  <li><a href="https://www.w3cschool.cn/clojure/clojure-j5w81wf2.html">W3Cschool, clojure教程</a></li>
+  <li><a href="https://clojure.org/guides/install_clojure">clojure官网安装教程</a></li>
+  <li><a href="https://emacs-lsp.github.io/lsp-mode/tutorials/clojure-guide/">Configure Emacs as a Clojure IDE</a></li>
+</ul>]]></content><author><name>甲与</name></author><category term="配置" /><summary type="html"><![CDATA[简介]]></summary></entry><entry><title type="html">Lisp基础语法：指针与函数</title><link href="http://localhost:4000/lisp%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95-%E6%8C%87%E9%92%88%E4%B8%8E%E5%87%BD%E6%95%B0/" rel="alternate" type="text/html" title="Lisp基础语法：指针与函数" /><published>2023-12-20T00:00:00+08:00</published><updated>2023-12-20T00:00:00+08:00</updated><id>http://localhost:4000/lisp%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95%EF%BC%9A%E6%8C%87%E9%92%88%E4%B8%8E%E5%87%BD%E6%95%B0</id><content type="html" xml:base="http://localhost:4000/lisp%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95-%E6%8C%87%E9%92%88%E4%B8%8E%E5%87%BD%E6%95%B0/"><![CDATA[<p>介绍lisp语言的指针和函数概念。</p>
+
+<h2 id="基础操作语法表">基础操作语法表</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Grammer</th>
+      <th>功能</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">car</td>
+      <td>选取列表首项</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">cdr</td>
+      <td>选取列表非首项</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">eq</td>
+      <td>判断元素是否相等</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">if</td>
+      <td>条件分支</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">atom</td>
+      <td>是否为叶节点(不可分割、组合的原子)</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">quote</td>
+      <td>为符号增加指向自身的引用</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">eval</td>
+      <td>返回符号的相邻引用值</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">cons</td>
+      <td>连接对象</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">set</td>
+      <td>设置符号指针</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">lambda</td>
+      <td>设置匿名函数</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">funcall</td>
+      <td>调用匿名函数</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="简介">简介</h2>
+
+<p>以下是lisp语言的基本形式。</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nv">symbol-1</span> <span class="nv">symbol-2</span> <span class="o">...</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>每一个符号都可以展开为其它基本形式，或者和其它符号构成新的表达式，从而形成嵌套结构。</p>
+
+<p>例如：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nv">symbol-1</span> <span class="p">(</span><span class="nv">symbol-2</span> <span class="nv">symbol-3</span><span class="p">)</span> <span class="nv">symbol-4</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>如果我们用 <code class="language-plaintext highlighter-rouge">symbol-5</code> 指向 <code class="language-plaintext highlighter-rouge">(symbol-2 symbol-3)</code> 这个整体，那么上述表达等价于：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nv">symbol-1</span> <span class="nv">symbol-5</span> <span class="nv">symbol-4</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>而如果我们用 <code class="language-plaintext highlighter-rouge">symbol-6</code> 指向 <code class="language-plaintext highlighter-rouge">(symbol-1 symbol-5 symbol-6)</code> 这个整体，那么上述表达等价于：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">symbol-6</span>
+</code></pre></div></div>
+
+<p>如上所示，lisp程序的执行过程可以视为不断从里向外用新的符号替换原有表达式的过程。</p>
+
+<p>只不过，一般情况下，第一个符号一般用于方法和函数的描述，这种表达方式又称为 <code class="language-plaintext highlighter-rouge">前缀表达</code> 。</p>
+
+<h2 id="举例">举例</h2>
+
+<p>lisp程序的执行过程类似于上述简化过程，例如：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">+</span> <span class="p">(</span><span class="nb">-</span> <span class="mi">3</span> <span class="mi">2</span><span class="p">)</span> <span class="mi">5</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">1</code> 等价于 <code class="language-plaintext highlighter-rouge">(- 3 2)</code>，进行替换得：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">+</span> <span class="mi">1</span> <span class="mi">5</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">6</code> 等价于 <code class="language-plaintext highlighter-rouge">(+ 1 5)</code>，进行替换得：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="mi">6</span>
+</code></pre></div></div>
+
+<p>所以，初始代码指向了 <code class="language-plaintext highlighter-rouge">6</code> 这个符号。</p>
+
+<h2 id="指针setquote-和-eval">指针：set,quote 和 eval</h2>
+
+<p>指针指的是，一个符号指向另一个符号的关系。</p>
+
+<p>如上述案例所示，符号有三种形式，在 <code class="language-plaintext highlighter-rouge">()</code> 内，被 <code class="language-plaintext highlighter-rouge">'</code> 引用，只有符号本身。</p>
+
+<p><code class="language-plaintext highlighter-rouge">set</code> 是用于规定指针的起点和终点。</p>
+
+<p><code class="language-plaintext highlighter-rouge">quote</code> 则用于创建指向符号自身的指针。</p>
+
+<p><code class="language-plaintext highlighter-rouge">eval</code> 用于获取符号指向的下一个符号。</p>
+
+<p>需要注意，elisp语言中数字和字符串的指针永远指向它自身。</p>
+
+<p>例如（以下等价的意义是说，等价的对象指针指向相同的目标）:</p>
+
+<p>等价于</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">+</span> <span class="mi">1</span> <span class="mi">3</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>等价于</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">eval</span> <span class="p">(</span><span class="nb">+</span> <span class="mi">1</span> <span class="mi">3</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p>等价于</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">eval</span> <span class="p">(</span><span class="nb">eval</span> <span class="p">(</span><span class="nb">+</span> <span class="mi">1</span> <span class="mi">3</span><span class="p">)))</span>
+</code></pre></div></div>
+
+<p>等价于</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">eval</span> <span class="o">...</span><span class="p">(</span><span class="nb">eval</span> <span class="p">(</span><span class="nb">+</span> <span class="mi">1</span> <span class="mi">3</span><span class="p">))</span><span class="o">...</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>这是因为 <code class="language-plaintext highlighter-rouge">(+ 1 3)</code> 作为符号已经指向了 <code class="language-plaintext highlighter-rouge">4</code> 。无论 有多少个 <code class="language-plaintext highlighter-rouge">eval</code> 函数要求获取 <code class="language-plaintext highlighter-rouge">4</code> 指向的下一个符号，
+我们永远都会得到 <code class="language-plaintext highlighter-rouge">4</code> 。</p>
+
+<p><img src="/assets/post_images/image-20240415224131410.png" alt="" /></p>
+
+<p>相应的，利用 <code class="language-plaintext highlighter-rouge">quote</code> 函数，我们可以回避一个符号被迫指向它的指针目标。</p>
+
+<p>如果一次从内向外的函数调用处理符号 <code class="language-plaintext highlighter-rouge">x</code>，函数只包括 <code class="language-plaintext highlighter-rouge">quote</code> 和 <code class="language-plaintext highlighter-rouge">eval</code> 两项，并且每当 <code class="language-plaintext highlighter-rouge">eval</code> 被执行时，至少有一个 <code class="language-plaintext highlighter-rouge">quote</code> 被执行，那么无论这次函数调用有多长, <code class="language-plaintext highlighter-rouge">x</code> 被处理后所返回的符号，其指针路径永远 <strong>经过</strong>  <code class="language-plaintext highlighter-rouge">x</code>。</p>
+
+<p>例如：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">eval</span> <span class="p">(</span><span class="k">quote</span> <span class="ss">'x</span><span class="p">))</span>
+<span class="c1">;;=&gt;x</span>
+</code></pre></div></div>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">eval</span> <span class="p">(</span><span class="k">quote</span> <span class="p">(</span><span class="k">quote</span> <span class="ss">'x</span><span class="p">)))</span>
+<span class="c1">;;=&gt;(quote x)</span>
+</code></pre></div></div>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">eval</span> <span class="p">(</span><span class="nb">eval</span> <span class="p">(</span><span class="k">quote</span> <span class="p">(</span><span class="k">quote</span> <span class="ss">'x</span><span class="p">))))</span>
+<span class="c1">;;=&gt;x</span>
+</code></pre></div></div>
+
+<p>可以观察到，eval一次仅仅消除一层quote。</p>
+
+<p><img src="/assets/post_images/image-20240415224150113.png" alt="" /></p>
+
+<p>而set可以为我们为符号设置一个特定的指针，以便其被执行时，指向特定符号。例如</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">set</span> <span class="ss">'x</span> <span class="s">"123123"</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>意味着符号 <code class="language-plaintext highlighter-rouge">x</code> 指向了 字串符号 <code class="language-plaintext highlighter-rouge">"123123"</code></p>
+
+<p><img src="/assets/post_images/image-20240415224204017.png" alt="" /></p>
+
+<h3 id="举例-1">举例</h3>
+
+<p>我们可以用 <code class="language-plaintext highlighter-rouge">set</code> 或 <code class="language-plaintext highlighter-rouge">约定</code> 关键字来设置一种替换过程：</p>
+
+<p>首先，我们约定：<code class="language-plaintext highlighter-rouge">f1</code> 指向 <code class="language-plaintext highlighter-rouge">(cons 'c nil)</code>，<code class="language-plaintext highlighter-rouge">f2</code> 指向 <code class="language-plaintext highlighter-rouge">(cons 'a (cons 'b (eval f1)))</code>， <code class="language-plaintext highlighter-rouge">f3</code> 指向 <code class="language-plaintext highlighter-rouge">(cons 'd (eval f2))</code>：</p>
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">set</span> <span class="ss">'f1</span> <span class="o">'</span><span class="p">(</span><span class="nb">cons</span> <span class="ss">'c</span> <span class="no">nil</span><span class="p">))</span>
+<span class="p">(</span><span class="nb">set</span> <span class="ss">'f2</span> <span class="o">'</span><span class="p">(</span><span class="nb">cons</span> <span class="ss">'a</span> <span class="p">(</span><span class="nb">cons</span> <span class="ss">'b</span> <span class="nv">f1</span><span class="p">)))</span>
+<span class="p">(</span><span class="nb">set</span> <span class="ss">'f3</span> <span class="o">'</span><span class="p">(</span><span class="nb">cons</span> <span class="ss">'d</span> <span class="p">(</span><span class="nb">eval</span> <span class="nv">f2</span><span class="p">)))</span>
+</code></pre></div></div>
+
+<p>（<code class="language-plaintext highlighter-rouge">cons</code> 的意义是把两个符号结合在一起。）</p>
+
+<p>分别执行 <code class="language-plaintext highlighter-rouge">f1</code> <code class="language-plaintext highlighter-rouge">f2</code> <code class="language-plaintext highlighter-rouge">f3</code></p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">eval</span> <span class="nv">f1</span><span class="p">)</span>
+<span class="p">(</span><span class="nb">eval</span> <span class="nv">f2</span><span class="p">)</span>
+<span class="p">(</span><span class="nb">eval</span> <span class="nv">f3</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>得到：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>执行符号</th>
+      <th>执行结果</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>f3</td>
+      <td>(d a b c)</td>
+    </tr>
+    <tr>
+      <td>f2</td>
+      <td>(a b c)</td>
+    </tr>
+    <tr>
+      <td>f1</td>
+      <td>(c)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>现在我们约定另外两段代码：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">set</span> <span class="ss">'F2</span> <span class="o">'</span><span class="p">(</span><span class="nb">cons</span> <span class="ss">'a</span> <span class="p">(</span><span class="nb">cons</span> <span class="ss">'b</span> <span class="p">(</span><span class="nb">cons</span> <span class="ss">'c</span> <span class="no">nil</span><span class="p">)))</span>
+<span class="p">(</span><span class="nb">set</span> <span class="ss">'F3</span> <span class="o">'</span><span class="p">(</span><span class="nb">cons</span> <span class="ss">'d</span> <span class="p">(</span><span class="nb">cons</span> <span class="ss">'a</span> <span class="p">(</span><span class="nb">cons</span> <span class="ss">'b</span> <span class="p">(</span><span class="nb">cons</span> <span class="ss">'c</span> <span class="no">nil</span><span class="p">)))))</span>
+</code></pre></div></div>
+
+<p>分别执行f3 F3 f2 F2，得到结果：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>执行符号</th>
+      <th>执行结果</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>f3, F3</td>
+      <td>(d a b c)</td>
+    </tr>
+    <tr>
+      <td>f2, F2</td>
+      <td>(a b c)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>以F3的执行过程为例，我们可以把F3的从内向外执行过程理解为：</p>
+
+<p>步骤一：</p>
+
+<p><img src="/assets/post_images/image-20240415224223342.png" alt="" /></p>
+
+<p>步骤二：</p>
+
+<p><img src="/assets/post_images/image-20240415224244826.png" alt="" /></p>
+
+<p>步骤三：</p>
+
+<p><img src="/assets/post_images/image-20240415224306562.png" alt="" /></p>
+
+<p>最后需要注意的是：</p>
+
+<p><code class="language-plaintext highlighter-rouge">(x ...)</code> 本身相当于以下 <code class="language-plaintext highlighter-rouge">eval</code> 语句：</p>
+
+<div class="language-emacs-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">funcall</span> <span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="nv">x</span> <span class="o">...</span><span class="p">)</span> <span class="p">(</span><span class="nb">eval</span> <span class="p">(</span><span class="nv">x</span> <span class="o">...</span><span class="p">)))</span> <span class="nv">x</span> <span class="o">...</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>不过，eval在何种程度上与<code class="language-plaintext highlighter-rouge">()</code>等价，quote在何种程度上与 <code class="language-plaintext highlighter-rouge">'</code> 等价，我暂时还没有理解清楚。</p>
+
+<h2 id="函数setfuncall和lambda">函数：set，funcall和lambda</h2>
+
+<p>如果我们从内向外把上述案例中 <code class="language-plaintext highlighter-rouge">cons</code> 语句中输入的字符提取出来，我们可以得到 <code class="language-plaintext highlighter-rouge">a b c d</code>。而执行结果则是： <code class="language-plaintext highlighter-rouge">(d a b c)</code> 。</p>
+
+<p>我们在一开始提到，每一个符号都可以展开为其它基本形式。</p>
+
+<p>那么，如果<code class="language-plaintext highlighter-rouge">a b c d</code> 具有以下指针形式如何呢？</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>符号</th>
+      <th>指针目标1</th>
+      <th>指针目标2</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>a</td>
+      <td>1</td>
+      <td>A</td>
+    </tr>
+    <tr>
+      <td>b</td>
+      <td>2</td>
+      <td>B</td>
+    </tr>
+    <tr>
+      <td>c</td>
+      <td>3</td>
+      <td>C</td>
+    </tr>
+    <tr>
+      <td>d</td>
+      <td>4</td>
+      <td>D</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>我们可以尝试以下代码：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">set</span> <span class="ss">'a</span> <span class="mi">1</span><span class="p">)</span>
+<span class="p">(</span><span class="nb">set</span> <span class="ss">'b</span> <span class="mi">2</span><span class="p">)</span>
+<span class="p">(</span><span class="nb">set</span> <span class="ss">'c</span> <span class="mi">3</span><span class="p">)</span>
+<span class="p">(</span><span class="nb">set</span> <span class="ss">'d</span> <span class="mi">4</span><span class="p">)</span>
+<span class="p">(</span><span class="nb">set</span> <span class="ss">'F4</span> <span class="o">'</span><span class="p">(</span><span class="nb">cons</span> <span class="nv">d</span> <span class="p">(</span><span class="nb">cons</span> <span class="nv">c</span> <span class="p">(</span><span class="nb">cons</span> <span class="nv">b</span> <span class="p">(</span><span class="nb">cons</span> <span class="nv">a</span> <span class="no">nil</span><span class="p">)))))</span>
+<span class="p">(</span><span class="nb">eval</span> <span class="nv">F4</span><span class="p">)</span>
+<span class="c1">;;=&gt;(4 3 2 1)</span>
+
+<span class="p">(</span><span class="nb">set</span> <span class="ss">'a</span> <span class="nv">A</span><span class="p">)</span>
+<span class="p">(</span><span class="nb">set</span> <span class="ss">'b</span> <span class="nv">B</span><span class="p">)</span>
+<span class="p">(</span><span class="nb">set</span> <span class="ss">'c</span> <span class="nv">C</span><span class="p">)</span>
+<span class="p">(</span><span class="nb">set</span> <span class="ss">'d</span> <span class="nv">D</span><span class="p">)</span>
+<span class="p">(</span><span class="nb">set</span> <span class="ss">'F5</span> <span class="o">'</span><span class="p">(</span><span class="nb">cons</span> <span class="nv">d</span> <span class="p">(</span><span class="nb">cons</span> <span class="nv">c</span> <span class="p">(</span><span class="nb">cons</span> <span class="nv">b</span> <span class="p">(</span><span class="nb">cons</span> <span class="nv">a</span> <span class="no">nil</span><span class="p">)))))</span>
+<span class="p">(</span><span class="nb">eval</span> <span class="nv">F5</span><span class="p">)</span>
+<span class="c1">;;=&gt;(D A B C)</span>
+</code></pre></div></div>
+
+<p>（考虑一下 <code class="language-plaintext highlighter-rouge">F4</code> 和 <code class="language-plaintext highlighter-rouge">F3</code> 有什么不同，为什么不同？）</p>
+
+<p>可以看到，代码将输入字符 <code class="language-plaintext highlighter-rouge">1 2 3 4</code> 和 <code class="language-plaintext highlighter-rouge">A B C D</code>的最后一个元素放在第一位，按照新的顺序建立了列表 <code class="language-plaintext highlighter-rouge">(4 3 2 1)</code> 和 <code class="language-plaintext highlighter-rouge">(D A B C)</code>。</p>
+
+<p>换言之，如果我们希望 <strong>把某四个符号的第一个元素放在第一项并把它们组合在一起得到新的列表</strong> ，我们只需要通过 <code class="language-plaintext highlighter-rouge">set</code> 修改 <code class="language-plaintext highlighter-rouge">a b c d</code> 的指针，而不需要修改 <code class="language-plaintext highlighter-rouge">F5</code> 。在这里， <code class="language-plaintext highlighter-rouge">F5</code> 不再是一种指向特定符号的符号，它的指向相比于指针发生了一种根本性的转向。</p>
+
+<p>以F5为例我们尝试对比以下代码：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">set</span> <span class="ss">'a</span> <span class="ss">'A</span><span class="p">)</span>
+<span class="p">(</span><span class="nb">eval</span> <span class="ss">'a</span><span class="p">)</span>
+<span class="c1">;;=&gt;A</span>
+</code></pre></div></div>
+
+<p>其中的指针关系可以用下图表示：</p>
+
+<p><img src="/assets/post_images/image-20240415224053549.png" alt="" /></p>
+
+<p>eval的结果和指针目标是相同的 <code class="language-plaintext highlighter-rouge">A</code>。</p>
+
+<p>但是 <code class="language-plaintext highlighter-rouge">f5</code> 的eval结果显然是 <code class="language-plaintext highlighter-rouge">a b c d</code> 以外的符号。指向关系如下图所示：</p>
+
+<p><img src="/assets/post_images/image-20240415224041011.png" alt="" /></p>
+
+<p>如果我们更换 符号 <code class="language-plaintext highlighter-rouge">a b c d</code> 所指向的对象，那么相应的输出结果也会改变：</p>
+
+<p><img src="/assets/post_images/image-20240415223958138.png" alt="" /></p>
+
+<p>这和我们对于函数的通常理解是一致的： <code class="language-plaintext highlighter-rouge">给定输入元素，进行处理，给定输出</code> 。那么，既然我们可以通过
+ <code class="language-plaintext highlighter-rouge">set</code> 和 <code class="language-plaintext highlighter-rouge">eval</code> 构建出函数的模型，那么 <code class="language-plaintext highlighter-rouge">defun</code> 似乎便可以由 <code class="language-plaintext highlighter-rouge">set</code> 和 <code class="language-plaintext highlighter-rouge">eval</code> 的基本组合而替代。</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">set</span> <span class="ss">'x</span> <span class="mi">4</span><span class="p">)</span>
+<span class="p">(</span><span class="nb">set</span> <span class="ss">'plus-one</span> <span class="p">(</span><span class="nb">+</span> <span class="nv">x</span> <span class="mi">1</span><span class="p">))</span>
+<span class="p">(</span><span class="nb">eval</span> <span class="ss">'plus-one</span><span class="p">)</span>
+<span class="c1">;;=&gt;5</span>
+
+<span class="nv">plus-one</span>
+<span class="c1">;;=&gt;5</span>
+
+<span class="p">(</span><span class="nb">set</span> <span class="ss">'x</span> <span class="mi">9</span><span class="p">)</span>
+<span class="p">(</span><span class="nb">eval</span> <span class="ss">'plus-one</span><span class="p">)</span>
+<span class="c1">;;=&gt;10</span>
+
+<span class="nv">plus-one</span>
+<span class="c1">;;=&gt;10</span>
+</code></pre></div></div>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">defun</span> <span class="nv">plus-one</span> <span class="p">(</span><span class="nv">x</span><span class="p">)</span> <span class="p">(</span><span class="nb">+</span> <span class="nv">x</span> <span class="mi">1</span><span class="p">))</span>
+<span class="p">(</span><span class="nv">plus-one</span> <span class="mi">4</span><span class="p">)</span>
+<span class="c1">;;=&gt;5</span>
+
+<span class="p">(</span><span class="nv">plus-one</span> <span class="mi">9</span><span class="p">)</span>
+<span class="c1">;;=&gt;10</span>
+</code></pre></div></div>
+
+<p>但是这样有一个命名问题，如果多个函数都需要调用符号 <code class="language-plaintext highlighter-rouge">x</code> 该如何处理呢？</p>
+
+<p>例如我们要求把数字 <code class="language-plaintext highlighter-rouge">3 2 1</code> 分别加一后返回给 <code class="language-plaintext highlighter-rouge">z</code>：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="p">(</span><span class="nb">defun</span> <span class="nv">plus-one</span> <span class="p">(</span><span class="nv">x</span><span class="p">)</span> <span class="p">(</span><span class="nb">+</span> <span class="nv">x</span> <span class="mi">1</span><span class="p">))</span>
+<span class="p">(</span><span class="nb">defun</span> <span class="nv">sum-abc</span> <span class="p">(</span><span class="nv">a</span> <span class="nv">b</span> <span class="nv">c</span><span class="p">)</span> 
+	<span class="p">(</span><span class="nb">+</span> <span class="p">(</span><span class="nv">plus-one</span> <span class="nv">a</span><span class="p">)</span> 
+		<span class="p">(</span><span class="nv">plus-one</span> <span class="nv">b</span><span class="p">)</span> 
+		<span class="p">(</span><span class="nv">plus-one</span> <span class="nv">c</span><span class="p">)))</span>
+		
+<span class="p">(</span><span class="nb">set</span> <span class="nv">z</span> <span class="p">(</span><span class="nv">sum-abc</span> <span class="mi">3</span> <span class="mi">2</span> <span class="mi">1</span><span class="p">))</span>
+<span class="c1">;;=&gt;9</span>
+</code></pre></div></div>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">set</span> <span class="ss">'plus-one</span> <span class="o">'</span><span class="p">(</span><span class="nb">+</span> <span class="mi">1</span> <span class="p">(</span><span class="nb">eval</span> <span class="p">(</span><span class="nb">eval</span> <span class="nv">x</span><span class="p">))))</span>
+<span class="p">(</span><span class="nb">set</span> <span class="ss">'sum-abc</span> <span class="o">'</span><span class="p">(</span><span class="k">progn</span>
+	<span class="p">(</span><span class="nb">set</span> <span class="ss">'x</span> <span class="ss">'a</span><span class="p">)</span>
+	<span class="p">(</span><span class="nb">set</span> <span class="ss">'z</span> <span class="p">(</span><span class="nb">+</span> <span class="nv">z</span> <span class="p">(</span><span class="nb">eval</span> <span class="nv">plus-one</span><span class="p">)))</span>
+	<span class="p">(</span><span class="nb">set</span> <span class="ss">'x</span> <span class="ss">'b</span><span class="p">)</span>
+	<span class="p">(</span><span class="nb">set</span> <span class="ss">'z</span> <span class="p">(</span><span class="nb">+</span> <span class="nv">z</span> <span class="p">(</span><span class="nb">eval</span> <span class="nv">plus-one</span><span class="p">)))</span>
+	<span class="p">(</span><span class="nb">set</span> <span class="ss">'x</span> <span class="ss">'c</span><span class="p">)</span>
+	<span class="p">(</span><span class="nb">set</span> <span class="ss">'z</span> <span class="p">(</span><span class="nb">+</span> <span class="nv">z</span> <span class="p">(</span><span class="nb">eval</span> <span class="nv">plus-one</span><span class="p">)))</span>
+	<span class="p">))</span>
+
+<span class="p">(</span><span class="nb">set</span> <span class="ss">'a</span> <span class="mi">3</span><span class="p">)</span>
+<span class="p">(</span><span class="nb">set</span> <span class="ss">'b</span> <span class="mi">2</span><span class="p">)</span>
+<span class="p">(</span><span class="nb">set</span> <span class="ss">'c</span> <span class="mi">1</span><span class="p">)</span>
+<span class="p">(</span><span class="nb">set</span> <span class="ss">'z</span> <span class="mi">0</span><span class="p">)</span>
+<span class="p">(</span><span class="nb">eval</span> <span class="nv">sum-abc</span><span class="p">)</span>
+<span class="c1">;;=&gt;9</span>
+
+<span class="p">(</span><span class="nb">set</span> <span class="ss">'a</span> <span class="no">nil</span><span class="p">)</span>
+<span class="p">(</span><span class="nb">set</span> <span class="ss">'b</span> <span class="no">nil</span><span class="p">)</span>
+<span class="p">(</span><span class="nb">set</span> <span class="ss">'c</span> <span class="no">nil</span><span class="p">)</span>
+<span class="p">(</span><span class="nb">set</span> <span class="ss">'z</span> <span class="no">nil</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>对于单线程程序而言，由于每一次执行且只执行一个函数，所以，只要在每一次执行函数后，将 <code class="language-plaintext highlighter-rouge">x</code> 的值归为 <code class="language-plaintext highlighter-rouge">nil</code> 或者 <code class="language-plaintext highlighter-rouge">x</code> 本身似乎便令 <code class="language-plaintext highlighter-rouge">set</code>-<code class="language-plaintext highlighter-rouge">quote</code>-<code class="language-plaintext highlighter-rouge">eval</code> 实现与 <code class="language-plaintext highlighter-rouge">defun</code> 相同的功能。但是，为了输入变量，消除函数间影响而增加的 <code class="language-plaintext highlighter-rouge">set</code> 语句，以及为了令函数功能一般化而增加的 <code class="language-plaintext highlighter-rouge">quote</code> 和 <code class="language-plaintext highlighter-rouge">eval</code> 语句会增加相当程度的代码量。</p>
+
+<p>elisp语言提供了两个基本操作来减少这些工作量：</p>
+
+<p>首先是 <code class="language-plaintext highlighter-rouge">lambda</code> 对于 <code class="language-plaintext highlighter-rouge">quote</code> 和 <code class="language-plaintext highlighter-rouge">eval</code> 语句的避免。</p>
+
+<p>在 <code class="language-plaintext highlighter-rouge">set-quote-eval</code> 的函数实现中，我们通过 <code class="language-plaintext highlighter-rouge">quote</code> 避免函数 <code class="language-plaintext highlighter-rouge">plus-one</code> 在定义阶段被执行后指向符号结果。同时在函数 <code class="language-plaintext highlighter-rouge">sum-abc</code> 中我们通过 <code class="language-plaintext highlighter-rouge">eval</code> 语句调用函数 <code class="language-plaintext highlighter-rouge">plus-one</code> 返回相应结果。</p>
+
+<p>而如果我们使用 <code class="language-plaintext highlighter-rouge">lambda</code> 无名函数表达，同样的功能可以用以下代码实现：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">;;plus-one</span>
+<span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="nv">x</span><span class="p">)</span> <span class="p">(</span><span class="nb">+</span> <span class="mi">1</span> <span class="nv">x</span><span class="p">))</span>
+<span class="c1">;;sum-abc</span>
+<span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="nv">a</span> <span class="nv">b</span> <span class="nv">c</span><span class="p">)</span> <span class="p">(</span><span class="nb">+</span> <span class="p">(</span><span class="nv">plus-one</span> <span class="nv">a</span><span class="p">)</span> <span class="p">(</span><span class="nv">plus-one</span> <span class="nv">b</span><span class="p">)</span> <span class="p">(</span><span class="nv">plus-one</span> <span class="nv">c</span><span class="p">)))</span>
+</code></pre></div></div>
+<p>这段代码存在两个错误，第一，lambda函数是无名函数，如果不设置指针指向它，是无法通过符号调用的，所以，函数 <code class="language-plaintext highlighter-rouge">plus-one</code> 需要增加 <code class="language-plaintext highlighter-rouge">set</code> 语句才能完成定义。第二，和基本操作或者 <code class="language-plaintext highlighter-rouge">defun</code> 可以直接作为前缀表达式的首项调用函数不同，通过 <code class="language-plaintext highlighter-rouge">set</code> 定义的 <code class="language-plaintext highlighter-rouge">lambda</code> 需要利用 <code class="language-plaintext highlighter-rouge">funcall</code> 才能进行调用。所以，上述代码应该改为：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">set</span> <span class="ss">'plus-one</span> <span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="nv">x</span><span class="p">)</span> <span class="p">(</span><span class="nb">+</span> <span class="nv">x</span> <span class="mi">1</span><span class="p">)))</span>
+<span class="p">(</span><span class="nb">set</span> <span class="ss">'sum-abc</span> 
+	<span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="nv">a</span> <span class="nv">b</span> <span class="nv">c</span><span class="p">)</span>
+		<span class="p">(</span><span class="nb">+</span> <span class="p">(</span><span class="nb">funcall</span> <span class="nv">plus-one</span> <span class="nv">a</span><span class="p">)</span>
+			<span class="p">(</span><span class="nb">funcall</span> <span class="nv">plus-one</span> <span class="nv">b</span><span class="p">)</span>
+			<span class="p">(</span><span class="nb">funcall</span> <span class="nv">plus-one</span> <span class="nv">c</span><span class="p">))))</span>
+
+<span class="p">(</span><span class="nb">funcall</span> <span class="nv">sum-abc</span> <span class="mi">3</span> <span class="mi">2</span> <span class="mi">1</span><span class="p">)</span>
+<span class="c1">;;=&gt;9</span>
+</code></pre></div></div>
+
+<p>至少相比与 <code class="language-plaintext highlighter-rouge">set-quote-eval</code>实现，我们避免了重复设置指针来在函数 <code class="language-plaintext highlighter-rouge">sum-abc</code> 中调用函数 <code class="language-plaintext highlighter-rouge">plus-one</code>。</p>
+
+<p>从表达形式而言，符号 <code class="language-plaintext highlighter-rouge">funcall sum-abc</code> 函数调用则等价于 <code class="language-plaintext highlighter-rouge">defun</code> 实现中的 <code class="language-plaintext highlighter-rouge">sum-abc</code> 函数调用。</p>
+
+<p>到这里位置，本篇博客篇幅已经很长了。至于列表和分支语句，下一篇博客中再进行记录吧。</p>
+
+<p>（关于 F4 和 F3 的不同，不同点在于 <code class="language-plaintext highlighter-rouge">F4</code> 去除了符号 <code class="language-plaintext highlighter-rouge">a b c d</code> 的引用，从而使得 <code class="language-plaintext highlighter-rouge">F4</code> 处理的对象从 符号  <code class="language-plaintext highlighter-rouge">a b c d</code> 本身指向 <code class="language-plaintext highlighter-rouge">a b c d</code> 指向的符号。）</p>
+
+<h2 id="参考">参考</h2>
+
+<ul>
+  <li><a href="https://zh.wikipedia.org/wiki/LISP">中文维基：lisp</a></li>
+  <li><a href="https://www.gnu.org/software/emacs/manual/elisp.html">GNU: Emacs Lisp Refference Manual</a></li>
+</ul>]]></content><author><name>甲与</name></author><category term="lisp" /><summary type="html"><![CDATA[介绍lisp语言的指针和函数概念。]]></summary></entry><entry><title type="html">Emacs配置</title><link href="http://localhost:4000/emacs%E9%85%8D%E7%BD%AE/" rel="alternate" type="text/html" title="Emacs配置" /><published>2023-12-19T00:00:00+08:00</published><updated>2023-12-19T00:00:00+08:00</updated><id>http://localhost:4000/emacs%E9%85%8D%E7%BD%AE</id><content type="html" xml:base="http://localhost:4000/emacs%E9%85%8D%E7%BD%AE/"><![CDATA[<p>本笔记用于说明一些常用的emacs配置，emacs版本， snap-emacs-29 。</p>
+<h1 id="emacs29配置">emacs29配置</h1>
+
+<p>emacs是一个可利用elisp内置语言和elpa仓库进行自定义扩展的文本编辑器。</p>
+
+<ul>
+  <li>相关网站：
+    <ul>
+      <li><a href="https://www.gnu.org/software/emacs/">emacs官网</a></li>
+      <li><a href="https://zh.wikipedia.org/wiki/Emacs">维基：emacs</a></li>
+      <li><a href="https://emacs-china.org/">emacs-china论坛</a></li>
+      <li><a href="https://www.reddit.com/r/emacs/?rdt=50949">Reddit: emacs</a></li>
+    </ul>
+  </li>
+</ul>
+
+<p>emacs配置文件位于 <code class="language-plaintext highlighter-rouge">~/.emaca.d/init.el</code> 或 <code class="language-plaintext highlighter-rouge">~/.emacs</code> 中。</p>
+
+<h3 id="elpa-仓库配置">elpa 仓库配置</h3>
+
+<ul>
+  <li><a href="https://mirrors.tuna.tsinghua.edu.cn/help/elpa/">ELPA 镜像使用帮助</a></li>
+</ul>
+
+<div class="language-elisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">setq</span> <span class="nv">package-archives</span> <span class="o">'</span><span class="p">((</span><span class="s">"gnu"</span>    <span class="o">.</span> <span class="s">"http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/"</span><span class="p">)</span>
+                         <span class="p">(</span><span class="s">"nongnu"</span> <span class="o">.</span> <span class="s">"http://mirrors.tuna.tsinghua.edu.cn/elpa/nongnu/"</span><span class="p">)</span>
+                         <span class="p">(</span><span class="s">"melpa"</span>  <span class="o">.</span> <span class="s">"http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/"</span><span class="p">)))</span>
+<span class="p">(</span><span class="nv">package-initialize</span><span class="p">)</span> <span class="c1">;; You might already have this line</span>
+</code></pre></div></div>
+<h3 id="dashboard">Dashboard</h3>
+
+<p>一个面板，显示近期文件和书签。</p>
+
+<div class="language-elisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">use-package</span> <span class="nv">dashboard</span>
+  <span class="ss">:ensure</span> <span class="no">t</span>
+  <span class="ss">:config</span>
+  <span class="p">(</span><span class="nv">dashboard-setup-startup-hook</span><span class="p">))</span>
+</code></pre></div></div>
+
+<h3 id="valign">valign</h3>
+
+<p>当向org和markdown文本中的表格中插入一些中文文档时，表格无法对齐。
+valign插件可以辅助对齐。</p>
+
+<div class="language-elisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">;; use-package with package.el:</span>
+<span class="p">(</span><span class="nb">use-package</span> <span class="nv">valign</span>
+  <span class="ss">:ensure</span> <span class="no">t</span>
+  <span class="ss">:config</span>
+  <span class="p">(</span><span class="nv">add-hook</span> <span class="ss">'org-mode-hook</span> <span class="nf">#'</span><span class="nv">valign-mode</span><span class="p">)</span>
+  <span class="p">(</span><span class="nv">add-hook</span> <span class="ss">'markdown-mode-hook</span> <span class="nf">#'</span><span class="nv">valign-mode</span><span class="p">))</span>
+</code></pre></div></div>
+
+<h3 id="vertico">Vertico</h3>
+
+<p>在迷你窗口打开文件命令时增加相关显示。</p>
+
+<div class="language-elisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">use-package</span> <span class="nv">vertico</span>
+  <span class="ss">:ensure</span> <span class="no">t</span>
+  <span class="ss">:config</span>
+  <span class="p">(</span><span class="nv">add-hook</span> <span class="ss">'emaca-startup-hook</span> <span class="nf">#'</span><span class="nv">vertico-mode</span><span class="p">))</span>
+
+</code></pre></div></div>
+
+<h3 id="pyim">Pyim</h3>
+
+<p>中文输入法。</p>
+
+<div class="language-elisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">use-package</span> <span class="nv">pyim</span>
+  <span class="ss">:ensure</span> <span class="no">t</span>
+  <span class="ss">:config</span>
+  <span class="p">(</span><span class="nb">require</span> <span class="ss">'pyim</span><span class="p">)</span>
+  <span class="p">(</span><span class="nb">require</span> <span class="ss">'pyim-basedict</span><span class="p">)</span>
+  <span class="p">(</span><span class="nv">pyim-basedict-enable</span><span class="p">)</span>
+  <span class="p">(</span><span class="k">setq</span> <span class="nv">default-input-method</span> <span class="s">"pyim"</span><span class="p">)</span>
+  <span class="p">(</span><span class="nv">pyim-default-scheme</span> <span class="ss">'ziranma-shuangpin</span><span class="p">))</span>
+</code></pre></div></div>
+
+<h3 id="dracula-theme">dracula-theme</h3>
+
+<p>黑色主题，耐看。</p>
+
+<div class="language-elisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">use-package</span> <span class="nv">dracula-theme</span>
+  <span class="ss">:ensure</span> <span class="no">t</span>
+  <span class="ss">:config</span>
+  <span class="p">(</span><span class="nv">load-theme</span> <span class="ss">'dracula</span><span class="p">))</span>
+</code></pre></div></div>
+
+<h3 id="treemacs">treemacs</h3>
+
+<p>方便管理项目。</p>
+
+<h3 id="其它">其它</h3>
+
+<ul>
+  <li>透明显示</li>
+</ul>
+
+<div class="language-elisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">;;set transparent effect</span>
+<span class="p">(</span><span class="nv">global-set-key</span> <span class="nv">[</span><span class="p">(</span><span class="nv">f11</span><span class="p">)</span><span class="nv">]</span> <span class="ss">'loop-alpha</span><span class="p">)</span>
+<span class="p">(</span><span class="k">setq</span> <span class="nv">alpha-list</span> <span class="o">'</span><span class="p">((</span><span class="mi">100</span> <span class="mi">100</span><span class="p">)</span> <span class="p">(</span><span class="mi">95</span> <span class="mi">65</span><span class="p">)</span> <span class="p">(</span><span class="mi">85</span> <span class="mi">55</span><span class="p">)</span> <span class="p">(</span><span class="mi">75</span> <span class="mi">45</span><span class="p">)</span> <span class="p">(</span><span class="mi">65</span> <span class="mi">35</span><span class="p">)))</span>
+<span class="p">(</span><span class="nb">defun</span> <span class="nv">loop-alpha</span> <span class="p">()</span>
+  <span class="p">(</span><span class="nv">interactive</span><span class="p">)</span>
+  <span class="p">(</span><span class="k">let</span> <span class="p">((</span><span class="nv">h</span> <span class="p">(</span><span class="nb">car</span> <span class="nv">alpha-list</span><span class="p">)))</span>                <span class="c1">;; head value will set to</span>
+    <span class="p">((</span><span class="k">lambda</span> <span class="p">(</span><span class="nv">a</span> <span class="nv">ab</span><span class="p">)</span>
+       <span class="p">(</span><span class="nv">set-frame-parameter</span> <span class="p">(</span><span class="nv">selected-frame</span><span class="p">)</span> <span class="ss">'alpha</span> <span class="p">(</span><span class="nb">list</span> <span class="nv">a</span> <span class="nv">ab</span><span class="p">))</span>
+       <span class="p">(</span><span class="nv">add-to-list</span> <span class="ss">'default-frame-alist</span> <span class="p">(</span><span class="nb">cons</span> <span class="ss">'alpha</span> <span class="p">(</span><span class="nb">list</span> <span class="nv">a</span> <span class="nv">ab</span><span class="p">)))</span>
+       <span class="p">)</span> <span class="p">(</span><span class="nb">car</span> <span class="nv">h</span><span class="p">)</span> <span class="p">(</span><span class="nb">car</span> <span class="p">(</span><span class="nb">cdr</span> <span class="nv">h</span><span class="p">)))</span>
+    <span class="p">(</span><span class="k">setq</span> <span class="nv">alpha-list</span> <span class="p">(</span><span class="nb">cdr</span> <span class="p">(</span><span class="nb">append</span> <span class="nv">alpha-list</span> <span class="p">(</span><span class="nb">list</span> <span class="nv">h</span><span class="p">))))</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+</code></pre></div></div>
+
+<ul>
+  <li>栏目隐藏</li>
+</ul>
+
+<div class="language-elisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">;;菜单栏隐藏</span>
+<span class="p">(</span><span class="nv">menu-bar-mode</span> <span class="mi">0</span><span class="p">)</span>
+<span class="c1">;;工具栏隐藏</span>
+<span class="p">(</span><span class="nv">tool-bar-mode</span> <span class="mi">0</span><span class="p">)</span>
+</code></pre></div></div>
+
+<ul>
+  <li>全屏</li>
+</ul>
+
+<div class="language-elisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nv">toggle-frame-fullscreen</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h2 id="参考">参考</h2>
+
+<ul>
+  <li><a href="https://github.com/casouri/valign">Github:casouri/valign</a></li>
+  <li><a href="https://github.com/emacs-dashboard/emacs-dashboard">Github:emaca-dashboard/emaca-dashboard</a></li>
+  <li><a href="https://github.com/Alexander-Miller/treemacs">Github:Alexander-Miller/treemacs</a></li>
+  <li><a href="https://github.com/dracula/emacs">Github:dracula/emaca</a></li>
+  <li><a href="https://github.com/minad/vertico">Github:minad/vertico</a></li>
+  <li><a href="https://github.com/tumashu/pyim">Github:tumashu/pyim</a></li>
+  <li><a href="https://github.com/emacs-dashboard/emacs-dashboard">Github:emacs-dashboard/emacs-dashboard</a></li>
+  <li><a href="https://emacs-china.org/t/emacs/2405">Emacs-China:Emacs 透明窗口</a></li>
+</ul>]]></content><author><name>甲与</name></author><category term="配置" /><summary type="html"><![CDATA[本笔记用于说明一些常用的emacs配置，emacs版本， snap-emacs-29 。 emacs29配置]]></summary></entry><entry><title type="html">Trilium配置</title><link href="http://localhost:4000/trilium%E9%85%8D%E7%BD%AE/" rel="alternate" type="text/html" title="Trilium配置" /><published>2023-12-17T00:00:00+08:00</published><updated>2023-12-17T00:00:00+08:00</updated><id>http://localhost:4000/trilium%E9%85%8D%E7%BD%AE</id><content type="html" xml:base="http://localhost:4000/trilium%E9%85%8D%E7%BD%AE/"><![CDATA[<p>Trilium 是一个便捷的笔记软件。本篇博客记录trilium的配置过程。</p>
+
+<p>在bash中下载trilium文件。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>weget https://github.com/zadam/trilium/releases/download/v0.62.6/trilium-linux-x64-server-0.62.6.tar.xz
+</code></pre></div></div>
+
+<p>解压文件。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">tar</span> <span class="nt">-xvf</span> trilium-linux-x64-server-0.62.6.tar.xz
+<span class="nb">mv </span>trilium-linux-x64-server /opt/trilium
+</code></pre></div></div>
+
+<p>设置系统服务文件 <code class="language-plaintext highlighter-rouge">/etc/systemd/system/trilium-service</code></p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>Unit]
+<span class="nv">Description</span><span class="o">=</span>Trilium Daemon
+<span class="nv">After</span><span class="o">=</span>syslog.target network.target
+
+<span class="o">[</span>Service]
+<span class="nv">User</span><span class="o">=</span>root
+<span class="nv">Group</span><span class="o">=</span>root
+<span class="nv">Type</span><span class="o">=</span>simple
+<span class="nv">ExecStart</span><span class="o">=</span>/opt/trilium/trilium.sh
+<span class="nv">WorkingDirectory</span><span class="o">=</span>/opt/trilium/
+
+<span class="nv">TimeoutStopSec</span><span class="o">=</span>20
+<span class="c"># KillMode=process leads to error, according to https://www.freedesktop.org/software/systemd/man/systemd.kill.html</span>
+<span class="nv">Restart</span><span class="o">=</span>always
+
+<span class="o">[</span>Install]
+<span class="nv">WantedBy</span><span class="o">=</span>multi-user.target
+</code></pre></div></div>
+
+<p>Trilium默认端口为8080。打开浏览器，输入 <code class="language-plaintext highlighter-rouge">ip/域名+8080</code> ，访问triliun网站，初始化密码。</p>
+
+<p>不过当前端口设置为8080，需要修改 <code class="language-plaintext highlighter-rouge">~/trilium-data/config.ini</code>  中的端口以及关闭ssl。</p>
+
+<div class="language-ini highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="py">port</span><span class="p">=</span><span class="s">2024</span>
+<span class="py">https</span><span class="p">=</span><span class="s">true</span>
+<span class="py">certPath</span><span class="p">=</span><span class="s">&lt;证书文件地址&gt;</span>
+<span class="py">keyPath</span><span class="p">=</span><span class="s">&lt;证书私匙地址&gt;</span>
+</code></pre></div></div>
+
+<p>重启trilium</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>systemctl restart trilium
+</code></pre></div></div>
+
+<p>访问 <code class="language-plaintext highlighter-rouge">ip/域名+2024</code> 成功。</p>
+
+<h2 id="参考">参考</h2>
+
+<ul>
+  <li><a href="https://github.com/zadam/trilium/wiki/Packaged-server-installation">Github: zadam/trilium/Packaged server installation</a></li>
+</ul>]]></content><author><name>甲与</name></author><category term="配置" /><summary type="html"><![CDATA[Trilium 是一个便捷的笔记软件。本篇博客记录trilium的配置过程。]]></summary></entry></feed>

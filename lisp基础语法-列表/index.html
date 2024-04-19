@@ -1,0 +1,845 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.24.0 by Michael Rose
+  Copyright 2013-2020 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="zh" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>Lisp基础语法：列表 - 甲与</title>
+<meta name="description" content="在上一篇博客中，我们试图说明，lisp的一切对象都可以视为一种符号对于另一种符号的指向，同时介绍了指针型指向和函数型指向的基本语法。这一片笔记记录列表类型。">
+
+
+  <meta name="author" content="甲与">
+  
+  <meta property="article:author" content="甲与">
+  
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:site_name" content="甲与">
+<meta property="og:title" content="Lisp基础语法：列表">
+<meta property="og:url" content="http://localhost:4000/lisp%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95-%E5%88%97%E8%A1%A8/">
+
+
+  <meta property="og:description" content="在上一篇博客中，我们试图说明，lisp的一切对象都可以视为一种符号对于另一种符号的指向，同时介绍了指针型指向和函数型指向的基本语法。这一片笔记记录列表类型。">
+
+
+
+  <meta property="og:image" content="http://localhost:4000/assets/images/wallhaven-o5e1jm.png">
+
+
+
+
+
+  <meta property="article:published_time" content="2023-12-24T00:00:00+08:00">
+
+
+
+
+
+
+<link rel="canonical" href="http://localhost:4000/lisp%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95-%E5%88%97%E8%A1%A8/">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": "甲与",
+      "url": "http://localhost:4000/"
+    
+  }
+</script>
+
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+
+  <link href="/feed.xml" type="application/atom+xml" rel="alternate" title="甲与 Feed">
+
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css"></noscript>
+
+
+
+    <!-- start custom head snippets -->
+
+<script type="text/javascript" async
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+  </head>
+
+  <body class="layout--single">
+    <nav class="skip-links">
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">转到主导航栏</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">转到内容</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">转到底部</a></li>
+  </ul>
+</nav>
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+        <a class="site-title" href="/">
+          甲与
+          
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/tags/">分类</a>
+            </li><li class="masthead__menu-item">
+              <a href="/year-archive/">归档</a>
+            </li></ul>
+        
+        <button class="search__toggle" type="button">
+          <span class="visually-hidden">切换搜索</span>
+          <i class="fas fa-search"></i>
+        </button>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">切换菜单</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+  
+
+
+
+
+
+
+
+<div class="page__hero"
+  style=" background-image: url('');"
+>
+  
+    <img src="/assets/images/wallhaven-o5e1jm.png" alt="Lisp基础语法：列表" class="page__hero-image">
+  
+  
+</div>
+
+
+
+
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person" class="h-card">
+
+  
+    <div class="author__avatar">
+      <a href="http://localhost:4000/">
+        <img src="/assets/images/6.png" alt="甲与" itemprop="image" class="u-photo">
+      </a>
+    </div>
+  
+
+  <div class="author__content">
+    <h3 class="author__name p-name" itemprop="name">
+      <a class="u-url" rel="me" href="http://localhost:4000/" itemprop="url">甲与</a>
+    </h3>
+    
+      <div class="author__bio p-note" itemprop="description">
+        <p>记录一些随想。</p>
+
+      </div>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">关注</button>
+    <ul class="author__urls social-icons">
+      
+
+      
+        
+          
+        
+          
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer me">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+
+  <article class="page h-entry" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="Lisp基础语法：列表">
+    <meta itemprop="description" content="在上一篇博客中，我们试图说明，lisp的一切对象都可以视为一种符号对于另一种符号的指向，同时介绍了指针型指向和函数型指向的基本语法。这一片笔记记录列表类型。">
+    <meta itemprop="datePublished" content="2023-12-24T00:00:00+08:00">
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title p-name" itemprop="headline">
+            <a href="http://localhost:4000/lisp%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95-%E5%88%97%E8%A1%A8/" class="u-url" itemprop="url">Lisp基础语法：列表
+</a>
+          </h1>
+          
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2023-12-24T00:00:00+08:00">December 24, 2023</time>
+      </span>
+    
+
+    
+
+    
+  </p>
+
+
+        </header>
+      
+
+      <section class="page__content e-content" itemprop="text">
+        
+          <aside class="sidebar__right ">
+            <nav class="toc">
+              <header><h4 class="nav__title"><i class="fas fa-cog"></i> 目录</h4></header>
+              <ul class="toc__menu"><li><a href="#列表cons-car-cdr">列表：cons, car ,cdr</a></li><li><a href="#总结">总结</a></li><li><a href="#参考">参考</a></li></ul>
+
+            </nav>
+          </aside>
+        
+        <p>在上一篇博客中，我们试图说明，lisp的一切对象都可以视为一种符号对于另一种符号的指向，同时介绍了指针型指向和函数型指向的基本语法。这一片笔记记录列表类型。</p>
+
+<h2 id="列表cons-car-cdr">列表：cons, car ,cdr</h2>
+
+<p>列表是由括号 <code class="language-plaintext highlighter-rouge">()</code> 包裹的符号，符号之间用空格分开。每一个符号指向另一个列表或符号。</p>
+
+<p><code class="language-plaintext highlighter-rouge">3</code> 和 <code class="language-plaintext highlighter-rouge">(+ 1 1 1)</code> 在数量上的返回结果是相同的。如果我们仅仅想要标示一种物品的数量，我们更习惯用 <code class="language-plaintext highlighter-rouge">3</code> 。这是因为，每次提到该物品的数量时， <code class="language-plaintext highlighter-rouge">3</code> 就读写意义上的能量消耗更小。
+我们姑且把这类能量消耗更小的符号称为<code class="language-plaintext highlighter-rouge">更精简的符号</code>。</p>
+
+<p>例如，当我们记录了一周的体温后，便可以用 <code class="language-plaintext highlighter-rouge">本周体温.txt</code> 来替代该文件中的体温数据本身。这时候，每一天的体温和本周体温便形成以下一对多的映射关系：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">set</span> <span class="ss">'week</span> <span class="o">'</span><span class="p">(</span><span class="nv">Mon</span> <span class="nv">Tue</span> <span class="nv">Wed</span> <span class="nv">Thr</span> <span class="nv">Fir</span> <span class="nv">Sat</span> <span class="nv">Sun</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p><img src="/assets/post_images/image-20240415212855550.png" alt="" /></p>
+
+<p>例如，设37.4~37.8摄氏度是低度发烧，而我们想要从一周中寻找低度发烧的 <code class="language-plaintext highlighter-rouge">Monday</code> ，那么我们不得不从 <code class="language-plaintext highlighter-rouge">week</code> 整体中选择 <code class="language-plaintext highlighter-rouge">Monday</code> 这一部分。</p>
+
+<p>如果存在一个函数如下所示的返回制定位置的符号便好了：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nv">select</span> <span class="o">'</span><span class="err">低烧</span><span class="o">'</span> <span class="nv">from</span> <span class="nv">week</span><span class="p">)</span>
+<span class="c1">;;we expecte: =&gt; Mon</span>
+<span class="c1">;;Actually: =&gt; Symbol's function definition is void: select</span>
+</code></pre></div></div>
+
+<p>遗憾的是，这是一个过于“高级”的函数，elisp并不会提供它的直接实现。我们要从一些更加低层的函数出发组装它。</p>
+
+<p>我们可能想象着：</p>
+
+<p><img src="/assets/post_images/image-20240415212914805.png" alt="" /></p>
+
+<p>然而实际上，在lisp语言中，<code class="language-plaintext highlighter-rouge">week</code> 是通过一种被称为 <code class="language-plaintext highlighter-rouge">cell</code> 的二元组来构成的。</p>
+
+<blockquote>
+  <p>The smallest basic unit of a plant or animal.</p>
+
+  <p>细胞</p>
+
+  <p>A small room with not much furniture, especially in a prison or a monastery or convent</p>
+
+  <p>小房间；单间牢房</p>
+</blockquote>
+
+<p>根据剑桥辞典的解释，我们暂称这种 <code class="language-plaintext highlighter-rouge">cell</code> 为小房间。每一个小房间有且仅有两个小孔（slot），左侧的小孔记录符号，右侧的小孔负责指向。每一个小房间可以通过右侧的小孔连到下一个房间中。</p>
+
+<p>例如：</p>
+
+<p><img src="assets/post_images/image-20240415212946114.png" alt="" /></p>
+
+<p>其lisp语言表达为：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">cons</span> <span class="nv">Mon</span> <span class="p">(</span><span class="nb">cons</span> <span class="nv">Tue</span> <span class="no">nil</span><span class="p">))</span>
+</code></pre></div></div>
+<p>类似地，我们可以构成要构成一周的体温数据：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">set</span> <span class="ss">'week</span> <span class="p">(</span><span class="nb">cons</span> <span class="ss">'Mon</span> <span class="p">(</span><span class="nb">cons</span> <span class="ss">'Tue</span> <span class="p">(</span><span class="nb">cons</span> <span class="ss">'Wed</span> 
+	<span class="p">(</span><span class="nb">cons</span> <span class="ss">'Thr</span> <span class="p">(</span><span class="nb">cons</span> <span class="ss">'Fri</span> <span class="p">(</span><span class="nb">cons</span> <span class="ss">'Sat</span>
+		<span class="p">(</span><span class="nb">cons</span> <span class="ss">'Sun</span> <span class="no">nil</span><span class="p">))))))))</span>
+</code></pre></div></div>
+
+<p><img src="/assets/post_images/image-20240415213050619.png" alt="" /></p>
+
+<p>这就是week列表的构成方式。便构成了我们直观意义上的列表，</p>
+
+<p>现在如果我们要访问其中的某个cell，lisp为我们提供了两种操作，选择当前列表的首项 <code class="language-plaintext highlighter-rouge">car</code> 或者选择当前列表首项以外的元素 <code class="language-plaintext highlighter-rouge">cdr</code> 。</p>
+
+<p>例如，如果我们要选区周三 <code class="language-plaintext highlighter-rouge">Wed</code> ，可以通过以下代码实现：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">car</span> <span class="p">(</span><span class="nb">cdr</span> <span class="p">(</span><span class="nb">cdr</span> <span class="nv">week</span><span class="p">)))</span>
+</code></pre></div></div>
+
+<p>对于访问列表 $x$ 的第 $n$ 个元素，只需要 $n-1$ 个表达式调用<code class="language-plaintext highlighter-rouge">cdr</code>原语，最后用 <code class="language-plaintext highlighter-rouge">car</code> 访问当前 <code class="language-plaintext highlighter-rouge">cell</code> 的列表数据即可。</p>
+
+<p>为了更方便访问列表任意位置元素，我们可以编写一个高级函数 <code class="language-plaintext highlighter-rouge">select</code>：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">set</span> <span class="ss">'select</span> <span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="nb">list</span> <span class="nb">position</span><span class="p">)</span>
+	<span class="p">(</span><span class="k">if</span> <span class="p">(</span><span class="nb">eq</span> <span class="nb">position</span> <span class="mi">1</span><span class="p">)</span>
+		<span class="p">(</span><span class="nb">car</span> <span class="nb">list</span><span class="p">)</span>
+		<span class="p">(</span><span class="k">if</span> <span class="p">(</span><span class="nb">&gt;</span> <span class="nb">position</span> <span class="mi">1</span><span class="p">)</span>
+			<span class="p">(</span><span class="nb">funcall</span> <span class="nv">select</span> <span class="p">(</span><span class="nb">cdr</span> <span class="nb">list</span><span class="p">)</span> <span class="p">(</span><span class="nb">-</span> <span class="nb">position</span> <span class="mi">1</span><span class="p">))</span>
+			<span class="p">(</span><span class="k">if</span> <span class="p">(</span><span class="nb">&lt;</span> <span class="nb">position</span> <span class="mi">1</span><span class="p">)</span>
+				<span class="no">nil</span><span class="p">)))))</span>
+</code></pre></div></div>
+<p>原理很简单，如果位置 <code class="language-plaintext highlighter-rouge">position</code> 的值不为一，便继续使用 <code class="language-plaintext highlighter-rouge">cdr</code> 原语同时令 <code class="language-plaintext highlighter-rouge">position</code> 减一。直到 <code class="language-plaintext highlighter-rouge">position</code> 的值为一，返回当前列表首项。</p>
+
+<p>有两个小问题。</p>
+
+<ol>
+  <li>
+    <p>如果 <code class="language-plaintext highlighter-rouge">position</code> 是非正整数，无论减多少次一，都不会抵达递归的结束条件 <code class="language-plaintext highlighter-rouge">position</code> 为一。这种情况下，为了避免陷入死循环，需要增加 <code class="language-plaintext highlighter-rouge">position</code> 为负数返回 <code class="language-plaintext highlighter-rouge">nil</code> 的分支。</p>
+  </li>
+  <li>
+    <p>如果 <code class="language-plaintext highlighter-rouge">position</code> 大于列表长度，由于 <code class="language-plaintext highlighter-rouge">position</code> 一定可以在有限步内减小至一，以及 <code class="language-plaintext highlighter-rouge">nil</code> 的 <code class="language-plaintext highlighter-rouge">cdr</code> 依然是<code class="language-plaintext highlighter-rouge">cdr</code>，所以该情形下不会陷入死循环。</p>
+  </li>
+</ol>
+
+<p>测试一下，选择 <code class="language-plaintext highlighter-rouge">week</code> 第五个元素 <code class="language-plaintext highlighter-rouge">Fri</code>：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">funcall</span> <span class="nv">select</span> <span class="nv">week</span> <span class="mi">5</span><span class="p">)</span>
+<span class="c1">;;=&gt;Fri</span>
+</code></pre></div></div>
+<p>选择一个负位置或超长位置，比如 <code class="language-plaintext highlighter-rouge">-3</code>和<code class="language-plaintext highlighter-rouge">8</code></p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">funcall</span> <span class="nv">select</span> <span class="nv">week</span> <span class="mi">-3</span><span class="p">)</span>
+<span class="c1">;;=&gt;nil</span>
+<span class="p">(</span><span class="nb">funcall</span> <span class="nv">select</span> <span class="nv">week</span> <span class="mi">8</span><span class="p">)</span>
+<span class="c1">;;=&gt;nil</span>
+</code></pre></div></div>
+
+<p>那么如果我怀疑 <code class="language-plaintext highlighter-rouge">week</code> 的长度到底是不是7天呢？（我担心之前创建数组时忘记了一天。）</p>
+
+<p>设置一个长度函数 <code class="language-plaintext highlighter-rouge">length</code>：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">set</span> <span class="ss">'length</span>
+     <span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+       <span class="p">(</span><span class="k">if</span> <span class="p">(</span><span class="nb">eq</span> <span class="p">(</span><span class="nb">eq</span> <span class="nb">list</span> <span class="no">nil</span><span class="p">)</span> <span class="no">nil</span><span class="p">)</span>
+	   <span class="p">(</span><span class="nb">+</span> <span class="mi">1</span> <span class="p">(</span><span class="nb">funcall</span> <span class="nb">length</span> <span class="p">(</span><span class="nb">cdr</span> <span class="nb">list</span><span class="p">)))</span>
+	 <span class="mi">0</span>
+	 <span class="p">)))</span>
+</code></pre></div></div>
+
+<p>原理是，直到空为止，每遍历一个元素，便让返回值加一。</p>
+
+<p>测试：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">funcall</span> <span class="nb">length</span> <span class="nv">week</span><span class="p">)</span>
+<span class="c1">;;=&gt;7</span>
+</code></pre></div></div>
+<p>现在赋予 week 中的每一天以一个温度的数值，但是一个一个赋值太麻烦了，能不能为
+<code class="language-plaintext highlighter-rouge">week</code> 中包含的每个元素一次性赋值呢？</p>
+
+<p>创建一个 <code class="language-plaintext highlighter-rouge">multi-set</code> 函数，我想给它两个参数，一个是变量列表，一个是值列表，然后利用 <code class="language-plaintext highlighter-rouge">set</code> 将变量指向相应值。
+这首先要求变量列表和值列表的长度相同。</p>
+
+<p>那么先设置一个判断长度相同的函数：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">set</span> <span class="ss">'length-eq</span>
+       <span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="nv">list-a</span> <span class="nv">list-b</span><span class="p">)</span>
+	 <span class="p">(</span><span class="k">if</span> <span class="p">(</span><span class="nb">eq</span> <span class="p">(</span><span class="nb">funcall</span> <span class="nb">length</span> <span class="nv">list-a</span><span class="p">)</span> <span class="p">(</span><span class="nb">funcall</span> <span class="nb">length</span> <span class="nv">list-b</span><span class="p">))</span>
+	     <span class="no">t</span> <span class="no">nil</span><span class="p">)))</span>
+<span class="c1">;;(funcall length-eq '(a b c) '(1 2 3))</span>
+<span class="c1">;;=&gt;t</span>
+<span class="c1">;;(funcall length-eq '(a b c) '(1 2 3 4))</span>
+<span class="c1">;;=&gt;nil</span>
+</code></pre></div></div>
+<p>变量列表和值列表相同的条件下，用 <code class="language-plaintext highlighter-rouge">set</code> 赋值。</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">set</span> <span class="ss">'multi-set</span>
+     <span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="nv">variables</span> <span class="nb">values</span><span class="p">)</span>
+       <span class="p">(</span><span class="k">if</span> <span class="p">(</span><span class="nb">funcall</span> <span class="nv">length-eq</span> <span class="nv">variables</span> <span class="nb">values</span><span class="p">)</span>
+	   <span class="p">(</span><span class="k">if</span> <span class="p">(</span><span class="nb">eq</span> <span class="p">(</span><span class="nb">eq</span> <span class="nv">variables</span> <span class="no">nil</span><span class="p">)</span> <span class="no">nil</span><span class="p">)</span>
+	       <span class="p">(</span><span class="nb">cons</span> <span class="p">(</span><span class="nb">set</span> <span class="p">(</span><span class="nb">car</span> <span class="nv">variables</span><span class="p">)</span> <span class="p">(</span><span class="nb">car</span> <span class="nb">values</span><span class="p">))</span>
+		     <span class="p">(</span><span class="nb">funcall</span> <span class="nv">multi-set</span> <span class="p">(</span><span class="nb">cdr</span> <span class="nv">variables</span><span class="p">)</span> <span class="p">(</span><span class="nb">cdr</span> <span class="nb">values</span><span class="p">)))</span>
+	     <span class="no">nil</span><span class="p">)</span>
+	 <span class="no">nil</span><span class="p">)))</span>
+<span class="c1">;;(funcall multi-set `(a b c) '(1 2 3))</span>
+<span class="c1">;;(list a b c)</span>
+<span class="c1">;;=&gt;(1 2 3)</span>
+</code></pre></div></div>
+
+<p>现在尝试为一天记录一个体温。</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">funcall</span> <span class="nv">multi-set</span> <span class="nv">week</span> <span class="o">'</span><span class="p">(</span><span class="mf">36.5</span> <span class="mf">36.4</span> <span class="mf">37.2</span> <span class="mf">36.8</span> <span class="mf">36.9</span> <span class="mf">36.7</span> <span class="mf">36.4</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p>既然可以一次性访设置多个指针，那么为什么不能一次性访问多个指针呢？</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">set</span> <span class="ss">'multi-eval</span>
+     <span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="nv">var-list</span><span class="p">)</span>
+       <span class="p">(</span><span class="k">if</span> <span class="p">(</span><span class="nb">eq</span> <span class="p">(</span><span class="nb">eq</span> <span class="nv">var-list</span> <span class="no">nil</span><span class="p">)</span> <span class="no">nil</span><span class="p">)</span>
+	   <span class="p">(</span><span class="nb">cons</span> <span class="p">(</span><span class="nb">eval</span> <span class="p">(</span><span class="nb">car</span> <span class="nv">var-list</span><span class="p">))</span> <span class="p">(</span><span class="nb">funcall</span> <span class="nv">multi-eval</span> <span class="p">(</span><span class="nb">cdr</span> <span class="nv">var-list</span><span class="p">)))</span>
+	 <span class="no">nil</span><span class="p">)))</span>
+<span class="c1">;;(funcall multi-eval week)</span>
+<span class="c1">;;=&gt;(36.5 36.4 37.2 36.8 36.9 36.7 36.4)</span>
+</code></pre></div></div>
+
+<p>从中我们看到一种更加普遍的形式， <code class="language-plaintext highlighter-rouge">multi</code> ，对于列表中的每一项执行某个函数：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">set</span> <span class="ss">'multi</span>
+       <span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="nv">fun</span> <span class="nv">vars</span><span class="p">)</span>
+	 <span class="p">(</span><span class="k">if</span> <span class="p">(</span><span class="nb">eq</span> <span class="p">(</span><span class="nb">eq</span> <span class="nv">vars</span> <span class="no">nil</span><span class="p">)</span> <span class="no">nil</span><span class="p">)</span>
+	     <span class="p">(</span><span class="nb">cons</span> <span class="p">(</span><span class="nb">funcall</span> <span class="nv">fun</span> <span class="p">(</span><span class="nb">car</span> <span class="nv">vars</span><span class="p">))</span> <span class="p">(</span><span class="nb">funcall</span> <span class="nv">multi</span> <span class="nv">fun</span> <span class="p">(</span><span class="nb">cdr</span> <span class="nv">vars</span><span class="p">)))</span>
+	   <span class="no">nil</span><span class="p">)))</span>
+<span class="c1">;;(funcall multi length '((1 2) (2 3 4)))</span>
+<span class="c1">;;=&gt;(2 3)</span>
+</code></pre></div></div>
+
+<p>这和 <code class="language-plaintext highlighter-rouge">mapcar</code> 的功能是一致的。</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">mapcar</span> <span class="nb">length</span> <span class="o">'</span><span class="p">((</span><span class="mi">1</span> <span class="mi">2</span><span class="p">)</span> <span class="p">(</span><span class="mi">2</span> <span class="mi">3</span> <span class="mi">4</span><span class="p">)))</span>
+<span class="c1">;;=&gt;(2 3)</span>
+</code></pre></div></div>
+
+<p>但是对于 <code class="language-plaintext highlighter-rouge">select</code> 这样具有两个参数输入的函数，<code class="language-plaintext highlighter-rouge">multi</code> 是无法处理的。
+例如，我想选择 <code class="language-plaintext highlighter-rouge">week</code> 中第二天和第三天温度构成一个新的列表。</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">set</span> <span class="ss">'multii</span>
+       <span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="nv">fun</span> <span class="nb">list</span> <span class="nv">vars</span><span class="p">)</span>
+	 <span class="p">(</span><span class="k">if</span> <span class="p">(</span><span class="nb">eq</span> <span class="p">(</span><span class="nb">eq</span> <span class="nv">vars</span> <span class="no">nil</span><span class="p">)</span> <span class="no">nil</span><span class="p">)</span>
+	     <span class="p">(</span><span class="nb">cons</span> <span class="p">(</span><span class="nb">funcall</span> <span class="nv">fun</span> <span class="nb">list</span> <span class="p">(</span><span class="nb">car</span> <span class="nv">vars</span><span class="p">))</span> <span class="p">(</span><span class="nb">funcall</span> <span class="nv">multii</span> <span class="nv">fun</span> <span class="nb">list</span> <span class="p">(</span><span class="nb">cdr</span> <span class="nv">vars</span><span class="p">)))</span>
+	   <span class="no">nil</span><span class="p">)))</span>
+<span class="c1">;;(funcall multii select '(a b c d e) '(2 3 1))</span>
+<span class="c1">;;=&gt;(b c a)</span>
+<span class="c1">;;(funcall multi-eval (funcall multii select week '(2 3)))</span>
+<span class="c1">;;=&gt;(36.4 37.2)</span>
+</code></pre></div></div>
+
+<p>是时候区分一下函数列表和变量（指针）列表了。</p>
+
+<p>如果我想单独设置七个函数，分别用于选择列表的1~7个元素如何？
+我完全可以在 <code class="language-plaintext highlighter-rouge">select</code> 函数的基础之上加以选择</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">set</span> <span class="nb">first</span> <span class="o">'</span><span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="nv">x</span><span class="p">)</span> <span class="p">(</span><span class="nv">select</span> <span class="nv">x</span> <span class="mi">1</span><span class="p">)))</span>
+<span class="p">(</span><span class="nb">set</span> <span class="nb">second</span> <span class="o">'</span><span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="nv">x</span><span class="p">)</span> <span class="p">(</span><span class="nv">select</span> <span class="nv">x</span> <span class="mi">2</span><span class="p">)))</span>
+<span class="p">(</span><span class="nb">set</span> <span class="nb">second</span> <span class="o">'</span><span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="nv">x</span><span class="p">)</span> <span class="p">(</span><span class="nv">select</span> <span class="nv">x</span> <span class="mi">3</span><span class="p">)))</span>
+
+<span class="o">...</span>
+</code></pre></div></div>
+<p>这样一来，从 <code class="language-plaintext highlighter-rouge">week</code> 中选取第二天和第三天就可以从多个参数输入一个函数，转向多个函数处理一个参数：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">set</span> <span class="ss">'multiii</span>
+	<span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="nv">funs</span> <span class="nv">var</span><span class="p">)</span>
+		<span class="p">(</span><span class="k">if</span> <span class="p">(</span><span class="nb">eq</span> <span class="p">(</span><span class="nb">eq</span> <span class="nv">funs</span> <span class="no">nil</span><span class="p">)</span> <span class="no">nil</span><span class="p">)</span>
+		<span class="p">(</span><span class="nb">cons</span> <span class="p">(</span><span class="nb">funcall</span> <span class="p">(</span><span class="nb">car</span> <span class="nv">funs</span><span class="p">)</span> <span class="nv">var</span><span class="p">)</span> <span class="p">(</span><span class="nb">funcall</span> <span class="nv">multiii</span> <span class="p">(</span><span class="nb">cdr</span> <span class="nv">funs</span><span class="p">)</span> <span class="nv">var</span><span class="p">))</span>
+	<span class="no">nil</span><span class="p">)))</span>
+<span class="c1">;;(funcall multiii (list first second third) week)</span>
+<span class="c1">;;=&gt;(Mon Tue Wed)</span>
+<span class="c1">;;(funcall multiii `(first second third) week)</span>
+<span class="c1">;;=&gt;wrong!</span>
+</code></pre></div></div>
+
+<p>这里的 <code class="language-plaintext highlighter-rouge">first</code> <code class="language-plaintext highlighter-rouge">second</code> <code class="language-plaintext highlighter-rouge">third</code> 都是对单一参数进行处理的函数，它们共同组成了函数列表。
+另一种列表是<code class="language-plaintext highlighter-rouge">Mon</code> <code class="language-plaintext highlighter-rouge">Tue</code> 等温度数据组成的参数（指针）列表，
+参数列表和函数列表并不能如表达式 <code class="language-plaintext highlighter-rouge">(+ 1 1)</code> 一样被直接运行。
+但是将参数列表和函数列表分开，用 <code class="language-plaintext highlighter-rouge">multi</code> 这样的函数再把它们结合在一起，例如 <code class="language-plaintext highlighter-rouge">todo</code>。</p>
+
+<p>现在我们不在用 <code class="language-plaintext highlighter-rouge">week</code> 记录温度，而记录日程表。</p>
+
+<p>例如：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">set</span> <span class="ss">'Mon</span> <span class="o">'</span><span class="p">(</span><span class="nv">task-1</span> <span class="nv">task-2</span><span class="p">))</span>
+<span class="o">...</span>
+</code></pre></div></div>
+
+<p>那么，利用 <code class="language-plaintext highlighter-rouge">multiii</code> 同具体周脱离的特性便可以制定面向一般周 <code class="language-plaintext highlighter-rouge">week-x</code> 的习惯：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">set</span> <span class="ss">'habits</span> <span class="o">'</span><span class="p">(</span><span class="nv">habit-1</span> <span class="nv">habit-2</span> <span class="o">...</span><span class="p">))</span>
+<span class="p">(</span><span class="nb">funcall</span> <span class="nv">multiii</span> <span class="nv">habits</span> <span class="nv">week-x</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>当需要调整习惯时，只需要利用 <code class="language-plaintext highlighter-rouge">car</code> <code class="language-plaintext highlighter-rouge">cdr</code> <code class="language-plaintext highlighter-rouge">cons</code> 调整函数列表 <code class="language-plaintext highlighter-rouge">habits</code> 即可，而不必牵涉到每天的具体任务。
+同理，调整习惯保持的时间段，只需要修改参数列表 <code class="language-plaintext highlighter-rouge">week-x</code> 即可，而不必牵涉到习惯的具体内容。</p>
+
+<h2 id="总结">总结</h2>
+
+<p>本篇笔记以温度记录为例，分析了列表的而基础结构和操作，区分了函数列表，参数列表和表达式三种不同的列表，同时对 <code class="language-plaintext highlighter-rouge">multi</code> 函数加以探索以结合参数列表和函数列表。</p>
+
+<h2 id="参考">参考</h2>
+
+<ul>
+  <li><a href="https://www.gnu.org/software/emacs/manual/elisp.html">GNU: Emacs Lisp Reference Manual</a></li>
+</ul>
+
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+  
+
+
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fas fa-fw fa-tags" aria-hidden="true"></i> 标签: </strong>
+    <span itemprop="keywords">
+    
+      <a href="/tags/#lisp" class="page__taxonomy-item p-category" rel="tag">lisp</a>
+    
+    </span>
+  </p>
+
+
+
+
+        
+
+  <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> 更新时间:</strong> <time class="dt-published" datetime="2023-12-24T00:00:00+08:00">December 24, 2023</time></p>
+
+      </footer>
+
+      
+
+      
+  <nav class="pagination">
+    
+      <a href="/lisp%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95-%E6%8C%87%E9%92%88%E4%B8%8E%E5%87%BD%E6%95%B0/" class="pagination--pager" title="Lisp基础语法：指针与函数
+">上一页</a>
+    
+    
+      <a href="/lisp%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95-%E4%B8%BB%E8%AF%AD/" class="pagination--pager" title="Lisp基础语法：主语
+">下一页</a>
+    
+  </nav>
+
+    </div>
+
+    
+  </article>
+
+  
+  
+    <div class="page__related">
+      <h2 class="page__related-title">猜您还喜欢</h2>
+      <div class="grid__wrapper">
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/hbase-%E9%85%8D%E7%BD%AE-(%E5%A4%B1%E8%B4%A5)/" rel="permalink">Hbase 配置 (失败)
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2024-04-15T00:00:00+08:00">April 15, 2024</time>
+      </span>
+    
+
+    
+
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">目标
+</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/tlaplus-%E7%94%B5%E6%8A%A5%E9%97%AE%E9%A2%98/" rel="permalink">Tlaplus：电报问题
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2024-03-14T00:00:00+08:00">March 14, 2024</time>
+      </span>
+    
+
+    
+
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">在一个小编程中测试tlaplus。
+</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/tlaplus-Pluscal/" rel="permalink">Tlaplus pluscal
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2024-03-13T00:00:00+08:00">March 13, 2024</time>
+      </span>
+    
+
+    
+
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">探索一下 tlaplus pluscal 的基本功能。
+</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/calibre-server-%E9%85%8D%E7%BD%AE/" rel="permalink">Calibre server 配置
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2024-02-25T00:00:00+08:00">February 25, 2024</time>
+      </span>
+    
+
+    
+
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">calibre-server是一种非常便利的线上电子阅读服务。
+之前的服务器到期了，现在重新配置了calibre-server，整理一下操作步骤。
+</p>
+  </article>
+</div>
+
+        
+      </div>
+    </div>
+  
+  
+</div>
+
+    </div>
+
+    
+      <div class="search-content">
+        <div class="search-content__inner-wrap"><form class="search-content__form" onkeydown="return event.key != 'Enter';" role="search">
+    <label class="sr-only" for="search">
+      输入您要搜索的关键词...
+    </label>
+    <input type="search" id="search" class="search-input" tabindex="-1" placeholder="输入您要搜索的关键词..." />
+  </form>
+  <div id="results" class="results"></div></div>
+
+      </div>
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+<!-- end custom footer snippets -->
+
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+      <li><strong>关注:</strong></li>
+    
+
+    
+
+    
+      <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+    
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2024 甲与. 技术来自于 <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+
+
+
+
+<script src="/assets/js/lunr/lunr.min.js"></script>
+<script src="/assets/js/lunr/lunr-store.js"></script>
+<script src="/assets/js/lunr/lunr-en.js"></script>
+
+
+
+
+
+
+
+  </body>
+</html>
