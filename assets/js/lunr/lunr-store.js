@@ -1,10 +1,4 @@
 var store = [{
-        "title": "Rbase 配置",
-        "excerpt":"之前配置过Rbase失败后，现在cpu 占用率达到100%，无法ssh连接。不知道在做什么。 再尝试一次吧。 重新启动 hdfs 和yarn start-hdfs.sh start-yarn.sh BandWitch 重启后的 hosts 文件刷新问题 lsattr file-name 查看属性 chattr +x file-name 增加x属性 chattr -x file-name 减少x属性 举例： root@J:/etc# lsattr hosts ----ia--------e----- hosts i（immutable）：表示文件或目录是不可变的，即不能被修改、删除、重命名或链接。只有超级用户（root）可以修改或删除该文件或目录。 a（append-only）：表示文件只能向其末尾追加数据，不能修改或删除文件中已有的数据。只有超级用户（root）可以修改或删除该文件。 e（extend）：表示文件或目录使用了ACL（Access Control List，访问控制列表）来控制访问权限，允许对文件或目录设置更细粒度的权限控制。 对策： root@J:/etc# chattr -i hosts root@J:/etc# chattr -a hosts root@J:/etc# chattr -e hosts root@J:/etc# lsattr hosts...","categories": [],
-        "tags": [],
-        "url": "/rbase-%E9%85%8D%E7%BD%AE/",
-        "teaser": null
-      },{
         "title": "Trilium配置",
         "excerpt":"Trilium 是一个便捷的笔记软件。本篇博客记录trilium的配置过程。 在bash中下载trilium文件。 weget https://github.com/zadam/trilium/releases/download/v0.62.6/trilium-linux-x64-server-0.62.6.tar.xz 解压文件。 tar -xvf trilium-linux-x64-server-0.62.6.tar.xz mv trilium-linux-x64-server /opt/trilium 设置系统服务文件 /etc/systemd/system/trilium-service [Unit] Description=Trilium Daemon After=syslog.target network.target [Service] User=root Group=root Type=simple ExecStart=/opt/trilium/trilium.sh WorkingDirectory=/opt/trilium/ TimeoutStopSec=20 # KillMode=process leads to error, according to https://www.freedesktop.org/software/systemd/man/systemd.kill.html Restart=always [Install] WantedBy=multi-user.target Trilium默认端口为8080。打开浏览器，输入 ip/域名+8080 ，访问triliun网站，初始化密码。 不过当前端口设置为8080，需要修改 ~/trilium-data/config.ini 中的端口以及关闭ssl。 port=2024 https=true certPath=&lt;证书文件地址&gt; keyPath=&lt;证书私匙地址&gt; 重启trilium systemctl restart...","categories": [],
         "tags": ["配置"],
