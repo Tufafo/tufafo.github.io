@@ -5,12 +5,6 @@ var store = [{
         "url": "/rbase-%E9%85%8D%E7%BD%AE/",
         "teaser": null
       },{
-        "title": "Tlaplus：操作符和函数",
-        "excerpt":"了解一下 tlaplus 的操作符和函数。 TLA+ 的变量 Q1：TLA+ 有什么自定义操作符？ 我比较感兴趣的是用户自定义操作符： set ++ elem == set \\union {elem} set -- elem == set \\ {elem} &gt;&gt; {1, 2} ++ 3 {1, 2, 3} &gt;&gt; {1, 2} – 2 {1} 现在可不可以吧fovis之类的定义了呢？ mio \\ifvp vio \\da ilio == IFVP(mio, vio, ilio) 好像不可以。 mio vio -da...","categories": [],
-        "tags": ["TLAplus"],
-        "url": "/tlaplus-%E6%93%8D%E4%BD%9C%E7%AC%A6%E5%92%8C%E5%87%BD%E6%95%B0/",
-        "teaser": null
-      },{
         "title": "Trilium配置",
         "excerpt":"Trilium 是一个便捷的笔记软件。本篇博客记录trilium的配置过程。 在bash中下载trilium文件。 weget https://github.com/zadam/trilium/releases/download/v0.62.6/trilium-linux-x64-server-0.62.6.tar.xz 解压文件。 tar -xvf trilium-linux-x64-server-0.62.6.tar.xz mv trilium-linux-x64-server /opt/trilium 设置系统服务文件 /etc/systemd/system/trilium-service [Unit] Description=Trilium Daemon After=syslog.target network.target [Service] User=root Group=root Type=simple ExecStart=/opt/trilium/trilium.sh WorkingDirectory=/opt/trilium/ TimeoutStopSec=20 # KillMode=process leads to error, according to https://www.freedesktop.org/software/systemd/man/systemd.kill.html Restart=always [Install] WantedBy=multi-user.target Trilium默认端口为8080。打开浏览器，输入 ip/域名+8080 ，访问triliun网站，初始化密码。 不过当前端口设置为8080，需要修改 ~/trilium-data/config.ini 中的端口以及关闭ssl。 port=2024 https=true certPath=&lt;证书文件地址&gt; keyPath=&lt;证书私匙地址&gt; 重启trilium systemctl restart...","categories": [],
         "tags": ["配置"],
@@ -65,6 +59,12 @@ var store = [{
         "url": "/tlaplus-%E7%94%B5%E6%8A%A5%E9%97%AE%E9%A2%98/",
         "teaser": null
       },{
+        "title": "Tlaplus：操作符和函数",
+        "excerpt":"了解一下 tlaplus 的操作符和函数。 TLA+ 的变量 Q1：TLA+ 有什么自定义操作符？ 我比较感兴趣的是用户自定义操作符： set ++ elem == set \\union {elem} set -- elem == set \\ {elem} &gt;&gt; {1, 2} ++ 3 {1, 2, 3} &gt;&gt; {1, 2} – 2 {1} 现在可不可以吧fovis之类的定义了呢？ mio \\ifvp vio \\da ilio == IFVP(mio, vio, ilio) 好像不可以。 mio vio -da...","categories": [],
+        "tags": ["TLAplus"],
+        "url": "/tlaplus-%E6%93%8D%E4%BD%9C%E7%AC%A6%E5%92%8C%E5%87%BD%E6%95%B0/",
+        "teaser": null
+      },{
         "title": "Hbase 配置 (失败)",
         "excerpt":"目标 熟悉hbase配置的基本流程 集群部署 环境说明 两台ubuntu20.04 VPS。 hadoop 在两个vps中用 ssh-keygen -t rsa 命令生成密匙文件，复制到另一个vps的 ~/.ssh/authorized_keys 中，实现免密登录。 在/etc/hosts 中修改ip-主机名映射关系。在/etc/hostname文件中修改主机名，reboot 使主机名修改生效。 下载jdk-11并解压，增加JAVA_HOME 到 ~/.bashrc 文件中，用source 命令使之生效。 从官网下载hadoop-3.9.2版本并解压。 修改文件 hadoop-env.sh 增加内容 export JAVA_HOME=/root/src/jdk-11 HDFS_DATANODE_USER=root HDFS_NAMENODE_USER=root HDFS_SECONDARYNAMENODE_USER=root core-site.xml 修改配置 &lt;configuration&gt; &lt;property&gt; &lt;name&gt;fs.defaultFS&lt;/name&gt; &lt;value&gt;hdfs://G:9000&lt;/value&gt; &lt;/property&gt; &lt;property&gt; &lt;name&gt;hadoop.tmp.dir&lt;/name&gt; &lt;value&gt;/root/data/tmp&lt;/value&gt; &lt;/property&gt; &lt;/configuration&gt; hdfs-site.xml 修改配置 &lt;configuration&gt; &lt;property&gt; &lt;name&gt;dfs.namenode.name.dir&lt;/name&gt; &lt;value&gt;/root/data/namenode&lt;/value&gt; &lt;/property&gt;...","categories": [],
         "tags": ["失败","分布式"],
@@ -72,38 +72,38 @@ var store = [{
         "teaser": null
       },{
     "title": "Portfolio",
-    "excerpt":" ","url": "http://localhost:4000/portfolio/"
+    "excerpt":" ","url": "/portfolio/"
   },{
     "title": null,
-    "excerpt":"","url": "http://localhost:4000/"
+    "excerpt":"","url": "/"
   },{
     "title": null,
-    "excerpt":"var idx = lunr(function () { this.field('title') this.field('excerpt') this.field('categories') this.field('tags') this.ref('id') this.pipeline.remove(lunr.trimmer) for (var item in store) { this.add({ title: store[item].title, excerpt: store[item].excerpt, categories: store[item].categories, tags: store[item].tags, id: item }) } }); $(document).ready(function() { $('input#search').on('keyup', function () { var resultdiv = $('#results'); var query = $(this).val().toLowerCase(); var result = idx.query(function...","url": "http://localhost:4000/assets/js/lunr/lunr-en.js"
+    "excerpt":"var idx = lunr(function () { this.field('title') this.field('excerpt') this.field('categories') this.field('tags') this.ref('id') this.pipeline.remove(lunr.trimmer) for (var item in store) { this.add({ title: store[item].title, excerpt: store[item].excerpt, categories: store[item].categories, tags: store[item].tags, id: item }) } }); $(document).ready(function() { $('input#search').on('keyup', function () { var resultdiv = $('#results'); var query = $(this).val().toLowerCase(); var result = idx.query(function...","url": "/assets/js/lunr/lunr-en.js"
   },{
     "title": null,
-    "excerpt":"step1list = new Array(); step1list[\"ΦΑΓΙΑ\"] = \"ΦΑ\"; step1list[\"ΦΑΓΙΟΥ\"] = \"ΦΑ\"; step1list[\"ΦΑΓΙΩΝ\"] = \"ΦΑ\"; step1list[\"ΣΚΑΓΙΑ\"] = \"ΣΚΑ\"; step1list[\"ΣΚΑΓΙΟΥ\"] = \"ΣΚΑ\"; step1list[\"ΣΚΑΓΙΩΝ\"] = \"ΣΚΑ\"; step1list[\"ΟΛΟΓΙΟΥ\"] = \"ΟΛΟ\"; step1list[\"ΟΛΟΓΙΑ\"] = \"ΟΛΟ\"; step1list[\"ΟΛΟΓΙΩΝ\"] = \"ΟΛΟ\"; step1list[\"ΣΟΓΙΟΥ\"] = \"ΣΟ\"; step1list[\"ΣΟΓΙΑ\"] = \"ΣΟ\"; step1list[\"ΣΟΓΙΩΝ\"] = \"ΣΟ\"; step1list[\"ΤΑΤΟΓΙΑ\"] = \"ΤΑΤΟ\"; step1list[\"ΤΑΤΟΓΙΟΥ\"] = \"ΤΑΤΟ\"; step1list[\"ΤΑΤΟΓΙΩΝ\"] = \"ΤΑΤΟ\"; step1list[\"ΚΡΕΑΣ\"]...","url": "http://localhost:4000/assets/js/lunr/lunr-gr.js"
+    "excerpt":"step1list = new Array(); step1list[\"ΦΑΓΙΑ\"] = \"ΦΑ\"; step1list[\"ΦΑΓΙΟΥ\"] = \"ΦΑ\"; step1list[\"ΦΑΓΙΩΝ\"] = \"ΦΑ\"; step1list[\"ΣΚΑΓΙΑ\"] = \"ΣΚΑ\"; step1list[\"ΣΚΑΓΙΟΥ\"] = \"ΣΚΑ\"; step1list[\"ΣΚΑΓΙΩΝ\"] = \"ΣΚΑ\"; step1list[\"ΟΛΟΓΙΟΥ\"] = \"ΟΛΟ\"; step1list[\"ΟΛΟΓΙΑ\"] = \"ΟΛΟ\"; step1list[\"ΟΛΟΓΙΩΝ\"] = \"ΟΛΟ\"; step1list[\"ΣΟΓΙΟΥ\"] = \"ΣΟ\"; step1list[\"ΣΟΓΙΑ\"] = \"ΣΟ\"; step1list[\"ΣΟΓΙΩΝ\"] = \"ΣΟ\"; step1list[\"ΤΑΤΟΓΙΑ\"] = \"ΤΑΤΟ\"; step1list[\"ΤΑΤΟΓΙΟΥ\"] = \"ΤΑΤΟ\"; step1list[\"ΤΑΤΟΓΙΩΝ\"] = \"ΤΑΤΟ\"; step1list[\"ΚΡΕΑΣ\"]...","url": "/assets/js/lunr/lunr-gr.js"
   },{
     "title": null,
-    "excerpt":"var store = [ {%- for c in site.collections -%} {%- if forloop.last -%} {%- assign l = true -%} {%- endif -%} {%- assign docs = c.docs | where_exp:'doc','doc.search != false' -%} {%- for doc in docs -%} {%- if doc.header.teaser -%} {%- capture teaser -%}{{ doc.header.teaser }}{%- endcapture...","url": "http://localhost:4000/assets/js/lunr/lunr-store.js"
+    "excerpt":"var store = [ {%- for c in site.collections -%} {%- if forloop.last -%} {%- assign l = true -%} {%- endif -%} {%- assign docs = c.docs | where_exp:'doc','doc.search != false' -%} {%- for doc in docs -%} {%- if doc.header.teaser -%} {%- capture teaser -%}{{ doc.header.teaser }}{%- endcapture...","url": "/assets/js/lunr/lunr-store.js"
   },{
     "title": "分类",
-    "excerpt":"","url": "http://localhost:4000/tags/"
+    "excerpt":"","url": "/tags/"
   },{
     "title": "归档",
-    "excerpt":"","url": "http://localhost:4000/year-archive/"
+    "excerpt":"","url": "/year-archive/"
   },{
     "title": null,
-    "excerpt":"","url": "http://localhost:4000/page2/"
+    "excerpt":"","url": "/page2/"
   },{
     "title": null,
-    "excerpt":"","url": "http://localhost:4000/page3/"
+    "excerpt":"","url": "/page3/"
   },{
     "title": null,
-    "excerpt":"{% if page.xsl %} {% endif %} {% assign collections = site.collections | where_exp:'collection','collection.output != false' %}{% for collection in collections %}{% assign docs = collection.docs | where_exp:'doc','doc.sitemap != false' %}{% for doc in docs %} {{ doc.url | replace:'/index.html','/' | absolute_url | xml_escape }} {% if doc.last_modified_at or doc.date...","url": "http://localhost:4000/sitemap.xml"
+    "excerpt":"{% if page.xsl %} {% endif %} {% assign collections = site.collections | where_exp:'collection','collection.output != false' %}{% for collection in collections %}{% assign docs = collection.docs | where_exp:'doc','doc.sitemap != false' %}{% for doc in docs %} {{ doc.url | replace:'/index.html','/' | absolute_url | xml_escape }} {% if doc.last_modified_at or doc.date...","url": "/sitemap.xml"
   },{
     "title": null,
-    "excerpt":"Sitemap: {{ \"sitemap.xml\" | absolute_url }} ","url": "http://localhost:4000/robots.txt"
+    "excerpt":"Sitemap: {{ \"sitemap.xml\" | absolute_url }} ","url": "/robots.txt"
   },{
     "title": null,
-    "excerpt":"{% if page.xsl %}{% endif %}Jekyll{{ site.time | date_to_xmlschema }}{{ page.url | absolute_url | xml_escape }}{% assign title = site.title | default: site.name %}{% if page.collection != \"posts\" %}{% assign collection = page.collection | capitalize %}{% assign title = title | append: \" | \" | append: collection %}{% endif...","url": "http://localhost:4000/feed.xml"
+    "excerpt":"{% if page.xsl %}{% endif %}Jekyll{{ site.time | date_to_xmlschema }}{{ page.url | absolute_url | xml_escape }}{% assign title = site.title | default: site.name %}{% if page.collection != \"posts\" %}{% assign collection = page.collection | capitalize %}{% assign title = title | append: \" | \" | append: collection %}{% endif...","url": "/feed.xml"
   }]
