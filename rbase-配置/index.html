@@ -1,0 +1,906 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.24.0 by Michael Rose
+  Copyright 2013-2020 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="zh" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>Rbase 配置 - 甲与</title>
+<meta name="description" content="之前配置过Rbase失败后，现在cpu 占用率达到100%，无法ssh连接。不知道在做什么。 再尝试一次吧。">
+
+
+  <meta name="author" content="甲与">
+  
+  <meta property="article:author" content="甲与">
+  
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:site_name" content="甲与">
+<meta property="og:title" content="Rbase 配置">
+<meta property="og:url" content="/rbase-%E9%85%8D%E7%BD%AE/">
+
+
+  <meta property="og:description" content="之前配置过Rbase失败后，现在cpu 占用率达到100%，无法ssh连接。不知道在做什么。 再尝试一次吧。">
+
+
+
+  <meta property="og:image" content="/assets/images/wallhaven-o5e1jm.png">
+
+
+
+
+
+  <meta property="article:published_time" content="0999-02-17T00:01:26+08:05">
+
+
+
+
+
+
+<link rel="canonical" href="/rbase-%E9%85%8D%E7%BD%AE/">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": "甲与",
+      "url": "/"
+    
+  }
+</script>
+
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+
+  <link href="/feed.xml" type="application/atom+xml" rel="alternate" title="甲与 Feed">
+
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css"></noscript>
+
+
+
+    <!-- start custom head snippets -->
+
+<script type="text/javascript" async
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+  </head>
+
+  <body class="layout--single">
+    <nav class="skip-links">
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">转到主导航栏</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">转到内容</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">转到底部</a></li>
+  </ul>
+</nav>
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+        <a class="site-title" href="/">
+          甲与
+          
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/tags/">分类</a>
+            </li><li class="masthead__menu-item">
+              <a href="/year-archive/">归档</a>
+            </li></ul>
+        
+        <button class="search__toggle" type="button">
+          <span class="visually-hidden">切换搜索</span>
+          <i class="fas fa-search"></i>
+        </button>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">切换菜单</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+  
+
+
+
+
+
+
+
+<div class="page__hero"
+  style=" background-image: url('');"
+>
+  
+    <img src="/assets/images/wallhaven-o5e1jm.png" alt="Rbase 配置" class="page__hero-image">
+  
+  
+</div>
+
+
+
+
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person" class="h-card">
+
+  
+    <div class="author__avatar">
+      <a href="/">
+        <img src="/assets/images/6.png" alt="甲与" itemprop="image" class="u-photo">
+      </a>
+    </div>
+  
+
+  <div class="author__content">
+    <h3 class="author__name p-name" itemprop="name">
+      <a class="u-url" rel="me" href="/" itemprop="url">甲与</a>
+    </h3>
+    
+      <div class="author__bio p-note" itemprop="description">
+        <p>记录一些随想。</p>
+
+      </div>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">关注</button>
+    <ul class="author__urls social-icons">
+      
+
+      
+        
+          
+        
+          
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer me">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+
+  <article class="page h-entry" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="Rbase 配置">
+    <meta itemprop="description" content="  之前配置过Rbase失败后，现在cpu 占用率达到100%，无法ssh连接。不知道在做什么。再尝试一次吧。">
+    <meta itemprop="datePublished" content="0999-02-17T00:01:26+08:05">
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title p-name" itemprop="headline">
+            <a href="/rbase-%E9%85%8D%E7%BD%AE/" class="u-url" itemprop="url">Rbase 配置
+</a>
+          </h1>
+          
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="0999-02-17T00:01:26+08:05">February 17, 0999</time>
+      </span>
+    
+
+    
+
+    
+  </p>
+
+
+        </header>
+      
+
+      <section class="page__content e-content" itemprop="text">
+        
+          <aside class="sidebar__right ">
+            <nav class="toc">
+              <header><h4 class="nav__title"><i class="fas fa-cog"></i> 目录</h4></header>
+              <ul class="toc__menu"><li><a href="#重启后的-hosts-文件刷新问题">重启后的 hosts 文件刷新问题</a></li><li><a href="#免密登录">免密登录</a></li><li><a href="#hdfs和yarn的基本功能是什么">HDFS和YARN的基本功能是什么？</a></li><li><a href="#hdfs-使用方法">hdfs 使用方法</a></li><li><a href="#zookeeper">zookeeper</a></li><li><a href="#hbase">hbase</a></li><li><a href="#2024-16-18">2024-16-18</a></li></ul>
+
+            </nav>
+          </aside>
+        
+        <ol>
+  <li>之前配置过Rbase失败后，现在cpu 占用率达到100%，无法ssh连接。不知道在做什么。
+再尝试一次吧。
+<img src="/assets/post_images/image-20240417110959098.png" alt="" /></li>
+</ol>
+
+<p>重新启动 hdfs 和yarn</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>start-hdfs.sh
+start-yarn.sh
+</code></pre></div></div>
+
+<p><img src="assets/post_images/image-20240417114123927.png" alt="" /></p>
+
+<p>BandWitch</p>
+
+<h4 id="重启后的-hosts-文件刷新问题">重启后的 hosts 文件刷新问题</h4>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">lsattr file-name</code> 查看属性</li>
+  <li><code class="language-plaintext highlighter-rouge">chattr +x file-name</code> 增加x属性</li>
+  <li><code class="language-plaintext highlighter-rouge">chattr -x file-name</code> 减少x属性</li>
+</ul>
+
+<p>举例：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>root@J:/etc# lsattr hosts
+<span class="nt">----ia--------e-----</span> hosts
+</code></pre></div></div>
+<p>i（immutable）：表示文件或目录是不可变的，即不能被修改、删除、重命名或链接。只有超级用户（root）可以修改或删除该文件或目录。</p>
+
+<p>a（append-only）：表示文件只能向其末尾追加数据，不能修改或删除文件中已有的数据。只有超级用户（root）可以修改或删除该文件。</p>
+
+<p>e（extend）：表示文件或目录使用了ACL（Access Control List，访问控制列表）来控制访问权限，允许对文件或目录设置更细粒度的权限控制。</p>
+
+<p>对策：</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>root@J:/etc# chattr -i hosts
+root@J:/etc# chattr -a hosts
+root@J:/etc# chattr -e hosts
+root@J:/etc# lsattr hosts
+-------------------- hosts
+</code></pre></div></div>
+
+<h4 id="免密登录">免密登录</h4>
+
+<p><code class="language-plaintext highlighter-rouge">id_rsa.pub</code> of G</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQD5s02Q58iVEv8bEQC4btMQN1H73FVQgYmzCU6sZ/GX0C1ERd9kq3k8dXOwVe7ZwEdNSL8b04TbN5sn90Nd6gRGSOEWuVRy/YtHeK+EaXTd2gH1dUPe663/dM30u7ZDbCxtHyy2UsspjpKWEpAdtt3/eQJ0TES2C6uH1GRfgn2Lg6NTNyYXHiUTXsXLd2F0/pL816M+4ILUbMqK/LF7qOxV/C7RAvncPODJC6APtfvycvTcMSaNKauqcl/Zn3M72KPYgfEpPgbxMsuq2bo2uDIyVrfPN6s+qRNOUoi9QRnrnTYvNlWJxGFsu6PMH8q/gfyB3GIkK2g7t14OIm49VJKOfwgEaRqIyrZfGy/ofFXXBWnaI8ogrSejpq2epXU3iQCVaEI+nBlFgwkSAcRyXiwpAkzzo3fFQNDYNifZtjt2xjkphzVvMkRpqkIgeEYFUBhVBn9+EGGemmgtlOLkDQU9lthMhuFbsXy3DY3acvb1LW7DACpi/teK2glDQmgZtKk= root@G
+</code></pre></div></div>
+
+<p>id_rsa.pub of J</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCxVafR0A5t6/zMJEhBgrmq0KQwt5lh4eCQrJ//ypiw04047fLxEu+GlhylS6s3VdZe4v6iML/NrfeyKOzM/PLSqK6Qjxdp9SM3cjoOVlGiHkg84w+YotWuDGaDQPocbK3/jM/Ul7fRAIY76WUCZPbLHODGN1DKq0KnrK4WEZ56Q3NmpATiUzE9GgNEAv3sdDxZjBA+a8hkuXaCAsZXPBIhLqY/RkxlDpQER79G3YcqgWr0U21fyqh/f2tvOIMHW3eoBpnqB/Qb/8SBwvWk25dPJgBxQ60vBj9hIfyp/CeCd+g0Pgc2fCEI0UJnNos9vz/oT/utXED8zz1t0Q6wdehC4aPitCgHYUqKCh7Ydw980M4IAFtN1rLJUHNmSKgdmt885oJ/XpGxxlqe1TWhjsoajcYlJp6BL6GwDSRq5hNwjdPMr77qFx0ClmP2L00AhPMd/2is7EuknV0rZW/lVTAYGaSa3iZhcbokHsqOIlI5bHmlnxTfVAuGDWNM0HBPOf0= root@J
+</code></pre></div></div>
+
+<p>hosts</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>	66.42.32.183 G
+	45.77.17.112 J
+</code></pre></div></div>
+
+<h4 id="hdfs和yarn的基本功能是什么">HDFS和YARN的基本功能是什么？</h4>
+
+<p><strong>HDFS (Hadoop Distributed File System )</strong></p>
+
+<p><strong>概述：</strong>
+HDFS 是一款分布式文件系统，用于存储海量数据并提供高度容错性。</p>
+
+<p><strong>主要功能：</strong></p>
+<ul>
+  <li>分布式存储：将数据块存储在集群中多台机器上，实现高容错性。</li>
+  <li>高吞吐量：通过并行读取和写入操作，实现高数据吞吐量。</li>
+  <li>数据保护：通过数据块复制和校验和检查来保护数据免受损坏或丢失。</li>
+</ul>
+
+<p><strong>YARN (Yet Another Resource Negotiator)</strong></p>
+
+<p><strong>概述：</strong>
+YARN 是 Hadoop 2.0 中的资源管理系统，负责协调和管理集群资源。</p>
+
+<p><strong>主要功能：</strong></p>
+<ul>
+  <li>资源管理：为应用程序分配和管理计算资源（CPU、内存等）。</li>
+  <li>作业调度：调度和管理作业执行，确保高效利用资源。</li>
+  <li>容错性：监控作业运行并重新启动失败的任务，确保作业完成。</li>
+  <li>分离式设计：将资源管理（ResourceManager）与应用程序管理（ApplicationMaster）分开，提高可扩展性和灵活性。</li>
+</ul>
+
+<h4 id="hdfs-使用方法">hdfs 使用方法</h4>
+
+<ul>
+  <li>查看根目录
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>hdfs dfs -ls /
+</code></pre></div>    </div>
+  </li>
+  <li>创建文件夹
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>hdfs dfs <span class="nt">-mkdir</span> /G
+</code></pre></div>    </div>
+  </li>
+  <li>创建文件
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>hdfs dfs <span class="nt">-touch</span> /G/test.txt
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>        <span class="o">[</span><span class="nt">-appendToFile</span> <span class="o">[</span><span class="nt">-n</span><span class="o">]</span> &lt;localsrc&gt; ... &lt;dst&gt;]
+        <span class="o">[</span><span class="nt">-cat</span> <span class="o">[</span><span class="nt">-ignoreCrc</span><span class="o">]</span> &lt;src&gt; ...]
+        <span class="o">[</span><span class="nt">-checksum</span> <span class="o">[</span><span class="nt">-v</span><span class="o">]</span> &lt;src&gt; ...]
+        <span class="o">[</span><span class="nt">-chgrp</span> <span class="o">[</span><span class="nt">-R</span><span class="o">]</span> GROUP PATH...]
+        <span class="o">[</span><span class="nt">-chmod</span> <span class="o">[</span><span class="nt">-R</span><span class="o">]</span> &lt;MODE[,MODE]... | OCTALMODE&gt; PATH...]
+        <span class="o">[</span><span class="nt">-chown</span> <span class="o">[</span><span class="nt">-R</span><span class="o">]</span> <span class="o">[</span>OWNER][:[GROUP]] PATH...]
+        <span class="o">[</span><span class="nt">-concat</span> &lt;target path&gt; &lt;src path&gt; &lt;src path&gt; ...]
+        <span class="o">[</span><span class="nt">-copyFromLocal</span> <span class="o">[</span><span class="nt">-f</span><span class="o">]</span> <span class="o">[</span><span class="nt">-p</span><span class="o">]</span> <span class="o">[</span><span class="nt">-l</span><span class="o">]</span> <span class="o">[</span><span class="nt">-d</span><span class="o">]</span> <span class="o">[</span><span class="nt">-t</span> &lt;thread count&gt;] <span class="o">[</span><span class="nt">-q</span> &lt;thread pool queue size&gt;] &lt;localsrc&gt; ... &lt;dst&gt;]
+        <span class="o">[</span><span class="nt">-copyToLocal</span> <span class="o">[</span><span class="nt">-f</span><span class="o">]</span> <span class="o">[</span><span class="nt">-p</span><span class="o">]</span> <span class="o">[</span><span class="nt">-crc</span><span class="o">]</span> <span class="o">[</span><span class="nt">-ignoreCrc</span><span class="o">]</span> <span class="o">[</span><span class="nt">-t</span> &lt;thread count&gt;] <span class="o">[</span><span class="nt">-q</span> &lt;thread pool queue size&gt;] &lt;src&gt; ... &lt;localdst&gt;]
+        <span class="o">[</span><span class="nt">-count</span> <span class="o">[</span><span class="nt">-q</span><span class="o">]</span> <span class="o">[</span><span class="nt">-h</span><span class="o">]</span> <span class="o">[</span><span class="nt">-v</span><span class="o">]</span> <span class="o">[</span><span class="nt">-t</span> <span class="o">[</span>&lt;storage <span class="nb">type</span><span class="o">&gt;]]</span> <span class="o">[</span><span class="nt">-u</span><span class="o">]</span> <span class="o">[</span><span class="nt">-x</span><span class="o">]</span> <span class="o">[</span><span class="nt">-e</span><span class="o">]</span> <span class="o">[</span><span class="nt">-s</span><span class="o">]</span> &lt;path&gt; ...]
+        <span class="o">[</span><span class="nt">-cp</span> <span class="o">[</span><span class="nt">-f</span><span class="o">]</span> <span class="o">[</span><span class="nt">-p</span> | <span class="nt">-p</span><span class="o">[</span>topax]] <span class="o">[</span><span class="nt">-d</span><span class="o">]</span> <span class="o">[</span><span class="nt">-t</span> &lt;thread count&gt;] <span class="o">[</span><span class="nt">-q</span> &lt;thread pool queue size&gt;] &lt;src&gt; ... &lt;dst&gt;]
+        <span class="o">[</span><span class="nt">-createSnapshot</span> &lt;snapshotDir&gt; <span class="o">[</span>&lt;snapshotName&gt;]]
+        <span class="o">[</span><span class="nt">-deleteSnapshot</span> &lt;snapshotDir&gt; &lt;snapshotName&gt;]
+        <span class="o">[</span><span class="nt">-df</span> <span class="o">[</span><span class="nt">-h</span><span class="o">]</span> <span class="o">[</span>&lt;path&gt; ...]]
+        <span class="o">[</span><span class="nt">-du</span> <span class="o">[</span><span class="nt">-s</span><span class="o">]</span> <span class="o">[</span><span class="nt">-h</span><span class="o">]</span> <span class="o">[</span><span class="nt">-v</span><span class="o">]</span> <span class="o">[</span><span class="nt">-x</span><span class="o">]</span> &lt;path&gt; ...]
+        <span class="o">[</span><span class="nt">-expunge</span> <span class="o">[</span><span class="nt">-immediate</span><span class="o">]</span> <span class="o">[</span><span class="nt">-fs</span> &lt;path&gt;]]
+        <span class="o">[</span><span class="nt">-find</span> &lt;path&gt; ... &lt;expression&gt; ...]
+        <span class="o">[</span><span class="nt">-get</span> <span class="o">[</span><span class="nt">-f</span><span class="o">]</span> <span class="o">[</span><span class="nt">-p</span><span class="o">]</span> <span class="o">[</span><span class="nt">-crc</span><span class="o">]</span> <span class="o">[</span><span class="nt">-ignoreCrc</span><span class="o">]</span> <span class="o">[</span><span class="nt">-t</span> &lt;thread count&gt;] <span class="o">[</span><span class="nt">-q</span> &lt;thread pool queue size&gt;] &lt;src&gt; ... &lt;localdst&gt;]
+        <span class="o">[</span><span class="nt">-getfacl</span> <span class="o">[</span><span class="nt">-R</span><span class="o">]</span> &lt;path&gt;]
+        <span class="o">[</span><span class="nt">-getfattr</span> <span class="o">[</span><span class="nt">-R</span><span class="o">]</span> <span class="o">{</span><span class="nt">-n</span> name | <span class="nt">-d</span><span class="o">}</span> <span class="o">[</span><span class="nt">-e</span> en] &lt;path&gt;]
+        <span class="o">[</span><span class="nt">-getmerge</span> <span class="o">[</span><span class="nt">-nl</span><span class="o">]</span> <span class="o">[</span><span class="nt">-skip-empty-file</span><span class="o">]</span> &lt;src&gt; &lt;localdst&gt;]
+        <span class="o">[</span><span class="nt">-head</span> &lt;file&gt;]
+        <span class="o">[</span><span class="nt">-help</span> <span class="o">[</span>cmd ...]]
+        <span class="o">[</span><span class="nt">-ls</span> <span class="o">[</span><span class="nt">-C</span><span class="o">]</span> <span class="o">[</span><span class="nt">-d</span><span class="o">]</span> <span class="o">[</span><span class="nt">-h</span><span class="o">]</span> <span class="o">[</span><span class="nt">-q</span><span class="o">]</span> <span class="o">[</span><span class="nt">-R</span><span class="o">]</span> <span class="o">[</span><span class="nt">-t</span><span class="o">]</span> <span class="o">[</span><span class="nt">-S</span><span class="o">]</span> <span class="o">[</span><span class="nt">-r</span><span class="o">]</span> <span class="o">[</span><span class="nt">-u</span><span class="o">]</span> <span class="o">[</span><span class="nt">-e</span><span class="o">]</span> <span class="o">[</span>&lt;path&gt; ...]]
+        <span class="o">[</span><span class="nt">-mkdir</span> <span class="o">[</span><span class="nt">-p</span><span class="o">]</span> &lt;path&gt; ...]
+        <span class="o">[</span><span class="nt">-moveFromLocal</span> <span class="o">[</span><span class="nt">-f</span><span class="o">]</span> <span class="o">[</span><span class="nt">-p</span><span class="o">]</span> <span class="o">[</span><span class="nt">-l</span><span class="o">]</span> <span class="o">[</span><span class="nt">-d</span><span class="o">]</span> &lt;localsrc&gt; ... &lt;dst&gt;]
+        <span class="o">[</span><span class="nt">-moveToLocal</span> &lt;src&gt; &lt;localdst&gt;]
+        <span class="o">[</span><span class="nt">-mv</span> &lt;src&gt; ... &lt;dst&gt;]
+        <span class="o">[</span><span class="nt">-put</span> <span class="o">[</span><span class="nt">-f</span><span class="o">]</span> <span class="o">[</span><span class="nt">-p</span><span class="o">]</span> <span class="o">[</span><span class="nt">-l</span><span class="o">]</span> <span class="o">[</span><span class="nt">-d</span><span class="o">]</span> <span class="o">[</span><span class="nt">-t</span> &lt;thread count&gt;] <span class="o">[</span><span class="nt">-q</span> &lt;thread pool queue size&gt;] &lt;localsrc&gt; ... &lt;dst&gt;]
+        <span class="o">[</span><span class="nt">-renameSnapshot</span> &lt;snapshotDir&gt; &lt;oldName&gt; &lt;newName&gt;]
+        <span class="o">[</span><span class="nt">-rm</span> <span class="o">[</span><span class="nt">-f</span><span class="o">]</span> <span class="o">[</span><span class="nt">-r</span>|-R] <span class="o">[</span><span class="nt">-skipTrash</span><span class="o">]</span> <span class="o">[</span><span class="nt">-safely</span><span class="o">]</span> &lt;src&gt; ...]
+        <span class="o">[</span><span class="nt">-rmdir</span> <span class="o">[</span><span class="nt">--ignore-fail-on-non-empty</span><span class="o">]</span> &lt;<span class="nb">dir</span><span class="o">&gt;</span> ...]
+        <span class="o">[</span><span class="nt">-setfacl</span> <span class="o">[</span><span class="nt">-R</span><span class="o">]</span> <span class="o">[{</span><span class="nt">-b</span>|-k<span class="o">}</span> <span class="o">{</span><span class="nt">-m</span>|-x &lt;acl_spec&gt;<span class="o">}</span> &lt;path&gt;]|[--set &lt;acl_spec&gt; &lt;path&gt;]]
+        <span class="o">[</span><span class="nt">-setfattr</span> <span class="o">{</span><span class="nt">-n</span> name <span class="o">[</span><span class="nt">-v</span> value] | <span class="nt">-x</span> name<span class="o">}</span> &lt;path&gt;]
+        <span class="o">[</span><span class="nt">-setrep</span> <span class="o">[</span><span class="nt">-R</span><span class="o">]</span> <span class="o">[</span><span class="nt">-w</span><span class="o">]</span> &lt;rep&gt; &lt;path&gt; ...]
+        <span class="o">[</span><span class="nt">-stat</span> <span class="o">[</span>format] &lt;path&gt; ...]
+        <span class="o">[</span><span class="nt">-tail</span> <span class="o">[</span><span class="nt">-f</span><span class="o">]</span> <span class="o">[</span><span class="nt">-s</span> &lt;<span class="nb">sleep </span>interval&gt;] &lt;file&gt;]
+        <span class="o">[</span><span class="nt">-test</span> -[defswrz] &lt;path&gt;]
+        <span class="o">[</span><span class="nt">-text</span> <span class="o">[</span><span class="nt">-ignoreCrc</span><span class="o">]</span> &lt;src&gt; ...]
+        <span class="o">[</span><span class="nt">-touch</span> <span class="o">[</span><span class="nt">-a</span><span class="o">]</span> <span class="o">[</span><span class="nt">-m</span><span class="o">]</span> <span class="o">[</span><span class="nt">-t</span> TIMESTAMP <span class="o">(</span>yyyyMMdd:HHmmss<span class="o">)</span> <span class="o">]</span> <span class="o">[</span><span class="nt">-c</span><span class="o">]</span> &lt;path&gt; ...]
+        <span class="o">[</span><span class="nt">-touchz</span> &lt;path&gt; ...]
+        <span class="o">[</span><span class="nt">-truncate</span> <span class="o">[</span><span class="nt">-w</span><span class="o">]</span> &lt;length&gt; &lt;path&gt; ...]
+        <span class="o">[</span><span class="nt">-usage</span> <span class="o">[</span>cmd ...]]
+</code></pre></div></div>
+
+<table>
+  <thead>
+    <tr>
+      <th>命令</th>
+      <th>功能</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">hdfs dfs -ls /</code></td>
+      <td> </td>
+    </tr>
+  </tbody>
+</table>
+
+<ul>
+  <li>https://juejin.cn/post/7033686192302325796</li>
+</ul>
+
+<h4 id="zookeeper">zookeeper</h4>
+
+<pre><code class="language-zookeeper">[zk: 127.0.0.1:2181(CONNECTED) 3] ls /
+[hbase, zookeeper]
+[zk: 127.0.0.1:2181(CONNECTED) 4] create /G
+Created /G
+[zk: 127.0.0.1:2181(CONNECTED) 5] create /G/2024
+Created /G/2024
+[zk: 127.0.0.1:2181(CONNECTED) 6] create /G/2024/04
+Created /G/2024/04
+[zk: 127.0.0.1:2181(CONNECTED) 7] create /G/2024/04/17
+Created /G/2024/04/17
+[zk: 127.0.0.1:2181(CONNECTED) 8] set /G/2024/04/17 "^^"
+[zk: 127.0.0.1:2181(CONNECTED) 9] get /G/2024/04/17
+^^
+</code></pre>
+
+<p>在ZooKeeper中，你可以使用命令行客户端（<code class="language-plaintext highlighter-rouge">zkCli.sh</code>）进行交互式操作。以下是一些常用的ZooKeeper命令行操作：</p>
+
+<ol>
+  <li><strong>连接到ZooKeeper服务器</strong>：
+    <ul>
+      <li>使用以下命令连接到ZooKeeper服务器：<code class="language-plaintext highlighter-rouge">./zkCli.sh -server &lt;ZooKeeper服务器地址&gt;:&lt;端口号&gt;</code></li>
+      <li>例如：<code class="language-plaintext highlighter-rouge">./zkCli.sh -server localhost:2181</code></li>
+    </ul>
+  </li>
+  <li><strong>基本操作</strong>：
+    <ul>
+      <li><strong>创建节点</strong>：<code class="language-plaintext highlighter-rouge">create /path data</code>
+        <ul>
+          <li>例如：<code class="language-plaintext highlighter-rouge">create /myNode "Hello World"</code></li>
+        </ul>
+      </li>
+      <li><strong>读取节点数据</strong>：<code class="language-plaintext highlighter-rouge">get /path</code>
+        <ul>
+          <li>例如：<code class="language-plaintext highlighter-rouge">get /myNode</code></li>
+        </ul>
+      </li>
+      <li><strong>更新节点数据</strong>：<code class="language-plaintext highlighter-rouge">set /path data</code>
+        <ul>
+          <li>例如：<code class="language-plaintext highlighter-rouge">set /myNode "New Data"</code></li>
+        </ul>
+      </li>
+      <li><strong>列出节点</strong>：<code class="language-plaintext highlighter-rouge">ls /path</code>
+        <ul>
+          <li>例如：<code class="language-plaintext highlighter-rouge">ls /</code></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><strong>监视节点</strong>：
+    <ul>
+      <li><strong>设置监视</strong>：<code class="language-plaintext highlighter-rouge">get /path true</code>
+        <ul>
+          <li>该命令将监视给定节点的变化。如果节点数据发生变化，客户端将收到通知。</li>
+        </ul>
+      </li>
+      <li><strong>取消监视</strong>：<code class="language-plaintext highlighter-rouge">rmr /path</code>
+        <ul>
+          <li>取消对节点的监视。</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><strong>删除节点</strong>：
+    <ul>
+      <li><strong>删除节点</strong>：<code class="language-plaintext highlighter-rouge">delete /path</code>
+        <ul>
+          <li>例如：<code class="language-plaintext highlighter-rouge">delete /myNode</code></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><strong>帮助</strong>：
+    <ul>
+      <li><strong>获取帮助</strong>：<code class="language-plaintext highlighter-rouge">help</code>
+        <ul>
+          <li>可以查看ZooKeeper命令行客户端的帮助信息。</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><strong>退出命令行客户端</strong>：
+    <ul>
+      <li><strong>退出</strong>：<code class="language-plaintext highlighter-rouge">quit</code> 或 <code class="language-plaintext highlighter-rouge">exit</code>
+        <ul>
+          <li>用于退出ZooKeeper命令行客户端。</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ol>
+
+<p>以上是一些常用的ZooKeeper命令行操作，你可以在命令行客户端中使用这些命令来管理和操作ZooKeeper节点。记得在操作之前先连接到ZooKeeper服务器，并确保有相应的权限执行这些操作。</p>
+
+<h4 id="hbase">hbase</h4>
+
+<p>start</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>root@G:~/src/apache-zookeeper-3.9.2-bin/conf# start-hbase.sh
+SLF4J: Class path contains multiple SLF4J bindings.
+SLF4J: Found binding <span class="k">in</span> <span class="o">[</span>jar:file:/root/src/hadoop-3.4.0/share/hadoop/common/lib/slf4j-reload4j-1.7.36.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding <span class="k">in</span> <span class="o">[</span>jar:file:/root/src/hbase-2.5.8/lib/client-facing-thirdparty/log4j-slf4j-impl-2.17.2.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings <span class="k">for </span>an explanation.
+SLF4J: Actual binding is of <span class="nb">type</span> <span class="o">[</span>org.slf4j.impl.Reload4jLoggerFactory]
+running master, logging to /root/src/hbase-2.5.8/bin/../logs/hbase-root-master-G.out
+J: running regionserver, logging to /root/src/hbase-2.5.8/bin/../logs/hbase-root-regionserver-J.out
+G: running regionserver, logging to /root/src/hbase-2.5.8/bin/../logs/hbase-root-regionserver-G.out
+J: running master, logging to /root/src/hbase-2.5.8/bin/../logs/hbase-root-master-J.out
+root@G:~/src/apache-zookeeper-3.9.2-bin/conf# jps
+5796 QuorumPeerMain
+6516 Jps
+6196 HMaster
+6378 HRegionServer
+root@G:~/src/apache-
+</code></pre></div></div>
+
+<h3 id="重启hosts文件被修改问题">重启hosts文件被修改问题</h3>
+
+<p>https://developer.aliyun.com/article/288459</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>chkconfig NetworkManager off
+</code></pre></div></div>
+
+<p>无法正常工作。</p>
+
+<hr />
+
+<h2 id="两个vps">两个vps</h2>
+
+<p>45.77.17.112</p>
+
+<p>wR8-pg{AVPx*f2s6</p>
+
+<p>66.42.32.183</p>
+
+<p>E)5nrm3{e##dHoR(</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQD5s02Q58iVEv8bEQC4btMQN1H73FVQgYmzCU6sZ/GX0C1ERd9kq3k8dXOwVe7ZwEdNSL8b04TbN5sn90Nd6gRGSOEWuVRy/YtHeK+EaXTd2gH1dUPe663/dM30u7ZDbCxtHyy2UsspjpKWEpAdtt3/eQJ0TES2C6uH1GRfgn2Lg6NTNyYXHiUTXsXLd2F0/pL816M+4ILUbMqK/LF7qOxV/C7RAvncPODJC6APtfvycvTcMSaNKauqcl/Zn3M72KPYgfEpPgbxMsuq2bo2uDIyVrfPN6s+qRNOUoi9QRnrnTYvNlWJxGFsu6PMH8q/gfyB3GIkK2g7t14OIm49VJKOfwgEaRqIyrZfGy/ofFXXBWnaI8ogrSejpq2epXU3iQCVaEI+nBlFgwkSAcRyXiwpAkzzo3fFQNDYNifZtjt2xjkphzVvMkRpqkIgeEYFUBhVBn9+EGGemmgtlOLkDQU9lthMhuFbsXy3DY3acvb1LW7DACpi/teK2glDQmgZtKk= root@G
+</code></pre></div></div>
+
+<h4 id="2024-16-18">2024-16-18</h4>
+
+<p><img src="/assets/post_images/image-20240418133614186.png" alt="" /></p>
+
+<p>为什么一<code class="language-plaintext highlighter-rouge">stop-all.sh</code> 就被强制退出而且无法连接ssh22端口？</p>
+
+<p>想设置脚本来在启动的时候修改host文件和ssh文件。</p>
+
+<p>否则每次重启都需要重新设置。</p>
+
+<p>但是重启服务器那个cpu占用率高到101%，是时间延迟吗？</p>
+
+<p>无法登录ssh。。</p>
+
+<p><img src="/assets/post_images/image-20240418135746417.png" alt="" /></p>
+
+<p>重新安装系统吧</p>
+
+<p>尝试snap 商店的hadoop吧。</p>
+
+<ul>
+  <li>core-site.xml</li>
+</ul>
+
+<p><img src="assets/post_images/image-20240418141356698.png" alt="" /></p>
+
+<p>snap zookeeper 无法开箱即用</p>
+
+<p>只能先使用apt中的hbase了</p>
+
+<ul>
+  <li>influxdb 是什么？</li>
+</ul>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+
+
+        
+
+  <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> 更新时间:</strong> <time class="dt-published" datetime="0999-02-17T00:01:26+08:05">February 17, 0999</time></p>
+
+      </footer>
+
+      
+
+      
+  <nav class="pagination">
+    
+      <a href="#" class="pagination--pager disabled">上一页</a>
+    
+    
+      <a href="/trilium%E9%85%8D%E7%BD%AE/" class="pagination--pager" title="Trilium配置
+">下一页</a>
+    
+  </nav>
+
+    </div>
+
+    
+  </article>
+
+  
+  
+    <div class="page__related">
+      <h2 class="page__related-title">猜您还喜欢</h2>
+      <div class="grid__wrapper">
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/hbase-%E9%85%8D%E7%BD%AE-(%E5%A4%B1%E8%B4%A5)/" rel="permalink">Hbase 配置 (失败)
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2024-04-15T00:00:00+08:00">April 15, 2024</time>
+      </span>
+    
+
+    
+
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">目标
+</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/tlaplus-%E6%93%8D%E4%BD%9C%E7%AC%A6%E5%92%8C%E5%87%BD%E6%95%B0/" rel="permalink">Tlaplus：操作符和函数
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2024-04-12T00:00:00+08:00">April 12, 2024</time>
+      </span>
+    
+
+    
+
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">了解一下 tlaplus 的操作符和函数。
+</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/tlaplus-%E7%94%B5%E6%8A%A5%E9%97%AE%E9%A2%98/" rel="permalink">Tlaplus：电报问题
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2024-03-14T00:00:00+08:00">March 14, 2024</time>
+      </span>
+    
+
+    
+
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">在一个小编程中测试tlaplus。
+</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/tlaplus-Pluscal/" rel="permalink">Tlaplus pluscal
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2024-03-13T00:00:00+08:00">March 13, 2024</time>
+      </span>
+    
+
+    
+
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">探索一下 tlaplus pluscal 的基本功能。
+</p>
+  </article>
+</div>
+
+        
+      </div>
+    </div>
+  
+  
+</div>
+
+    </div>
+
+    
+      <div class="search-content">
+        <div class="search-content__inner-wrap"><form class="search-content__form" onkeydown="return event.key != 'Enter';" role="search">
+    <label class="sr-only" for="search">
+      输入您要搜索的关键词...
+    </label>
+    <input type="search" id="search" class="search-input" tabindex="-1" placeholder="输入您要搜索的关键词..." />
+  </form>
+  <div id="results" class="results"></div></div>
+
+      </div>
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+<!-- end custom footer snippets -->
+
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+      <li><strong>关注:</strong></li>
+    
+
+    
+
+    
+      <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+    
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2024 甲与. 技术来自于 <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+
+
+
+
+<script src="/assets/js/lunr/lunr.min.js"></script>
+<script src="/assets/js/lunr/lunr-store.js"></script>
+<script src="/assets/js/lunr/lunr-en.js"></script>
+
+
+
+
+
+
+
+  </body>
+</html>

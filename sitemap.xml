@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
+<loc>/rbase-%E9%85%8D%E7%BD%AE/</loc>
+<lastmod>0999-02-17T00:01:26+08:05</lastmod>
+</url>
+<url>
 <loc>/trilium%E9%85%8D%E7%BD%AE/</loc>
 <lastmod>2023-12-17T00:00:00+08:00</lastmod>
 </url>
