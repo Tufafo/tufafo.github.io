@@ -1,0 +1,924 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.24.0 by Michael Rose
+  Copyright 2013-2020 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="zh" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>如何使用 minio 进行数据库查询 - 甲与</title>
+<meta name="description" content="minio 提供了对s3存储对象的sql操作。一方面为了处理实验报告，另一方面也是为了增加可以使用的工具数量，所以需要增进对于mc sql的理解。">
+
+
+  <meta name="author" content="甲与">
+  
+  <meta property="article:author" content="甲与">
+  
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:site_name" content="甲与">
+<meta property="og:title" content="如何使用 minio 进行数据库查询">
+<meta property="og:url" content="/%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8-minio-%E8%BF%9B%E8%A1%8C%E6%95%B0%E6%8D%AE%E5%BA%93%E6%9F%A5%E8%AF%A2/">
+
+
+  <meta property="og:description" content="minio 提供了对s3存储对象的sql操作。一方面为了处理实验报告，另一方面也是为了增加可以使用的工具数量，所以需要增进对于mc sql的理解。">
+
+
+
+  <meta property="og:image" content="/assets/images/wallhaven-o5e1jm.png">
+
+
+
+
+
+  <meta property="article:published_time" content="2024-04-20T00:00:00+08:00">
+
+
+
+
+
+
+<link rel="canonical" href="/%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8-minio-%E8%BF%9B%E8%A1%8C%E6%95%B0%E6%8D%AE%E5%BA%93%E6%9F%A5%E8%AF%A2/">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": "甲与",
+      "url": "/"
+    
+  }
+</script>
+
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+
+  <link href="/feed.xml" type="application/atom+xml" rel="alternate" title="甲与 Feed">
+
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css"></noscript>
+
+
+
+    <!-- start custom head snippets -->
+
+<script type="text/javascript" async
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+  </head>
+
+  <body class="layout--single">
+    <nav class="skip-links">
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">转到主导航栏</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">转到内容</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">转到底部</a></li>
+  </ul>
+</nav>
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+        <a class="site-title" href="/">
+          甲与
+          
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/tags/">分类</a>
+            </li><li class="masthead__menu-item">
+              <a href="/year-archive/">归档</a>
+            </li></ul>
+        
+        <button class="search__toggle" type="button">
+          <span class="visually-hidden">切换搜索</span>
+          <i class="fas fa-search"></i>
+        </button>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">切换菜单</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+  
+
+
+
+
+
+
+
+<div class="page__hero"
+  style=" background-image: url('');"
+>
+  
+    <img src="/assets/images/wallhaven-o5e1jm.png" alt="如何使用 minio 进行数据库查询" class="page__hero-image">
+  
+  
+</div>
+
+
+
+
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person" class="h-card">
+
+  
+    <div class="author__avatar">
+      <a href="/">
+        <img src="/assets/images/6.png" alt="甲与" itemprop="image" class="u-photo">
+      </a>
+    </div>
+  
+
+  <div class="author__content">
+    <h3 class="author__name p-name" itemprop="name">
+      <a class="u-url" rel="me" href="/" itemprop="url">甲与</a>
+    </h3>
+    
+      <div class="author__bio p-note" itemprop="description">
+        <p>记录一些随想。</p>
+
+      </div>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">关注</button>
+    <ul class="author__urls social-icons">
+      
+
+      
+        
+          
+        
+          
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer me">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+
+  <article class="page h-entry" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="如何使用 minio 进行数据库查询">
+    <meta itemprop="description" content="minio 提供了对s3存储对象的sql操作。一方面为了处理实验报告，另一方面也是为了增加可以使用的工具数量，所以需要增进对于mc sql的理解。">
+    <meta itemprop="datePublished" content="2024-04-20T00:00:00+08:00">
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title p-name" itemprop="headline">
+            <a href="/%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8-minio-%E8%BF%9B%E8%A1%8C%E6%95%B0%E6%8D%AE%E5%BA%93%E6%9F%A5%E8%AF%A2/" class="u-url" itemprop="url">如何使用 minio 进行数据库查询
+</a>
+          </h1>
+          
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2024-04-20T00:00:00+08:00">April 20, 2024</time>
+      </span>
+    
+
+    
+
+    
+  </p>
+
+
+        </header>
+      
+
+      <section class="page__content e-content" itemprop="text">
+        
+          <aside class="sidebar__right ">
+            <nav class="toc">
+              <header><h4 class="nav__title"><i class="fas fa-cog"></i> 目录</h4></header>
+              <ul class="toc__menu"><li><a href="#s3-是什么">s3 是什么？</a></li><li><a href="#可以把minio上的何种对象视为s3对象">可以把minio上的何种对象视为s3对象？</a></li><li><a href="#可以如何操作s3">可以如何操作S3？</a><ul><li><a href="#sql-操作">sql 操作</a></li></ul></li><li><a href="#如何把mc的sql操作封装到emacs中">如何把mc的sql操作封装到emacs中？</a></li><li><a href="#参考">参考</a></li></ul>
+
+            </nav>
+          </aside>
+        
+        <p>minio 提供了对s3存储对象的sql操作。一方面为了处理实验报告，另一方面也是为了增加可以使用的工具数量，所以需要增进对于<code class="language-plaintext highlighter-rouge">mc sql</code>的理解。</p>
+
+<p>本篇博客处理以下几个问题：</p>
+
+<ul>
+  <li>s3 是什么？</li>
+  <li>minio 上的何种对象可以视为 s3 对象？</li>
+  <li>如何操作 S3 对象？</li>
+  <li>如何把这种查询封装到emacs中？</li>
+</ul>
+
+<h2 id="s3-是什么"><code class="language-plaintext highlighter-rouge">s3</code> 是什么？</h2>
+
+<blockquote>
+  <p>Amazon Simple Storage Service（Amazon S3）是一种对象存储服务，提供行业领先的可扩展性、数据可用性、安全性和性能。各种规模和行业的客户都可以使用 Amazon S3 存储和保护任意数量的数据，用于数据湖、网站、移动应用程序、备份和恢复、归档、企业应用程序、IoT 设备和大数据分析。Amazon S3 提供了管理功能，使您可以优化、组织和配置对数据的访问，以满足您的特定业务、组织和合规性要求。</p>
+</blockquote>
+
+<p>所以，S3, 全称Simple Storage Service，直译简单存储服务。那么 <code class="language-plaintext highlighter-rouge">S3 Object</code> 就是简单存储服务对象。</p>
+
+<p>另外需要注意，s3o 文件一般要下载到本地进行处理，然后上传进行覆盖。</p>
+
+<h2 id="可以把minio上的何种对象视为s3对象">可以把minio上的何种对象视为<code class="language-plaintext highlighter-rouge">s3对象</code>？</h2>
+
+<p><code class="language-plaintext highlighter-rouge">mc sql --help</code> 看看文档。</p>
+
+<p><img src="/assets/post_images/image-20240420090054853.png" alt="" /></p>
+
+<p>所以，可以把<code class="language-plaintext highlighter-rouge">csv</code>文件理解为一种<code class="language-plaintext highlighter-rouge">s3 Object</code>的实例。确实足够简单😊。</p>
+
+<p>那只要把bash命令封装到elisp中就可以了。不过在这之前要先熟悉一下 csv文件的基本操作。</p>
+
+<h2 id="可以如何操作s3">可以如何操作S3？</h2>
+
+<p>打开 <code class="language-plaintext highlighter-rouge">Libreoffice</code> 创建几个数据，</p>
+
+<p><img src="/assets/post_images/image-20240420090847909.png" alt="" /></p>
+
+<p>按默认格式存储为csv文件 <code class="language-plaintext highlighter-rouge">stu.csv</code>，打开emacs看看：</p>
+
+<p><img src="/assets/post_images/image-20240420091006763.png" alt="" /></p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>mc mb minio-server/csv
+<span class="nv">$ </span>mc put stu.csv minio-server/csv
+</code></pre></div></div>
+
+<h3 id="sql-操作">sql 操作</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ mc sql --recursive --query "select * from S3Object" minio-server/csv/stu.csv
+张三,100
+李四,50
+王五,60
+</code></pre></div></div>
+
+<p>好棒👍。来增加几个查询条件看看吧。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$mc</span> sql <span class="nt">--recursive</span> <span class="nt">--query</span> <span class="s2">"select * from S3Object where </span><span class="se">\"</span><span class="s2">成绩</span><span class="se">\"</span><span class="s2">=100"</span> minio-server/csv/stu.csv
+张三,100
+<span class="nv">$mc</span> sql <span class="nt">--recursive</span> <span class="nt">--query</span> <span class="s2">"select * from S3Object where </span><span class="se">\"</span><span class="s2">成绩</span><span class="se">\"</span><span class="s2">&gt;=60"</span> minio-server/csv/stu.csv
+张三,100
+王五,60
+</code></pre></div></div>
+
+<p>漂亮🎉。</p>
+
+<h2 id="如何把mc的sql操作封装到emacs中">如何把mc的sql操作封装到emacs中？</h2>
+
+<p>按照主语表达法，<code class="language-plaintext highlighter-rouge">(as-s3o-be-sq file-name sql-sentence)</code> 就可以获取数据了。其中<code class="language-plaintext highlighter-rouge">sq</code>的意义是，<code class="language-plaintext highlighter-rouge">structured query</code>，因为<code class="language-plaintext highlighter-rouge">sql</code>的全称是：<code class="language-plaintext highlighter-rouge">structured query language</code>。（所以实际上说<code class="language-plaintext highlighter-rouge">使用sql语言</code> 这种说法是不正确的，什么是<code class="language-plaintext highlighter-rouge">language语言</code>呢？）不过这样的限制也很明显，最多只能查询一个表，所以表和表的连接基本上就不用考虑了。</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="p">(</span><span class="nb">defun</span> <span class="nv">as-s3o-be-sq</span> <span class="p">(</span><span class="nv">s3o</span> <span class="nv">sq</span><span class="p">)</span>
+      <span class="s">"make a sq query to s3o on minio server. The input of s3o should be a string path to s3o, and sq should be a string of sql. This function will return query result as string"</span>
+      <span class="p">(</span><span class="nv">shell-command</span> <span class="p">(</span><span class="nb">format</span> <span class="s">"mc sql --recursive --query \"%s\" %s"</span> <span class="nv">s3o</span> <span class="nv">sq</span><span class="p">)))</span>
+      
+</code></pre></div></div>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="p">(</span><span class="nv">as-s3o-be-sq</span> <span class="s">"select * from S3Object"</span> <span class="s">"minio-server/csv/stu.csv"</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>结果<strong>返回0 而Message 中则返回查询结果</strong>。</p>
+
+<p>嗯……<code class="language-plaintext highlighter-rouge">shell-command</code> 会返回退出码，<code class="language-plaintext highlighter-rouge">shell-command-to-string</code> 才能获得<code class="language-plaintext highlighter-rouge">shell</code> 的输出结果。</p>
+
+<p>改一下：</p>
+
+<p><img src="/assets/post_images/image-20240420094006548.png" alt="" /></p>
+
+<p>完美🎉🎉。</p>
+
+<h2 id="参考">参考</h2>
+
+<ul>
+  <li>https://docs.aws.amazon.com/zh_cn/AmazonS3/latest/userguide/Welcome.html</li>
+</ul>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+  
+
+
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fas fa-fw fa-tags" aria-hidden="true"></i> 标签: </strong>
+    <span itemprop="keywords">
+    
+      <a href="/tags/#minio" class="page__taxonomy-item p-category" rel="tag">minio</a>
+    
+    </span>
+  </p>
+
+
+
+
+        
+
+  <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> 更新时间:</strong> <time class="dt-published" datetime="2024-04-20T00:00:00+08:00">April 20, 2024</time></p>
+
+      </footer>
+
+      
+
+      
+  <nav class="pagination">
+    
+      <a href="/%E5%85%B3%E4%BA%8E%E6%88%91%E5%9C%A8%E9%85%8D%E7%BD%AEhbase%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98/" class="pagination--pager" title="关于我在配置hbase中的一些问题
+">上一页</a>
+    
+    
+      <a href="#" class="pagination--pager disabled">下一页</a>
+    
+  </nav>
+
+    </div>
+
+    
+  </article>
+
+  
+  
+    <div class="page__related">
+      <h2 class="page__related-title">猜您还喜欢</h2>
+      <div class="grid__wrapper">
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/%E5%85%B3%E4%BA%8E%E6%88%91%E5%9C%A8%E9%85%8D%E7%BD%AEhbase%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98/" rel="permalink">关于我在配置hbase中的一些问题
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2024-04-20T00:00:00+08:00">April 20, 2024</time>
+      </span>
+    
+
+    
+
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">现在系统已经重装，所以再去探究错误的原因和处理方案已经意义不大。现在把当时的日志整理以下，用以备忘。
+</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/segfault%E7%AE%80%E4%BB%8B/" rel="permalink">Segfault简介
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2024-04-19T00:00:00+08:00">April 19, 2024</time>
+      </span>
+    
+
+    
+
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">记录一个可以免费使用vps的网站，segfault。
+</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/minio-%E7%9A%84%E9%85%8D%E7%BD%AE%E8%BF%87%E7%A8%8B/" rel="permalink">Minio 的配置过程
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2024-04-19T00:00:00+08:00">April 19, 2024</time>
+      </span>
+    
+
+    
+
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">如果只是想用分布式文件系统，其实hadoop也可以，但在配置hbase的过程中出现的节点丢失和高cpu占用率问题还是让我想尝试其它的分布式框架。这次记录minio的配置过程。
+</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/hbase-%E9%85%8D%E7%BD%AE-(%E5%A4%B1%E8%B4%A5)/" rel="permalink">Hbase 配置 (失败)
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2024-04-15T00:00:00+08:00">April 15, 2024</time>
+      </span>
+    
+
+    
+
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">目标
+</p>
+  </article>
+</div>
+
+        
+      </div>
+    </div>
+  
+  
+</div>
+
+    </div>
+
+    
+      <div class="search-content">
+        <div class="search-content__inner-wrap"><form class="search-content__form" onkeydown="return event.key != 'Enter';" role="search">
+    <label class="sr-only" for="search">
+      输入您要搜索的关键词...
+    </label>
+    <input type="search" id="search" class="search-input" tabindex="-1" placeholder="输入您要搜索的关键词..." />
+  </form>
+  <div id="results" class="results"></div></div>
+
+      </div>
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+ <script src="https://l2dwidget.js.org/lib/L2Dwidget.min.js"></script>
+ <script type="text/javascript">
+
+   function getRandomStringFromSet(stringSet) {
+       const randomIndex = Math.floor(Math.random() * stringSet.length);
+       return stringSet[randomIndex];
+   }
+   
+   // 指定字符串集合
+   const myStringSet = [
+
+
+       "常识只有一个问题——就是它不常见。\n– Milt Bryce，系统方法论之父", 
+       "想象力比知识重要。\n -爱因斯坦",
+       "问题是愿景和现实之间的差别。\n- 温伯格"
+       
+
+
+   ];
+
+   // 调用函数从指定字符串集合中随机返回一个字符串
+   const randomString = getRandomStringFromSet(myStringSet);
+   
+   L2Dwidget
+    .on('*', (name) => {
+        console.log('%c EVENT ' + '%c -> ' + name, 'background: #222; color: yellow', 'background: #fff; color: #000')
+    })
+    .init({
+	"model": {
+            "jsonPath": "https://unpkg.com/live2d-widget-model-hijiki@1.0.5/assets/hijiki.model.json",
+	    　　        "scale": 1
+        },
+        "display": {
+            "position": "right",
+            "width": 200,
+            "height": 300,
+　　        "hOffset": 0,
+            "vOffset": -20
+        },
+        "mobile": {
+            "show": true,
+            "scale": 0.5
+        },
+        "react": {
+            "opacityDefault": 0.8,
+            "opacityOnHover": 1
+        },
+        dialog: {
+            // 开启对话框
+            enable: true,
+	    width: 300, // Set the width of the dialogue box to 300px
+	    height: 500, // Set the height of the dialogue box to 200px
+            script: {
+		// 每空闲 10 秒钟，显示一条一言
+		'every idle 1s': randomString,
+		// 当触摸到星星图案
+		'hover .star': '星星在天上而你在我心里 (*/ω＼*)',
+		// 当触摸到角色身体
+		'tap body': randomString,
+		// 当触摸到角色头部
+		'tap face': '人家已经不是小孩子了！'
+            }
+        }
+        });
+    </script>
+
+
+ <script>
+   !function () {
+    function n(n, e, t) {
+        return n.getAttribute(e) || t
+    }
+ 
+    function e(n) {
+        return document.getElementsByTagName(n)
+    }
+ 
+    function t() {
+        var t = e("script"), o = t.length, i = t[o - 1];
+        return {l: o, z: n(i, "zIndex", -1), o: n(i, "opacity", .5), c: n(i, "color", "0, 191, 255"), n: n(i, "count", 99)}
+    }
+ 
+    function o() {
+        a = m.width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth, c = m.height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight
+    }
+ 
+    function i() {
+        r.clearRect(0, 0, a, c);
+        var n, e, t, o, m, l;
+        s.forEach(function (i, x) {
+            for (i.x += i.xa, i.y += i.ya, i.xa *= i.x > a || i.x < 0 ? -1 : 1, i.ya *= i.y > c || i.y < 0 ? -1 : 1, r.fillRect(i.x - .5, i.y - .5, 1, 1), e = x + 1; e < u.length; e++) n = u[e], null !== n.x && null !== n.y && (o = i.x - n.x, m = i.y - n.y, l = o * o + m * m, l < n.max && (n === y && l >= n.max / 2 && (i.x -= .03 * o, i.y -= .03 * m), t = (n.max - l) / n.max, r.beginPath(), r.lineWidth = t / 2, r.strokeStyle = "rgba(" + d.c + "," + (t + .2) + ")", r.moveTo(i.x, i.y), r.lineTo(n.x, n.y), r.stroke()))
+        }), x(i)
+    }
+ 
+    var a, c, u, m = document.createElement("canvas"), d = t(), l = "c_n" + d.l, r = m.getContext("2d"),
+        x = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || function (n) {
+            window.setTimeout(n, 1e3 / 45)
+        }, w = Math.random, y = {x: null, y: null, max: 2e4};
+    m.id = l, m.style.cssText = "position:fixed;top:0;left:0;z-index:" + d.z + ";opacity:" + d.o, e("body")[0].appendChild(m), o(), window.onresize = o, window.onmousemove = function (n) {
+        n = n || window.event, y.x = n.clientX, y.y = n.clientY
+    }, window.onmouseout = function () {
+        y.x = null, y.y = null
+    };
+    for (var s = [], f = 0; d.n > f; f++) {
+        var h = w() * a, g = w() * c, v = 2 * w() - 1, p = 2 * w() - 1;
+        s.push({x: h, y: g, xa: v, ya: p, max: 6e3})
+    }
+    u = s.concat([y]), setTimeout(function () {
+        i()
+    }, 100)
+}();
+ </script>
+
+ <script>
+function clickEffect() {
+  let balls = [];
+  let longPressed = false;
+  let longPress;
+  let multiplier = 0;
+  let width, height;
+  let origin;
+  let normal;
+  let ctx;
+  const colours = ["#F73859", "#14FFEC", "#00E0FF", "#FF99FE", "#FAF15D"];
+  const canvas = document.createElement("canvas");
+  document.body.appendChild(canvas);
+  canvas.setAttribute("style", "width: 100%; height: 100%; top: 0; left: 0; z-index: 99999; position: fixed; pointer-events: none;");
+  const pointer = document.createElement("span");
+  pointer.classList.add("pointer");
+  document.body.appendChild(pointer);
+ 
+  if (canvas.getContext && window.addEventListener) {
+    ctx = canvas.getContext("2d");
+    updateSize();
+    window.addEventListener('resize', updateSize, false);
+    loop();
+    window.addEventListener("mousedown", function(e) {
+      pushBalls(randBetween(10, 20), e.clientX, e.clientY);
+      document.body.classList.add("is-pressed");
+      longPress = setTimeout(function(){
+        document.body.classList.add("is-longpress");
+        longPressed = true;
+      }, 500);
+    }, false);
+    window.addEventListener("mouseup", function(e) {
+      clearInterval(longPress);
+      if (longPressed == true) {
+        document.body.classList.remove("is-longpress");
+        pushBalls(randBetween(50 + Math.ceil(multiplier), 100 + Math.ceil(multiplier)), e.clientX, e.clientY);
+        longPressed = false;
+      }
+      document.body.classList.remove("is-pressed");
+    }, false);
+    window.addEventListener("mousemove", function(e) {
+      let x = e.clientX;
+      let y = e.clientY;
+      pointer.style.top = y + "px";
+      pointer.style.left = x + "px";
+    }, false);
+  } else {
+    console.log("canvas or addEventListener is unsupported!");
+  }
+ 
+ 
+  function updateSize() {
+    canvas.width = window.innerWidth * 2;
+    canvas.height = window.innerHeight * 2;
+    canvas.style.width = window.innerWidth + 'px';
+    canvas.style.height = window.innerHeight + 'px';
+    ctx.scale(2, 2);
+    width = (canvas.width = window.innerWidth);
+    height = (canvas.height = window.innerHeight);
+    origin = {
+      x: width / 2,
+      y: height / 2
+    };
+    normal = {
+      x: width / 2,
+      y: height / 2
+    };
+  }
+  class Ball {
+    constructor(x = origin.x, y = origin.y) {
+      this.x = x;
+      this.y = y;
+      this.angle = Math.PI * 2 * Math.random();
+      if (longPressed == true) {
+        this.multiplier = randBetween(14 + multiplier, 15 + multiplier);
+      } else {
+        this.multiplier = randBetween(6, 12);
+      }
+      this.vx = (this.multiplier + Math.random() * 0.5) * Math.cos(this.angle);
+      this.vy = (this.multiplier + Math.random() * 0.5) * Math.sin(this.angle);
+      this.r = randBetween(8, 12) + 3 * Math.random();
+      this.color = colours[Math.floor(Math.random() * colours.length)];
+    }
+    update() {
+      this.x += this.vx - normal.x;
+      this.y += this.vy - normal.y;
+      normal.x = -2 / window.innerWidth * Math.sin(this.angle);
+      normal.y = -2 / window.innerHeight * Math.cos(this.angle);
+      this.r -= 0.3;
+      this.vx *= 0.9;
+      this.vy *= 0.9;
+    }
+  }
+ 
+  function pushBalls(count = 1, x = origin.x, y = origin.y) {
+    for (let i = 0; i < count; i++) {
+      balls.push(new Ball(x, y));
+    }
+  }
+ 
+  function randBetween(min, max) {
+    return Math.floor(Math.random() * max) + min;
+  }
+ 
+  function loop() {
+    ctx.fillStyle = "rgba(255, 255, 255, 0)";
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (let i = 0; i < balls.length; i++) {
+      let b = balls[i];
+      if (b.r < 0) continue;
+      ctx.fillStyle = b.color;
+      ctx.beginPath();
+      ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2, false);
+      ctx.fill();
+      b.update();
+    }
+    if (longPressed == true) {
+      multiplier += 0.2;
+    } else if (!longPressed && multiplier >= 0) {
+      multiplier -= 0.4;
+    }
+    removeBall();
+    requestAnimationFrame(loop);
+  }
+ 
+  function removeBall() {
+    for (let i = 0; i < balls.length; i++) {
+      let b = balls[i];
+      if (b.x + b.r < 0 || b.x - b.r > width || b.y + b.r < 0 || b.y - b.r > height || b.r < 0) {
+        balls.splice(i, 1);
+      }
+    }
+  }
+}
+clickEffect();//调用特效函数
+</script>
+<!-- end custom footer snippets -->
+
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+      <li><strong>关注:</strong></li>
+    
+
+    
+
+    
+      <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+    
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2024 甲与</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+
+
+
+
+<script src="/assets/js/lunr/lunr.min.js"></script>
+<script src="/assets/js/lunr/lunr-store.js"></script>
+<script src="/assets/js/lunr/lunr-en.js"></script>
+
+
+
+
+
+
+
+  </body>
+</html>

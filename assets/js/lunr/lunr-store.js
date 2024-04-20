@@ -65,6 +65,30 @@ var store = [{
         "url": "/hbase-%E9%85%8D%E7%BD%AE-(%E5%A4%B1%E8%B4%A5)/",
         "teaser": null
       },{
+        "title": "Minio 的配置过程",
+        "excerpt":"如果只是想用分布式文件系统，其实hadoop也可以，但在配置hbase的过程中出现的节点丢失和高cpu占用率问题还是让我想尝试其它的分布式框架。这次记录minio的配置过程。 介绍 Minio是一个开源的分布式对象存储服务，专注于高性能、高可用性和轻量级的设计，有以下两个基本特征： 对象存储服务：MinIO 是一个对象存储服务，它允许用户以类似文件系统的方式存储和检索大规模数据。这种存储方式适用于云原生应用程序、大数据分析、备份和归档等场景。 分布式架构：MinIO 使用分布式架构，可以在多个节点上并行存储和检索数据。这种架构可以提供高扩展性和高性能，使得 MinIO 能够应对大规模数据存储的需求。 步骤 环境 ubuntu20.04 安装 wget https://dl.min.io/server/minio/release/linux-amd64/archive/minio_20240406052602.0.0_amd64.deb -O minio.deb sudo dpkg -i minio.deb mkdir /data mkdir /data/drive1 mkdir /data/drive2 mkdir /data/drive3 mkdir /data/drive4 配置: 在/etc/hosts 中 ip_1 N1 ip_2 N2 在~/.bashrc中 export MINIO_ACCESS_KEY=minioadmin export MINIO_SECRET_KEY=minioadmin export CI=true export MINIO_CI_CD=true 启动: 在两个节点中： nohup...","categories": [],
+        "tags": ["配置","minio"],
+        "url": "/minio-%E7%9A%84%E9%85%8D%E7%BD%AE%E8%BF%87%E7%A8%8B/",
+        "teaser": null
+      },{
+        "title": "Segfault简介",
+        "excerpt":"记录一个可以免费使用vps的网站，segfault。 直接登录即可获得一个vps，会给出一个Secret用于再次登录。 限制 当然有一定限制： 申请的时候等60秒，这个无所谓。 网络流量受限制，但是实际上登录后的下载速度并不慢。 cpu受限，但是对于运行emacs之类小组件而言的没有什么问题，可用外存估计不过1G，因为之前单单尝试sudo update sudo upgrade 磁盘空间就满了。 可能被自动封禁，以及登出后服务器关闭，所以不适合需要持续化存储的作业。 根据 https://thc.org/sf/token 的说法，token 是非卖品，你需要访问以下telegram 频道： 然后用符合下述标准的理由提出申请： 参与讨论。 帮助管理员/系统管理员；管理群聊。 分享你的想法、评论和顾虑。 寻找漏洞。 为社区做贡献的项目。 新颖且令人兴奋的项目。 拯救世界。 黑客行动主义和IT安全研究。 命令行登录 除了在网页端登录之外，还可以命令行登录。 在本地的~/.ssh 目录下，你需要把openssh 的私匙复制到id_sf-adm-segfault-net 中，把ssh_config 内容复制到 config 文件中。然后通过 ssh server-name 即可登录。当然也有 sftp 和 scp 命令用于传输文件。scp 的用法是： scp &lt;server-name&gt;:/path/to/file /local/path 关于外部端口访问 segfault的vps 默认不提供公网ip，所以是不能直接从外部计算机访问的，要访问需要用特定方式打开端口，在这里给出一种实现方案： #...","categories": [],
+        "tags": ["简介"],
+        "url": "/segfault%E7%AE%80%E4%BB%8B/",
+        "teaser": null
+      },{
+        "title": "关于我在配置hbase中的一些问题",
+        "excerpt":"现在系统已经重装，所以再去探究错误的原因和处理方案已经意义不大。现在把当时的日志整理以下，用以备忘。 问题一：高CPU占用率 当我把hbase启动失败的两个节点放置几天后查看，发现： 由于节点流量是有上限的，每个月100G。 😮‍💨😮‍💨😮‍💨 再对比一下性能消耗吧。 Hbase基于hadoop，而hadoop又是基于ssh协议进行文件传输，所以有时候top查看进程会发现sshd占用率高过100%。而minio就稳定得多。不过这种对比不能说明hadoop和minio的优劣，因为其中不包含只运行hadoop条件下的信息。不过hadoop还要连接到scala、Hive这些工具，进行csv到sql的文件转换，才能进行sql查询，相比之下，minio的确是要方便一些👍。 问题二：hosts文件自动更改 当我启动zookeeper或重启之后，没过多久hosts文件自动清空并增加 i a e属性。 当然重启还有一种情况，那就是 hosts 文件恢复默认配置。 这可能和vps服务商的默认配置有关。 lsattr file-name 查看属性 chattr +x file-name 增加x属性 chattr -x file-name 减少x属性 举例： root@J:/etc# lsattr hosts ----ia--------e----- hosts i（immutable）：表示文件或目录是不可变的，即不能被修改、删除、重命名或链接。只有超级用户（root）可以修改或删除该文件或目录。 a（append-only）：表示文件只能向其末尾追加数据，不能修改或删除文件中已有的数据。只有超级用户（root）可以修改或删除该文件。 e（extend）：表示文件或目录使用了ACL（Access Control List，访问控制列表）来控制访问权限，允许对文件或目录设置更细粒度的权限控制。 对策： root@J:/etc# chattr -i hosts root@J:/etc# chattr -a hosts root@J:/etc# chattr -e...","categories": [],
+        "tags": [],
+        "url": "/%E5%85%B3%E4%BA%8E%E6%88%91%E5%9C%A8%E9%85%8D%E7%BD%AEhbase%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98/",
+        "teaser": null
+      },{
+        "title": "如何使用 minio 进行数据库查询",
+        "excerpt":"minio 提供了对s3存储对象的sql操作。一方面为了处理实验报告，另一方面也是为了增加可以使用的工具数量，所以需要增进对于mc sql的理解。 本篇博客处理以下几个问题： s3 是什么？ minio 上的何种对象可以视为 s3 对象？ 如何操作 S3 对象？ 如何把这种查询封装到emacs中？ s3 是什么？ Amazon Simple Storage Service（Amazon S3）是一种对象存储服务，提供行业领先的可扩展性、数据可用性、安全性和性能。各种规模和行业的客户都可以使用 Amazon S3 存储和保护任意数量的数据，用于数据湖、网站、移动应用程序、备份和恢复、归档、企业应用程序、IoT 设备和大数据分析。Amazon S3 提供了管理功能，使您可以优化、组织和配置对数据的访问，以满足您的特定业务、组织和合规性要求。 所以，S3, 全称Simple Storage Service，直译简单存储服务。那么 S3 Object 就是简单存储服务对象。 另外需要注意，s3o 文件一般要下载到本地进行处理，然后上传进行覆盖。 可以把minio上的何种对象视为s3对象？ mc sql --help 看看文档。 所以，可以把csv文件理解为一种s3 Object的实例。确实足够简单😊。 那只要把bash命令封装到elisp中就可以了。不过在这之前要先熟悉一下 csv文件的基本操作。 可以如何操作S3？ 打开 Libreoffice 创建几个数据， 按默认格式存储为csv文件...","categories": [],
+        "tags": ["minio"],
+        "url": "/%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8-minio-%E8%BF%9B%E8%A1%8C%E6%95%B0%E6%8D%AE%E5%BA%93%E6%9F%A5%E8%AF%A2/",
+        "teaser": null
+      },{
     "title": "Portfolio",
     "excerpt":" ","url": "/portfolio/"
   },{

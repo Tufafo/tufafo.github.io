@@ -1,4 +1,594 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.3">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2024-04-19T09:16:09+08:00</updated><id>/feed.xml</id><title type="html">甲与</title><author><name>甲与</name></author><entry><title type="html">Hbase 配置 (失败)</title><link href="/hbase-%E9%85%8D%E7%BD%AE-(%E5%A4%B1%E8%B4%A5)/" rel="alternate" type="text/html" title="Hbase 配置 (失败)" /><published>2024-04-15T00:00:00+08:00</published><updated>2024-04-15T00:00:00+08:00</updated><id>/hbase%20%E9%85%8D%E7%BD%AE%20(%E5%A4%B1%E8%B4%A5)</id><content type="html" xml:base="/hbase-%E9%85%8D%E7%BD%AE-(%E5%A4%B1%E8%B4%A5)/"><![CDATA[<h2 id="目标">目标</h2>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.3">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2024-04-20T18:04:47+08:00</updated><id>/feed.xml</id><title type="html">甲与</title><author><name>甲与</name></author><entry><title type="html">关于我在配置hbase中的一些问题</title><link href="/%E5%85%B3%E4%BA%8E%E6%88%91%E5%9C%A8%E9%85%8D%E7%BD%AEhbase%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98/" rel="alternate" type="text/html" title="关于我在配置hbase中的一些问题" /><published>2024-04-20T00:00:00+08:00</published><updated>2024-04-20T00:00:00+08:00</updated><id>/%E5%85%B3%E4%BA%8E%E6%88%91%E5%9C%A8%E9%85%8D%E7%BD%AEhbase%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98</id><content type="html" xml:base="/%E5%85%B3%E4%BA%8E%E6%88%91%E5%9C%A8%E9%85%8D%E7%BD%AEhbase%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98/"><![CDATA[<p>现在系统已经重装，所以再去探究错误的原因和处理方案已经意义不大。现在把当时的日志整理以下，用以备忘。</p>
+
+<h3 id="问题一高cpu占用率">问题一：高CPU占用率</h3>
+
+<p>当我把hbase启动失败的两个节点放置几天后查看，发现：</p>
+
+<p><img src="/assets/post_images/image-20240417110959098.png" alt="" /></p>
+
+<p>由于节点流量是有上限的，每个月100G。</p>
+
+<p><img src="/assets/post_images/image-20240420095141618.png" alt="" />
+😮‍💨😮‍💨😮‍💨</p>
+
+<p>再对比一下性能消耗吧。</p>
+
+<p><img src="/assets/post_images/image-20240420095613423.png" alt="" /></p>
+
+<p>Hbase基于hadoop，而hadoop又是基于ssh协议进行文件传输，所以有时候top查看进程会发现sshd占用率高过100%。而minio就稳定得多。不过这种对比不能说明hadoop和minio的优劣，因为其中不包含只运行hadoop条件下的信息。不过hadoop还要连接到scala、Hive这些工具，进行csv到sql的文件转换，才能进行sql查询，相比之下，minio的确是要方便一些👍。</p>
+
+<h3 id="问题二hosts文件自动更改">问题二：hosts文件自动更改</h3>
+
+<p>当我启动zookeeper或重启之后，没过多久hosts文件自动清空并增加 <code class="language-plaintext highlighter-rouge">i a e</code>属性。</p>
+
+<p>当然重启还有一种情况，那就是 <code class="language-plaintext highlighter-rouge">hosts</code> 文件恢复默认配置。</p>
+
+<p>这可能和vps服务商的默认配置有关。</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">lsattr file-name</code> 查看属性</li>
+  <li><code class="language-plaintext highlighter-rouge">chattr +x file-name</code> 增加x属性</li>
+  <li><code class="language-plaintext highlighter-rouge">chattr -x file-name</code> 减少x属性</li>
+</ul>
+
+<p>举例：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>root@J:/etc# lsattr hosts
+<span class="nt">----ia--------e-----</span> hosts
+</code></pre></div></div>
+<p>i（immutable）：表示文件或目录是不可变的，即不能被修改、删除、重命名或链接。只有超级用户（root）可以修改或删除该文件或目录。</p>
+
+<p>a（append-only）：表示文件只能向其末尾追加数据，不能修改或删除文件中已有的数据。只有超级用户（root）可以修改或删除该文件。</p>
+
+<p>e（extend）：表示文件或目录使用了ACL（Access Control List，访问控制列表）来控制访问权限，允许对文件或目录设置更细粒度的权限控制。</p>
+
+<p>对策：</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>root@J:/etc# chattr -i hosts
+root@J:/etc# chattr -a hosts
+root@J:/etc# chattr -e hosts
+root@J:/etc# lsattr hosts
+-------------------- hosts
+</code></pre></div></div>
+
+<h3 id="问题三-节点丢失">问题三： 节点丢失</h3>
+
+<p>jps查看节点发现只有jps本身，重启系统格式化namenode之后一切节点正常，但是持续运行一段时间会发生节点丢失问题，不过hadoop的webUI和命令行工具都能正常运行，9870端口也显示两个服务器在线，不明白是为什么。</p>
+
+<h3 id="问题四命令行工具的使用">问题四：命令行工具的使用</h3>
+
+<p>hadoop和zookeeper都提供了命令行的操作工具，用来创建和查看文件。</p>
+
+<h4 id="hdfs-使用方法">hdfs 使用方法</h4>
+
+<ul>
+  <li>查看根目录
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>hdfs dfs -ls /
+</code></pre></div>    </div>
+  </li>
+  <li>创建文件夹
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>hdfs dfs <span class="nt">-mkdir</span> /G
+</code></pre></div>    </div>
+  </li>
+  <li>创建文件
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>hdfs dfs <span class="nt">-touch</span> /G/test.txt
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<h4 id="zookeeper-使用">zookeeper 使用</h4>
+
+<p>在ZooKeeper中，你可以使用命令行客户端（<code class="language-plaintext highlighter-rouge">zkCli.sh</code>）进行交互式操作。以下是一些常用的ZooKeeper命令行操作：</p>
+
+<ol>
+  <li><strong>连接到ZooKeeper服务器</strong>：
+    <ul>
+      <li>使用以下命令连接到ZooKeeper服务器：<code class="language-plaintext highlighter-rouge">./zkCli.sh -server &lt;ZooKeeper服务器地址&gt;:&lt;端口号&gt;</code></li>
+      <li>例如：<code class="language-plaintext highlighter-rouge">./zkCli.sh -server localhost:2181</code></li>
+    </ul>
+  </li>
+  <li><strong>基本操作</strong>：
+    <ul>
+      <li><strong>创建节点</strong>：<code class="language-plaintext highlighter-rouge">create /path data</code>
+        <ul>
+          <li>例如：<code class="language-plaintext highlighter-rouge">create /myNode "Hello World"</code></li>
+        </ul>
+      </li>
+      <li><strong>读取节点数据</strong>：<code class="language-plaintext highlighter-rouge">get /path</code>
+        <ul>
+          <li>例如：<code class="language-plaintext highlighter-rouge">get /myNode</code></li>
+        </ul>
+      </li>
+      <li><strong>更新节点数据</strong>：<code class="language-plaintext highlighter-rouge">set /path data</code>
+        <ul>
+          <li>例如：<code class="language-plaintext highlighter-rouge">set /myNode "New Data"</code></li>
+        </ul>
+      </li>
+      <li><strong>列出节点</strong>：<code class="language-plaintext highlighter-rouge">ls /path</code>
+        <ul>
+          <li>例如：<code class="language-plaintext highlighter-rouge">ls /</code></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><strong>监视节点</strong>：
+    <ul>
+      <li><strong>设置监视</strong>：<code class="language-plaintext highlighter-rouge">get /path true</code>
+        <ul>
+          <li>该命令将监视给定节点的变化。如果节点数据发生变化，客户端将收到通知。</li>
+        </ul>
+      </li>
+      <li><strong>取消监视</strong>：<code class="language-plaintext highlighter-rouge">rmr /path</code>
+        <ul>
+          <li>取消对节点的监视。</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><strong>删除节点</strong>：
+    <ul>
+      <li><strong>删除节点</strong>：<code class="language-plaintext highlighter-rouge">delete /path</code>
+        <ul>
+          <li>例如：<code class="language-plaintext highlighter-rouge">delete /myNode</code></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><strong>帮助</strong>：
+    <ul>
+      <li><strong>获取帮助</strong>：<code class="language-plaintext highlighter-rouge">help</code>
+        <ul>
+          <li>可以查看ZooKeeper命令行客户端的帮助信息。</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><strong>退出命令行客户端</strong>：
+    <ul>
+      <li><strong>退出</strong>：<code class="language-plaintext highlighter-rouge">quit</code> 或 <code class="language-plaintext highlighter-rouge">exit</code>
+        <ul>
+          <li>用于退出ZooKeeper命令行客户端。</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ol>]]></content><author><name>甲与</name></author><summary type="html"><![CDATA[现在系统已经重装，所以再去探究错误的原因和处理方案已经意义不大。现在把当时的日志整理以下，用以备忘。]]></summary></entry><entry><title type="html">如何使用 minio 进行数据库查询</title><link href="/%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8-minio-%E8%BF%9B%E8%A1%8C%E6%95%B0%E6%8D%AE%E5%BA%93%E6%9F%A5%E8%AF%A2/" rel="alternate" type="text/html" title="如何使用 minio 进行数据库查询" /><published>2024-04-20T00:00:00+08:00</published><updated>2024-04-20T00:00:00+08:00</updated><id>/%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8%20minio%20%E8%BF%9B%E8%A1%8C%E6%95%B0%E6%8D%AE%E5%BA%93%E6%9F%A5%E8%AF%A2</id><content type="html" xml:base="/%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8-minio-%E8%BF%9B%E8%A1%8C%E6%95%B0%E6%8D%AE%E5%BA%93%E6%9F%A5%E8%AF%A2/"><![CDATA[<p>minio 提供了对s3存储对象的sql操作。一方面为了处理实验报告，另一方面也是为了增加可以使用的工具数量，所以需要增进对于<code class="language-plaintext highlighter-rouge">mc sql</code>的理解。</p>
+
+<p>本篇博客处理以下几个问题：</p>
+
+<ul>
+  <li>s3 是什么？</li>
+  <li>minio 上的何种对象可以视为 s3 对象？</li>
+  <li>如何操作 S3 对象？</li>
+  <li>如何把这种查询封装到emacs中？</li>
+</ul>
+
+<h2 id="s3-是什么"><code class="language-plaintext highlighter-rouge">s3</code> 是什么？</h2>
+
+<blockquote>
+  <p>Amazon Simple Storage Service（Amazon S3）是一种对象存储服务，提供行业领先的可扩展性、数据可用性、安全性和性能。各种规模和行业的客户都可以使用 Amazon S3 存储和保护任意数量的数据，用于数据湖、网站、移动应用程序、备份和恢复、归档、企业应用程序、IoT 设备和大数据分析。Amazon S3 提供了管理功能，使您可以优化、组织和配置对数据的访问，以满足您的特定业务、组织和合规性要求。</p>
+</blockquote>
+
+<p>所以，S3, 全称Simple Storage Service，直译简单存储服务。那么 <code class="language-plaintext highlighter-rouge">S3 Object</code> 就是简单存储服务对象。</p>
+
+<p>另外需要注意，s3o 文件一般要下载到本地进行处理，然后上传进行覆盖。</p>
+
+<h2 id="可以把minio上的何种对象视为s3对象">可以把minio上的何种对象视为<code class="language-plaintext highlighter-rouge">s3对象</code>？</h2>
+
+<p><code class="language-plaintext highlighter-rouge">mc sql --help</code> 看看文档。</p>
+
+<p><img src="/assets/post_images/image-20240420090054853.png" alt="" /></p>
+
+<p>所以，可以把<code class="language-plaintext highlighter-rouge">csv</code>文件理解为一种<code class="language-plaintext highlighter-rouge">s3 Object</code>的实例。确实足够简单😊。</p>
+
+<p>那只要把bash命令封装到elisp中就可以了。不过在这之前要先熟悉一下 csv文件的基本操作。</p>
+
+<h2 id="可以如何操作s3">可以如何操作S3？</h2>
+
+<p>打开 <code class="language-plaintext highlighter-rouge">Libreoffice</code> 创建几个数据，</p>
+
+<p><img src="/assets/post_images/image-20240420090847909.png" alt="" /></p>
+
+<p>按默认格式存储为csv文件 <code class="language-plaintext highlighter-rouge">stu.csv</code>，打开emacs看看：</p>
+
+<p><img src="/assets/post_images/image-20240420091006763.png" alt="" /></p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>mc mb minio-server/csv
+<span class="nv">$ </span>mc put stu.csv minio-server/csv
+</code></pre></div></div>
+
+<h3 id="sql-操作">sql 操作</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ mc sql --recursive --query "select * from S3Object" minio-server/csv/stu.csv
+张三,100
+李四,50
+王五,60
+</code></pre></div></div>
+
+<p>好棒👍。来增加几个查询条件看看吧。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$mc</span> sql <span class="nt">--recursive</span> <span class="nt">--query</span> <span class="s2">"select * from S3Object where </span><span class="se">\"</span><span class="s2">成绩</span><span class="se">\"</span><span class="s2">=100"</span> minio-server/csv/stu.csv
+张三,100
+<span class="nv">$mc</span> sql <span class="nt">--recursive</span> <span class="nt">--query</span> <span class="s2">"select * from S3Object where </span><span class="se">\"</span><span class="s2">成绩</span><span class="se">\"</span><span class="s2">&gt;=60"</span> minio-server/csv/stu.csv
+张三,100
+王五,60
+</code></pre></div></div>
+
+<p>漂亮🎉。</p>
+
+<h2 id="如何把mc的sql操作封装到emacs中">如何把mc的sql操作封装到emacs中？</h2>
+
+<p>按照主语表达法，<code class="language-plaintext highlighter-rouge">(as-s3o-be-sq file-name sql-sentence)</code> 就可以获取数据了。其中<code class="language-plaintext highlighter-rouge">sq</code>的意义是，<code class="language-plaintext highlighter-rouge">structured query</code>，因为<code class="language-plaintext highlighter-rouge">sql</code>的全称是：<code class="language-plaintext highlighter-rouge">structured query language</code>。（所以实际上说<code class="language-plaintext highlighter-rouge">使用sql语言</code> 这种说法是不正确的，什么是<code class="language-plaintext highlighter-rouge">language语言</code>呢？）不过这样的限制也很明显，最多只能查询一个表，所以表和表的连接基本上就不用考虑了。</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="p">(</span><span class="nb">defun</span> <span class="nv">as-s3o-be-sq</span> <span class="p">(</span><span class="nv">s3o</span> <span class="nv">sq</span><span class="p">)</span>
+      <span class="s">"make a sq query to s3o on minio server. The input of s3o should be a string path to s3o, and sq should be a string of sql. This function will return query result as string"</span>
+      <span class="p">(</span><span class="nv">shell-command</span> <span class="p">(</span><span class="nb">format</span> <span class="s">"mc sql --recursive --query \"%s\" %s"</span> <span class="nv">s3o</span> <span class="nv">sq</span><span class="p">)))</span>
+      
+</code></pre></div></div>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="p">(</span><span class="nv">as-s3o-be-sq</span> <span class="s">"select * from S3Object"</span> <span class="s">"minio-server/csv/stu.csv"</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>结果<strong>返回0 而Message 中则返回查询结果</strong>。</p>
+
+<p>嗯……<code class="language-plaintext highlighter-rouge">shell-command</code> 会返回退出码，<code class="language-plaintext highlighter-rouge">shell-command-to-string</code> 才能获得<code class="language-plaintext highlighter-rouge">shell</code> 的输出结果。</p>
+
+<p>改一下：</p>
+
+<p><img src="/assets/post_images/image-20240420094006548.png" alt="" /></p>
+
+<p>完美🎉🎉。</p>
+
+<h2 id="参考">参考</h2>
+
+<ul>
+  <li>https://docs.aws.amazon.com/zh_cn/AmazonS3/latest/userguide/Welcome.html</li>
+</ul>]]></content><author><name>甲与</name></author><category term="minio" /><summary type="html"><![CDATA[minio 提供了对s3存储对象的sql操作。一方面为了处理实验报告，另一方面也是为了增加可以使用的工具数量，所以需要增进对于mc sql的理解。]]></summary></entry><entry><title type="html">Minio 的配置过程</title><link href="/minio-%E7%9A%84%E9%85%8D%E7%BD%AE%E8%BF%87%E7%A8%8B/" rel="alternate" type="text/html" title="Minio 的配置过程" /><published>2024-04-19T00:00:00+08:00</published><updated>2024-04-19T00:00:00+08:00</updated><id>/minio%20%E7%9A%84%E9%85%8D%E7%BD%AE%E8%BF%87%E7%A8%8B</id><content type="html" xml:base="/minio-%E7%9A%84%E9%85%8D%E7%BD%AE%E8%BF%87%E7%A8%8B/"><![CDATA[<p>如果只是想用分布式文件系统，其实hadoop也可以，但在配置hbase的过程中出现的节点丢失和高cpu占用率问题还是让我想尝试其它的分布式框架。这次记录minio的配置过程。</p>
+
+<h2 id="介绍">介绍</h2>
+
+<p><a href="https://min.io">Minio</a>是一个开源的分布式对象存储服务，专注于高性能、高可用性和轻量级的设计，有以下两个基本特征：</p>
+
+<ol>
+  <li>
+    <p><strong>对象存储服务</strong>：MinIO 是一个对象存储服务，它允许用户以类似文件系统的方式存储和检索大规模数据。这种存储方式适用于云原生应用程序、大数据分析、备份和归档等场景。</p>
+  </li>
+  <li>
+    <p><strong>分布式架构</strong>：MinIO 使用分布式架构，可以在多个节点上并行存储和检索数据。这种架构可以提供高扩展性和高性能，使得 MinIO 能够应对大规模数据存储的需求。</p>
+  </li>
+</ol>
+
+<h2 id="步骤">步骤</h2>
+
+<p>环境 ubuntu20.04</p>
+
+<ol>
+  <li>安装</li>
+</ol>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>wget https://dl.min.io/server/minio/release/linux-amd64/archive/minio_20240406052602.0.0_amd64.deb <span class="nt">-O</span> minio.deb
+<span class="nb">sudo </span>dpkg <span class="nt">-i</span> minio.deb
+
+<span class="nb">mkdir</span> /data
+<span class="nb">mkdir</span> /data/drive1
+<span class="nb">mkdir</span> /data/drive2
+<span class="nb">mkdir</span> /data/drive3
+<span class="nb">mkdir</span> /data/drive4
+</code></pre></div></div>
+
+<p>配置:</p>
+
+<ul>
+  <li>在<code class="language-plaintext highlighter-rouge">/etc/hosts</code> 中
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ip_1 N1
+ip_2 N2
+</code></pre></div>    </div>
+  </li>
+  <li>在<code class="language-plaintext highlighter-rouge">~/.bashrc</code>中</li>
+</ul>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">export </span><span class="nv">MINIO_ACCESS_KEY</span><span class="o">=</span>minioadmin
+<span class="nb">export </span><span class="nv">MINIO_SECRET_KEY</span><span class="o">=</span>minioadmin
+<span class="nb">export </span><span class="nv">CI</span><span class="o">=</span><span class="nb">true
+export </span><span class="nv">MINIO_CI_CD</span><span class="o">=</span><span class="nb">true</span>
+</code></pre></div></div>
+
+<p>启动:</p>
+
+<p>在两个节点中：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">nohup </span>minio server http://N<span class="o">{</span>1..2<span class="o">}</span>:9000/data/drive<span class="o">{</span>1...4<span class="o">}</span> &amp;
+</code></pre></div></div>
+
+<p>于命令行中访问文件 <code class="language-plaintext highlighter-rouge">nohup.out</code> 查看 <code class="language-plaintext highlighter-rouge">webUI</code> 端口进行访问即可。</p>
+
+<h3 id="命令行端-mc">命令行端 MC</h3>
+
+<p>安装</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>wget https://dl.min.io/client/mc/release/linux-amd64/mc
+<span class="nb">chmod</span> +x mc
+<span class="nb">sudo mv </span>mc /usr/local/bin/mc
+</code></pre></div></div>
+
+<p>设置用户</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mc <span class="nb">alias set local </span>http://your_ip:9000 minioadmin minioadmin
+</code></pre></div></div>
+
+<p>操作：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mc <span class="nt">--help</span> 查看命令帮助
+</code></pre></div></div>
+
+<p>基本的路径格式是 <code class="language-plaintext highlighter-rouge">alias 设置的登录名+桶名+对象路径</code> 。</p>
+
+<p>创建桶</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mc mb minio-server/test
+</code></pre></div></div>
+
+<p>比如查看<code class="language-plaintext highlighter-rouge">b1</code> 目录下的文件：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mc <span class="nb">ls </span>minio-server/test
+</code></pre></div></div>
+
+<p>再比如上传文件</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mc put test.txt minio-server/test
+</code></pre></div></div>
+
+<p>下载文件</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mc get minio-server/test/test.txt ./
+</code></pre></div></div>
+
+<p>其它</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>命令</th>
+      <th>描述</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">alias</code></td>
+      <td>在配置文件中管理服务器凭据</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">admin</code></td>
+      <td>管理MinIO服务器</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">anonymous</code></td>
+      <td>管理对存储桶和对象的匿名访问</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">batch</code></td>
+      <td>管理批处理作业</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">cp</code></td>
+      <td>复制对象</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">cat</code></td>
+      <td>显示对象内容</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">diff</code></td>
+      <td>列出两个存储桶之间对象名称、大小和日期的差异</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">du</code></td>
+      <td>递归总结磁盘使用情况</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">encrypt</code></td>
+      <td>管理存储桶加密配置</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">event</code></td>
+      <td>管理对象通知</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">find</code></td>
+      <td>搜索对象</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">get</code></td>
+      <td>将S3对象获取到本地</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">head</code></td>
+      <td>显示对象的前n行</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">ilm</code></td>
+      <td>管理存储桶生命周期</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">idp</code></td>
+      <td>管理MinIO身份提供者服务器配置</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">license</code></td>
+      <td>许可证相关命令</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">legalhold</code></td>
+      <td>管理对象的法律保留</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">ls</code></td>
+      <td>列出存储桶和对象</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">mb</code></td>
+      <td>创建一个存储桶</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">mv</code></td>
+      <td>移动对象</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">mirror</code></td>
+      <td>将对象同步到远程站点</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">od</code></td>
+      <td>测量单个流上传和下载</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">ping</code></td>
+      <td>执行存活性检查</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">pipe</code></td>
+      <td>将标准输入流传输到对象</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">put</code></td>
+      <td>将对象上传到存储桶</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">quota</code></td>
+      <td>管理存储桶配额</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">rm</code></td>
+      <td>删除对象</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">retention</code></td>
+      <td>为对象设置保留期</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">rb</code></td>
+      <td>删除一个存储桶</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">replicate</code></td>
+      <td>配置服务器端存储桶复制</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">ready</code></td>
+      <td>检查集群是否就绪</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">sql</code></td>
+      <td>在对象上运行SQL查询</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">stat</code></td>
+      <td>显示对象元数据</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">support</code></td>
+      <td>支持相关命令</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">share</code></td>
+      <td>生成临时访问对象的URL</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">tree</code></td>
+      <td>以树状格式列出存储桶和对象</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">tag</code></td>
+      <td>管理存储桶和对象的标签</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">undo</code></td>
+      <td>撤销PUT/DELETE操作</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">update</code></td>
+      <td>将mc更新到最新版本</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">version</code></td>
+      <td>管理存储桶版本控制</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">watch</code></td>
+      <td>监听对象通知事件</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="参考">参考</h2>
+
+<ul>
+  <li>https://www.youtube.com/watch?v=zSKhvmWIO2k</li>
+  <li>https://min.io/docs/minio/linux/operations/install-deploy-manage/deploy-minio-multi-node-multi-drive.html</li>
+  <li>https://min.io/docs/minio/linux/operations/install-deploy-manage/deploy-minio-single-node-single-drive.html</li>
+  <li>https://min.io/docs/minio/linux/index.html#procedure</li>
+</ul>]]></content><author><name>甲与</name></author><category term="配置" /><category term="minio" /><summary type="html"><![CDATA[如果只是想用分布式文件系统，其实hadoop也可以，但在配置hbase的过程中出现的节点丢失和高cpu占用率问题还是让我想尝试其它的分布式框架。这次记录minio的配置过程。]]></summary></entry><entry><title type="html">Segfault简介</title><link href="/segfault%E7%AE%80%E4%BB%8B/" rel="alternate" type="text/html" title="Segfault简介" /><published>2024-04-19T00:00:00+08:00</published><updated>2024-04-19T00:00:00+08:00</updated><id>/segfault%E7%AE%80%E4%BB%8B</id><content type="html" xml:base="/segfault%E7%AE%80%E4%BB%8B/"><![CDATA[<p>记录一个可以免费使用vps的网站，<a href="https://shell.segfault.net">segfault</a>。</p>
+
+<p>直接登录即可获得一个vps，会给出一个<code class="language-plaintext highlighter-rouge">Secret</code>用于再次登录。</p>
+
+<p><img src="/assets/post_images/image-20240420080409217.png" alt="" /></p>
+<h2 id="限制">限制</h2>
+
+<p>当然有一定限制：</p>
+
+<p><img src="/assets/post_images/image-20240420080800998.png" alt="" /></p>
+
+<p>申请的时候等60秒，这个无所谓。</p>
+
+<p>网络流量受限制，但是实际上登录后的下载速度并不慢。</p>
+
+<p>cpu受限，但是对于运行emacs之类小组件而言的没有什么问题，可用外存估计不过1G，因为之前单单尝试<code class="language-plaintext highlighter-rouge">sudo update</code> <code class="language-plaintext highlighter-rouge">sudo upgrade</code> 磁盘空间就满了。</p>
+
+<p>可能被自动封禁，以及登出后服务器关闭，所以不适合需要持续化存储的作业。</p>
+
+<p>根据 <code class="language-plaintext highlighter-rouge">https://thc.org/sf/token</code> 的说法，<code class="language-plaintext highlighter-rouge">token</code> 是非卖品，你需要访问以下telegram 频道：</p>
+
+<p><img src="assets/post_images/image-20240420081410897.png" alt="" /></p>
+
+<p>然后用符合下述标准的理由提出申请：</p>
+
+<ul>
+  <li>参与讨论。</li>
+  <li>帮助管理员/系统管理员；管理群聊。</li>
+  <li>分享你的想法、评论和顾虑。</li>
+  <li>寻找漏洞。</li>
+  <li>为社区做贡献的项目。</li>
+  <li>新颖且令人兴奋的项目。</li>
+  <li>拯救世界。</li>
+  <li>黑客行动主义和IT安全研究。</li>
+</ul>
+
+<h2 id="命令行登录">命令行登录</h2>
+
+<p>除了在网页端登录之外，还可以命令行登录。</p>
+
+<p><img src="/assets/post_images/image-20240420082946802.png" alt="" /></p>
+
+<p>在本地的<code class="language-plaintext highlighter-rouge">~/.ssh</code> 目录下，你需要把<code class="language-plaintext highlighter-rouge">openssh</code> 的私匙复制到<code class="language-plaintext highlighter-rouge">id_sf-adm-segfault-net</code> 中，把<code class="language-plaintext highlighter-rouge">ssh_config</code> 内容复制到 <code class="language-plaintext highlighter-rouge">config</code> 文件中。然后通过 <code class="language-plaintext highlighter-rouge">ssh server-name</code> 即可登录。当然也有 sftp 和 scp 命令用于传输文件。<code class="language-plaintext highlighter-rouge">scp</code> 的用法是：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>scp &lt;server-name&gt;:/path/to/file /local/path
+</code></pre></div></div>
+
+<h2 id="关于外部端口访问">关于外部端口访问</h2>
+
+<p><code class="language-plaintext highlighter-rouge">segfault</code>的vps 默认不提供公网ip，所以是不能直接从外部计算机访问的，要访问需要用特定方式打开端口，在这里给出一种实现方案：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Request a random public TCP port:</span>
+curl sf/port
+<span class="nb">echo</span> <span class="s2">"Your public IP:PORT is </span><span class="si">$(</span><span class="nb">cat</span> /config/self/reverse_ip<span class="si">)</span><span class="s2">:</span><span class="si">$(</span><span class="nb">cat</span> /config/self/reverse_port<span class="si">)</span><span class="s2">"</span>
+</code></pre></div></div>
+
+<p>你的tcp端口和ip会存放在 <code class="language-plaintext highlighter-rouge">/config/self</code> 目录下的 <code class="language-plaintext highlighter-rouge">reverse_ip</code> 和 <code class="language-plaintext highlighter-rouge">reverse_port</code> 文件中。在这里测试<code class="language-plaintext highlighter-rouge">trilium</code> 或者 <code class="language-plaintext highlighter-rouge">emacs</code> 的 <code class="language-plaintext highlighter-rouge">elnode</code> 或许会很有趣😄。</p>
+
+<h2 id="参考">参考</h2>
+
+<ul>
+  <li>https://www.thc.org/sf/faq/</li>
+  <li>https://github.com/hackerschoice/thc-tips-tricks-hacks-cheat-sheet#tunnel</li>
+</ul>]]></content><author><name>甲与</name></author><category term="简介" /><summary type="html"><![CDATA[记录一个可以免费使用vps的网站，segfault。]]></summary></entry><entry><title type="html">Hbase 配置 (失败)</title><link href="/hbase-%E9%85%8D%E7%BD%AE-(%E5%A4%B1%E8%B4%A5)/" rel="alternate" type="text/html" title="Hbase 配置 (失败)" /><published>2024-04-15T00:00:00+08:00</published><updated>2024-04-15T00:00:00+08:00</updated><id>/hbase%20%E9%85%8D%E7%BD%AE%20(%E5%A4%B1%E8%B4%A5)</id><content type="html" xml:base="/hbase-%E9%85%8D%E7%BD%AE-(%E5%A4%B1%E8%B4%A5)/"><![CDATA[<h2 id="目标">目标</h2>
 
 <p>熟悉hbase配置的基本流程</p>
 
@@ -1989,952 +2579,4 @@ apt <span class="nb">install </span>certbot
   <li><a href="https://zh.m.wikipedia.org/wiki/%E6%B3%A2%E5%85%B0%E8%A1%A8%E7%A4%BA%E6%B3%95">维基百科：波兰表示法</a></li>
   <li><a href="https://zh.m.wikipedia.org/wiki/%E9%80%86%E6%B3%A2%E5%85%B0%E8%A1%A8%E7%A4%BA%E6%B3%95">维基百科：逆波兰表示法</a></li>
   <li><a href="https://zh.m.wikipedia.org/wiki/%E9%80%86%E6%B3%A2%E5%85%B0%E8%A1%A8%E7%A4%BA%E6%B3%95">维基百科：S表达式</a></li>
-</ul>]]></content><author><name>甲与</name></author><category term="语法" /><summary type="html"><![CDATA[介绍一下lisp语言的主语。]]></summary></entry><entry><title type="html">Lisp基础语法：列表</title><link href="/lisp%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95-%E5%88%97%E8%A1%A8/" rel="alternate" type="text/html" title="Lisp基础语法：列表" /><published>2023-12-24T00:00:00+08:00</published><updated>2023-12-24T00:00:00+08:00</updated><id>/lisp%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95%EF%BC%9A%E5%88%97%E8%A1%A8</id><content type="html" xml:base="/lisp%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95-%E5%88%97%E8%A1%A8/"><![CDATA[<p>在上一篇博客中，我们试图说明，lisp的一切对象都可以视为一种符号对于另一种符号的指向，同时介绍了指针型指向和函数型指向的基本语法。这一片笔记记录列表类型。</p>
-
-<h2 id="列表cons-car-cdr">列表：cons, car ,cdr</h2>
-
-<p>列表是由括号 <code class="language-plaintext highlighter-rouge">()</code> 包裹的符号，符号之间用空格分开。每一个符号指向另一个列表或符号。</p>
-
-<p><code class="language-plaintext highlighter-rouge">3</code> 和 <code class="language-plaintext highlighter-rouge">(+ 1 1 1)</code> 在数量上的返回结果是相同的。如果我们仅仅想要标示一种物品的数量，我们更习惯用 <code class="language-plaintext highlighter-rouge">3</code> 。这是因为，每次提到该物品的数量时， <code class="language-plaintext highlighter-rouge">3</code> 就读写意义上的能量消耗更小。
-我们姑且把这类能量消耗更小的符号称为<code class="language-plaintext highlighter-rouge">更精简的符号</code>。</p>
-
-<p>例如，当我们记录了一周的体温后，便可以用 <code class="language-plaintext highlighter-rouge">本周体温.txt</code> 来替代该文件中的体温数据本身。这时候，每一天的体温和本周体温便形成以下一对多的映射关系：</p>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">set</span> <span class="ss">'week</span> <span class="o">'</span><span class="p">(</span><span class="nv">Mon</span> <span class="nv">Tue</span> <span class="nv">Wed</span> <span class="nv">Thr</span> <span class="nv">Fir</span> <span class="nv">Sat</span> <span class="nv">Sun</span><span class="p">))</span>
-</code></pre></div></div>
-
-<p><img src="/assets/post_images/image-20240415212855550.png" alt="" /></p>
-
-<p>例如，设37.4~37.8摄氏度是低度发烧，而我们想要从一周中寻找低度发烧的 <code class="language-plaintext highlighter-rouge">Monday</code> ，那么我们不得不从 <code class="language-plaintext highlighter-rouge">week</code> 整体中选择 <code class="language-plaintext highlighter-rouge">Monday</code> 这一部分。</p>
-
-<p>如果存在一个函数如下所示的返回制定位置的符号便好了：</p>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nv">select</span> <span class="o">'</span><span class="err">低烧</span><span class="o">'</span> <span class="nv">from</span> <span class="nv">week</span><span class="p">)</span>
-<span class="c1">;;we expecte: =&gt; Mon</span>
-<span class="c1">;;Actually: =&gt; Symbol's function definition is void: select</span>
-</code></pre></div></div>
-
-<p>遗憾的是，这是一个过于“高级”的函数，elisp并不会提供它的直接实现。我们要从一些更加低层的函数出发组装它。</p>
-
-<p>我们可能想象着：</p>
-
-<p><img src="/assets/post_images/image-20240415212914805.png" alt="" /></p>
-
-<p>然而实际上，在lisp语言中，<code class="language-plaintext highlighter-rouge">week</code> 是通过一种被称为 <code class="language-plaintext highlighter-rouge">cell</code> 的二元组来构成的。</p>
-
-<blockquote>
-  <p>The smallest basic unit of a plant or animal.</p>
-
-  <p>细胞</p>
-
-  <p>A small room with not much furniture, especially in a prison or a monastery or convent</p>
-
-  <p>小房间；单间牢房</p>
-</blockquote>
-
-<p>根据剑桥辞典的解释，我们暂称这种 <code class="language-plaintext highlighter-rouge">cell</code> 为小房间。每一个小房间有且仅有两个小孔（slot），左侧的小孔记录符号，右侧的小孔负责指向。每一个小房间可以通过右侧的小孔连到下一个房间中。</p>
-
-<p>例如：</p>
-
-<p><img src="assets/post_images/image-20240415212946114.png" alt="" /></p>
-
-<p>其lisp语言表达为：</p>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">cons</span> <span class="nv">Mon</span> <span class="p">(</span><span class="nb">cons</span> <span class="nv">Tue</span> <span class="no">nil</span><span class="p">))</span>
-</code></pre></div></div>
-<p>类似地，我们可以构成要构成一周的体温数据：</p>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">set</span> <span class="ss">'week</span> <span class="p">(</span><span class="nb">cons</span> <span class="ss">'Mon</span> <span class="p">(</span><span class="nb">cons</span> <span class="ss">'Tue</span> <span class="p">(</span><span class="nb">cons</span> <span class="ss">'Wed</span> 
-	<span class="p">(</span><span class="nb">cons</span> <span class="ss">'Thr</span> <span class="p">(</span><span class="nb">cons</span> <span class="ss">'Fri</span> <span class="p">(</span><span class="nb">cons</span> <span class="ss">'Sat</span>
-		<span class="p">(</span><span class="nb">cons</span> <span class="ss">'Sun</span> <span class="no">nil</span><span class="p">))))))))</span>
-</code></pre></div></div>
-
-<p><img src="/assets/post_images/image-20240415213050619.png" alt="" /></p>
-
-<p>这就是week列表的构成方式。便构成了我们直观意义上的列表，</p>
-
-<p>现在如果我们要访问其中的某个cell，lisp为我们提供了两种操作，选择当前列表的首项 <code class="language-plaintext highlighter-rouge">car</code> 或者选择当前列表首项以外的元素 <code class="language-plaintext highlighter-rouge">cdr</code> 。</p>
-
-<p>例如，如果我们要选区周三 <code class="language-plaintext highlighter-rouge">Wed</code> ，可以通过以下代码实现：</p>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">car</span> <span class="p">(</span><span class="nb">cdr</span> <span class="p">(</span><span class="nb">cdr</span> <span class="nv">week</span><span class="p">)))</span>
-</code></pre></div></div>
-
-<p>对于访问列表 $x$ 的第 $n$ 个元素，只需要 $n-1$ 个表达式调用<code class="language-plaintext highlighter-rouge">cdr</code>原语，最后用 <code class="language-plaintext highlighter-rouge">car</code> 访问当前 <code class="language-plaintext highlighter-rouge">cell</code> 的列表数据即可。</p>
-
-<p>为了更方便访问列表任意位置元素，我们可以编写一个高级函数 <code class="language-plaintext highlighter-rouge">select</code>：</p>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">set</span> <span class="ss">'select</span> <span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="nb">list</span> <span class="nb">position</span><span class="p">)</span>
-	<span class="p">(</span><span class="k">if</span> <span class="p">(</span><span class="nb">eq</span> <span class="nb">position</span> <span class="mi">1</span><span class="p">)</span>
-		<span class="p">(</span><span class="nb">car</span> <span class="nb">list</span><span class="p">)</span>
-		<span class="p">(</span><span class="k">if</span> <span class="p">(</span><span class="nb">&gt;</span> <span class="nb">position</span> <span class="mi">1</span><span class="p">)</span>
-			<span class="p">(</span><span class="nb">funcall</span> <span class="nv">select</span> <span class="p">(</span><span class="nb">cdr</span> <span class="nb">list</span><span class="p">)</span> <span class="p">(</span><span class="nb">-</span> <span class="nb">position</span> <span class="mi">1</span><span class="p">))</span>
-			<span class="p">(</span><span class="k">if</span> <span class="p">(</span><span class="nb">&lt;</span> <span class="nb">position</span> <span class="mi">1</span><span class="p">)</span>
-				<span class="no">nil</span><span class="p">)))))</span>
-</code></pre></div></div>
-<p>原理很简单，如果位置 <code class="language-plaintext highlighter-rouge">position</code> 的值不为一，便继续使用 <code class="language-plaintext highlighter-rouge">cdr</code> 原语同时令 <code class="language-plaintext highlighter-rouge">position</code> 减一。直到 <code class="language-plaintext highlighter-rouge">position</code> 的值为一，返回当前列表首项。</p>
-
-<p>有两个小问题。</p>
-
-<ol>
-  <li>
-    <p>如果 <code class="language-plaintext highlighter-rouge">position</code> 是非正整数，无论减多少次一，都不会抵达递归的结束条件 <code class="language-plaintext highlighter-rouge">position</code> 为一。这种情况下，为了避免陷入死循环，需要增加 <code class="language-plaintext highlighter-rouge">position</code> 为负数返回 <code class="language-plaintext highlighter-rouge">nil</code> 的分支。</p>
-  </li>
-  <li>
-    <p>如果 <code class="language-plaintext highlighter-rouge">position</code> 大于列表长度，由于 <code class="language-plaintext highlighter-rouge">position</code> 一定可以在有限步内减小至一，以及 <code class="language-plaintext highlighter-rouge">nil</code> 的 <code class="language-plaintext highlighter-rouge">cdr</code> 依然是<code class="language-plaintext highlighter-rouge">cdr</code>，所以该情形下不会陷入死循环。</p>
-  </li>
-</ol>
-
-<p>测试一下，选择 <code class="language-plaintext highlighter-rouge">week</code> 第五个元素 <code class="language-plaintext highlighter-rouge">Fri</code>：</p>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">funcall</span> <span class="nv">select</span> <span class="nv">week</span> <span class="mi">5</span><span class="p">)</span>
-<span class="c1">;;=&gt;Fri</span>
-</code></pre></div></div>
-<p>选择一个负位置或超长位置，比如 <code class="language-plaintext highlighter-rouge">-3</code>和<code class="language-plaintext highlighter-rouge">8</code></p>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">funcall</span> <span class="nv">select</span> <span class="nv">week</span> <span class="mi">-3</span><span class="p">)</span>
-<span class="c1">;;=&gt;nil</span>
-<span class="p">(</span><span class="nb">funcall</span> <span class="nv">select</span> <span class="nv">week</span> <span class="mi">8</span><span class="p">)</span>
-<span class="c1">;;=&gt;nil</span>
-</code></pre></div></div>
-
-<p>那么如果我怀疑 <code class="language-plaintext highlighter-rouge">week</code> 的长度到底是不是7天呢？（我担心之前创建数组时忘记了一天。）</p>
-
-<p>设置一个长度函数 <code class="language-plaintext highlighter-rouge">length</code>：</p>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">set</span> <span class="ss">'length</span>
-     <span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="nb">list</span><span class="p">)</span>
-       <span class="p">(</span><span class="k">if</span> <span class="p">(</span><span class="nb">eq</span> <span class="p">(</span><span class="nb">eq</span> <span class="nb">list</span> <span class="no">nil</span><span class="p">)</span> <span class="no">nil</span><span class="p">)</span>
-	   <span class="p">(</span><span class="nb">+</span> <span class="mi">1</span> <span class="p">(</span><span class="nb">funcall</span> <span class="nb">length</span> <span class="p">(</span><span class="nb">cdr</span> <span class="nb">list</span><span class="p">)))</span>
-	 <span class="mi">0</span>
-	 <span class="p">)))</span>
-</code></pre></div></div>
-
-<p>原理是，直到空为止，每遍历一个元素，便让返回值加一。</p>
-
-<p>测试：</p>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">funcall</span> <span class="nb">length</span> <span class="nv">week</span><span class="p">)</span>
-<span class="c1">;;=&gt;7</span>
-</code></pre></div></div>
-<p>现在赋予 week 中的每一天以一个温度的数值，但是一个一个赋值太麻烦了，能不能为
-<code class="language-plaintext highlighter-rouge">week</code> 中包含的每个元素一次性赋值呢？</p>
-
-<p>创建一个 <code class="language-plaintext highlighter-rouge">multi-set</code> 函数，我想给它两个参数，一个是变量列表，一个是值列表，然后利用 <code class="language-plaintext highlighter-rouge">set</code> 将变量指向相应值。
-这首先要求变量列表和值列表的长度相同。</p>
-
-<p>那么先设置一个判断长度相同的函数：</p>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">set</span> <span class="ss">'length-eq</span>
-       <span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="nv">list-a</span> <span class="nv">list-b</span><span class="p">)</span>
-	 <span class="p">(</span><span class="k">if</span> <span class="p">(</span><span class="nb">eq</span> <span class="p">(</span><span class="nb">funcall</span> <span class="nb">length</span> <span class="nv">list-a</span><span class="p">)</span> <span class="p">(</span><span class="nb">funcall</span> <span class="nb">length</span> <span class="nv">list-b</span><span class="p">))</span>
-	     <span class="no">t</span> <span class="no">nil</span><span class="p">)))</span>
-<span class="c1">;;(funcall length-eq '(a b c) '(1 2 3))</span>
-<span class="c1">;;=&gt;t</span>
-<span class="c1">;;(funcall length-eq '(a b c) '(1 2 3 4))</span>
-<span class="c1">;;=&gt;nil</span>
-</code></pre></div></div>
-<p>变量列表和值列表相同的条件下，用 <code class="language-plaintext highlighter-rouge">set</code> 赋值。</p>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">set</span> <span class="ss">'multi-set</span>
-     <span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="nv">variables</span> <span class="nb">values</span><span class="p">)</span>
-       <span class="p">(</span><span class="k">if</span> <span class="p">(</span><span class="nb">funcall</span> <span class="nv">length-eq</span> <span class="nv">variables</span> <span class="nb">values</span><span class="p">)</span>
-	   <span class="p">(</span><span class="k">if</span> <span class="p">(</span><span class="nb">eq</span> <span class="p">(</span><span class="nb">eq</span> <span class="nv">variables</span> <span class="no">nil</span><span class="p">)</span> <span class="no">nil</span><span class="p">)</span>
-	       <span class="p">(</span><span class="nb">cons</span> <span class="p">(</span><span class="nb">set</span> <span class="p">(</span><span class="nb">car</span> <span class="nv">variables</span><span class="p">)</span> <span class="p">(</span><span class="nb">car</span> <span class="nb">values</span><span class="p">))</span>
-		     <span class="p">(</span><span class="nb">funcall</span> <span class="nv">multi-set</span> <span class="p">(</span><span class="nb">cdr</span> <span class="nv">variables</span><span class="p">)</span> <span class="p">(</span><span class="nb">cdr</span> <span class="nb">values</span><span class="p">)))</span>
-	     <span class="no">nil</span><span class="p">)</span>
-	 <span class="no">nil</span><span class="p">)))</span>
-<span class="c1">;;(funcall multi-set `(a b c) '(1 2 3))</span>
-<span class="c1">;;(list a b c)</span>
-<span class="c1">;;=&gt;(1 2 3)</span>
-</code></pre></div></div>
-
-<p>现在尝试为一天记录一个体温。</p>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">funcall</span> <span class="nv">multi-set</span> <span class="nv">week</span> <span class="o">'</span><span class="p">(</span><span class="mf">36.5</span> <span class="mf">36.4</span> <span class="mf">37.2</span> <span class="mf">36.8</span> <span class="mf">36.9</span> <span class="mf">36.7</span> <span class="mf">36.4</span><span class="p">))</span>
-</code></pre></div></div>
-
-<p>既然可以一次性访设置多个指针，那么为什么不能一次性访问多个指针呢？</p>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">set</span> <span class="ss">'multi-eval</span>
-     <span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="nv">var-list</span><span class="p">)</span>
-       <span class="p">(</span><span class="k">if</span> <span class="p">(</span><span class="nb">eq</span> <span class="p">(</span><span class="nb">eq</span> <span class="nv">var-list</span> <span class="no">nil</span><span class="p">)</span> <span class="no">nil</span><span class="p">)</span>
-	   <span class="p">(</span><span class="nb">cons</span> <span class="p">(</span><span class="nb">eval</span> <span class="p">(</span><span class="nb">car</span> <span class="nv">var-list</span><span class="p">))</span> <span class="p">(</span><span class="nb">funcall</span> <span class="nv">multi-eval</span> <span class="p">(</span><span class="nb">cdr</span> <span class="nv">var-list</span><span class="p">)))</span>
-	 <span class="no">nil</span><span class="p">)))</span>
-<span class="c1">;;(funcall multi-eval week)</span>
-<span class="c1">;;=&gt;(36.5 36.4 37.2 36.8 36.9 36.7 36.4)</span>
-</code></pre></div></div>
-
-<p>从中我们看到一种更加普遍的形式， <code class="language-plaintext highlighter-rouge">multi</code> ，对于列表中的每一项执行某个函数：</p>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">set</span> <span class="ss">'multi</span>
-       <span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="nv">fun</span> <span class="nv">vars</span><span class="p">)</span>
-	 <span class="p">(</span><span class="k">if</span> <span class="p">(</span><span class="nb">eq</span> <span class="p">(</span><span class="nb">eq</span> <span class="nv">vars</span> <span class="no">nil</span><span class="p">)</span> <span class="no">nil</span><span class="p">)</span>
-	     <span class="p">(</span><span class="nb">cons</span> <span class="p">(</span><span class="nb">funcall</span> <span class="nv">fun</span> <span class="p">(</span><span class="nb">car</span> <span class="nv">vars</span><span class="p">))</span> <span class="p">(</span><span class="nb">funcall</span> <span class="nv">multi</span> <span class="nv">fun</span> <span class="p">(</span><span class="nb">cdr</span> <span class="nv">vars</span><span class="p">)))</span>
-	   <span class="no">nil</span><span class="p">)))</span>
-<span class="c1">;;(funcall multi length '((1 2) (2 3 4)))</span>
-<span class="c1">;;=&gt;(2 3)</span>
-</code></pre></div></div>
-
-<p>这和 <code class="language-plaintext highlighter-rouge">mapcar</code> 的功能是一致的。</p>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">mapcar</span> <span class="nb">length</span> <span class="o">'</span><span class="p">((</span><span class="mi">1</span> <span class="mi">2</span><span class="p">)</span> <span class="p">(</span><span class="mi">2</span> <span class="mi">3</span> <span class="mi">4</span><span class="p">)))</span>
-<span class="c1">;;=&gt;(2 3)</span>
-</code></pre></div></div>
-
-<p>但是对于 <code class="language-plaintext highlighter-rouge">select</code> 这样具有两个参数输入的函数，<code class="language-plaintext highlighter-rouge">multi</code> 是无法处理的。
-例如，我想选择 <code class="language-plaintext highlighter-rouge">week</code> 中第二天和第三天温度构成一个新的列表。</p>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">set</span> <span class="ss">'multii</span>
-       <span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="nv">fun</span> <span class="nb">list</span> <span class="nv">vars</span><span class="p">)</span>
-	 <span class="p">(</span><span class="k">if</span> <span class="p">(</span><span class="nb">eq</span> <span class="p">(</span><span class="nb">eq</span> <span class="nv">vars</span> <span class="no">nil</span><span class="p">)</span> <span class="no">nil</span><span class="p">)</span>
-	     <span class="p">(</span><span class="nb">cons</span> <span class="p">(</span><span class="nb">funcall</span> <span class="nv">fun</span> <span class="nb">list</span> <span class="p">(</span><span class="nb">car</span> <span class="nv">vars</span><span class="p">))</span> <span class="p">(</span><span class="nb">funcall</span> <span class="nv">multii</span> <span class="nv">fun</span> <span class="nb">list</span> <span class="p">(</span><span class="nb">cdr</span> <span class="nv">vars</span><span class="p">)))</span>
-	   <span class="no">nil</span><span class="p">)))</span>
-<span class="c1">;;(funcall multii select '(a b c d e) '(2 3 1))</span>
-<span class="c1">;;=&gt;(b c a)</span>
-<span class="c1">;;(funcall multi-eval (funcall multii select week '(2 3)))</span>
-<span class="c1">;;=&gt;(36.4 37.2)</span>
-</code></pre></div></div>
-
-<p>是时候区分一下函数列表和变量（指针）列表了。</p>
-
-<p>如果我想单独设置七个函数，分别用于选择列表的1~7个元素如何？
-我完全可以在 <code class="language-plaintext highlighter-rouge">select</code> 函数的基础之上加以选择</p>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">set</span> <span class="nb">first</span> <span class="o">'</span><span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="nv">x</span><span class="p">)</span> <span class="p">(</span><span class="nv">select</span> <span class="nv">x</span> <span class="mi">1</span><span class="p">)))</span>
-<span class="p">(</span><span class="nb">set</span> <span class="nb">second</span> <span class="o">'</span><span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="nv">x</span><span class="p">)</span> <span class="p">(</span><span class="nv">select</span> <span class="nv">x</span> <span class="mi">2</span><span class="p">)))</span>
-<span class="p">(</span><span class="nb">set</span> <span class="nb">second</span> <span class="o">'</span><span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="nv">x</span><span class="p">)</span> <span class="p">(</span><span class="nv">select</span> <span class="nv">x</span> <span class="mi">3</span><span class="p">)))</span>
-
-<span class="o">...</span>
-</code></pre></div></div>
-<p>这样一来，从 <code class="language-plaintext highlighter-rouge">week</code> 中选取第二天和第三天就可以从多个参数输入一个函数，转向多个函数处理一个参数：</p>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">set</span> <span class="ss">'multiii</span>
-	<span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="nv">funs</span> <span class="nv">var</span><span class="p">)</span>
-		<span class="p">(</span><span class="k">if</span> <span class="p">(</span><span class="nb">eq</span> <span class="p">(</span><span class="nb">eq</span> <span class="nv">funs</span> <span class="no">nil</span><span class="p">)</span> <span class="no">nil</span><span class="p">)</span>
-		<span class="p">(</span><span class="nb">cons</span> <span class="p">(</span><span class="nb">funcall</span> <span class="p">(</span><span class="nb">car</span> <span class="nv">funs</span><span class="p">)</span> <span class="nv">var</span><span class="p">)</span> <span class="p">(</span><span class="nb">funcall</span> <span class="nv">multiii</span> <span class="p">(</span><span class="nb">cdr</span> <span class="nv">funs</span><span class="p">)</span> <span class="nv">var</span><span class="p">))</span>
-	<span class="no">nil</span><span class="p">)))</span>
-<span class="c1">;;(funcall multiii (list first second third) week)</span>
-<span class="c1">;;=&gt;(Mon Tue Wed)</span>
-<span class="c1">;;(funcall multiii `(first second third) week)</span>
-<span class="c1">;;=&gt;wrong!</span>
-</code></pre></div></div>
-
-<p>这里的 <code class="language-plaintext highlighter-rouge">first</code> <code class="language-plaintext highlighter-rouge">second</code> <code class="language-plaintext highlighter-rouge">third</code> 都是对单一参数进行处理的函数，它们共同组成了函数列表。
-另一种列表是<code class="language-plaintext highlighter-rouge">Mon</code> <code class="language-plaintext highlighter-rouge">Tue</code> 等温度数据组成的参数（指针）列表，
-参数列表和函数列表并不能如表达式 <code class="language-plaintext highlighter-rouge">(+ 1 1)</code> 一样被直接运行。
-但是将参数列表和函数列表分开，用 <code class="language-plaintext highlighter-rouge">multi</code> 这样的函数再把它们结合在一起，例如 <code class="language-plaintext highlighter-rouge">todo</code>。</p>
-
-<p>现在我们不在用 <code class="language-plaintext highlighter-rouge">week</code> 记录温度，而记录日程表。</p>
-
-<p>例如：</p>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">set</span> <span class="ss">'Mon</span> <span class="o">'</span><span class="p">(</span><span class="nv">task-1</span> <span class="nv">task-2</span><span class="p">))</span>
-<span class="o">...</span>
-</code></pre></div></div>
-
-<p>那么，利用 <code class="language-plaintext highlighter-rouge">multiii</code> 同具体周脱离的特性便可以制定面向一般周 <code class="language-plaintext highlighter-rouge">week-x</code> 的习惯：</p>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">set</span> <span class="ss">'habits</span> <span class="o">'</span><span class="p">(</span><span class="nv">habit-1</span> <span class="nv">habit-2</span> <span class="o">...</span><span class="p">))</span>
-<span class="p">(</span><span class="nb">funcall</span> <span class="nv">multiii</span> <span class="nv">habits</span> <span class="nv">week-x</span><span class="p">)</span>
-</code></pre></div></div>
-
-<p>当需要调整习惯时，只需要利用 <code class="language-plaintext highlighter-rouge">car</code> <code class="language-plaintext highlighter-rouge">cdr</code> <code class="language-plaintext highlighter-rouge">cons</code> 调整函数列表 <code class="language-plaintext highlighter-rouge">habits</code> 即可，而不必牵涉到每天的具体任务。
-同理，调整习惯保持的时间段，只需要修改参数列表 <code class="language-plaintext highlighter-rouge">week-x</code> 即可，而不必牵涉到习惯的具体内容。</p>
-
-<h2 id="总结">总结</h2>
-
-<p>本篇笔记以温度记录为例，分析了列表的而基础结构和操作，区分了函数列表，参数列表和表达式三种不同的列表，同时对 <code class="language-plaintext highlighter-rouge">multi</code> 函数加以探索以结合参数列表和函数列表。</p>
-
-<h2 id="参考">参考</h2>
-
-<ul>
-  <li><a href="https://www.gnu.org/software/emacs/manual/elisp.html">GNU: Emacs Lisp Reference Manual</a></li>
-</ul>]]></content><author><name>甲与</name></author><category term="lisp" /><summary type="html"><![CDATA[在上一篇博客中，我们试图说明，lisp的一切对象都可以视为一种符号对于另一种符号的指向，同时介绍了指针型指向和函数型指向的基本语法。这一片笔记记录列表类型。]]></summary></entry><entry><title type="html">Clojure配置</title><link href="/clojure%E9%85%8D%E7%BD%AE/" rel="alternate" type="text/html" title="Clojure配置" /><published>2023-12-20T00:00:00+08:00</published><updated>2023-12-20T00:00:00+08:00</updated><id>/clojure%E9%85%8D%E7%BD%AE</id><content type="html" xml:base="/clojure%E9%85%8D%E7%BD%AE/"><![CDATA[<h2 id="简介">简介</h2>
-
-<p>clojure是一种安装在java虚拟机上的lisp方言。最近想在linux环境上尝试clojure的语言，配合emacs使用。现在记录安装过程。</p>
-
-<p>环境Ubuntu20.04，emacs29。</p>
-
-<h2 id="安装clojure">安装Clojure</h2>
-
-<p>Ubuntu20.04环境下apt中本身就包含Clojure的安装包，所以直接安装clojure即可。</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>apt <span class="nb">install </span>clojure
-<span class="nb">sudo </span>apt <span class="nb">install </span>leiningen
-<span class="nb">sudo </span>apt <span class="nb">install </span>default-jre
-</code></pre></div></div>
-
-<h2 id="emacs环境">Emacs环境</h2>
-
-<p>elisp代码如下，保存在配置文档 <code class="language-plaintext highlighter-rouge">/.emacs.d/init.el</code>：</p>
-
-<div class="language-elisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">;;clojure interactive development environment that rocks!</span>
-<span class="p">(</span><span class="nb">use-package</span> <span class="nv">cider</span>
-  <span class="ss">:ensure</span> <span class="no">t</span><span class="p">)</span>
-
-<span class="p">(</span><span class="nb">use-package</span> <span class="nv">lsp-treemacs</span>
-  <span class="ss">:ensure</span> <span class="no">t</span><span class="p">)</span>
-
-<span class="c1">;;语法检查</span>
-<span class="p">(</span><span class="nb">use-package</span> <span class="nv">flycheck</span>
-  <span class="ss">:ensure</span> <span class="no">t</span><span class="p">)</span>
-
-<span class="c1">;;自动补全</span>
-<span class="p">(</span><span class="nb">use-package</span> <span class="nv">company</span>
-  <span class="ss">:ensure</span> <span class="no">t</span><span class="p">)</span>
-
-<span class="c1">;;clojure主模式</span>
-<span class="p">(</span><span class="nb">use-package</span> <span class="nv">clojure-mode</span>
-  <span class="ss">:ensure</span> <span class="no">t</span>
-  <span class="ss">:config</span>
-  <span class="p">(</span><span class="nv">add-hook</span> <span class="ss">'clojure-mode-hook</span> <span class="ss">'lsp</span><span class="p">)</span>
-  <span class="p">(</span><span class="nv">add-hook</span> <span class="ss">'clojurescript-mode-hook</span> <span class="ss">'lsp</span><span class="p">)</span>
-  <span class="p">(</span><span class="nv">add-hook</span> <span class="ss">'clojurec-mode-hok</span> <span class="ss">'lsp</span><span class="p">))</span>
-
-<span class="p">(</span><span class="nb">use-package</span> <span class="nv">lsp-mode</span>
-  <span class="ss">:ensure</span> <span class="no">t</span>
-  <span class="ss">:config</span><span class="p">)</span>
-</code></pre></div></div>
-
-<h2 id="启动环境">启动环境</h2>
-
-<p>在tmux中创建新的clojure工程：</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>lein new myapp
-</code></pre></div></div>
-
-<p>启动该工程的repl：</p>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cd myapp
-lein repl
-</code></pre></div></div>
-
-<p>在emacs中接入该工程：</p>
-
-<pre><code class="language-emacs">M-x cider RET
-cider-connect-clj RET
-localhost RET
-TAB RET
-</code></pre>
-
-<p>在repl中进行代码测试</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>myapp.core&gt; <span class="o">(</span>+ 3 5<span class="o">)</span>
-8
-</code></pre></div></div>
-
-<h2 id="语法">语法</h2>
-
-<p>关于语法，可以参考<a href="https://www.w3cschool.cn/clojure/clojure-j5w81wf2.html">W3Cschool, clojure教程</a> 《Programming Clojure》、 《 Web Development with Clojure, Third Edition》 等书籍。</p>
-
-<h2 id="参考以及相关链接">参考以及相关链接</h2>
-<ul>
-  <li><a href="https://www.w3cschool.cn/clojure/clojure-j5w81wf2.html">W3Cschool, clojure教程</a></li>
-  <li><a href="https://clojure.org/guides/install_clojure">clojure官网安装教程</a></li>
-  <li><a href="https://emacs-lsp.github.io/lsp-mode/tutorials/clojure-guide/">Configure Emacs as a Clojure IDE</a></li>
-</ul>]]></content><author><name>甲与</name></author><category term="配置" /><summary type="html"><![CDATA[简介]]></summary></entry><entry><title type="html">Lisp基础语法：指针与函数</title><link href="/lisp%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95-%E6%8C%87%E9%92%88%E4%B8%8E%E5%87%BD%E6%95%B0/" rel="alternate" type="text/html" title="Lisp基础语法：指针与函数" /><published>2023-12-20T00:00:00+08:00</published><updated>2023-12-20T00:00:00+08:00</updated><id>/lisp%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95%EF%BC%9A%E6%8C%87%E9%92%88%E4%B8%8E%E5%87%BD%E6%95%B0</id><content type="html" xml:base="/lisp%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95-%E6%8C%87%E9%92%88%E4%B8%8E%E5%87%BD%E6%95%B0/"><![CDATA[<p>介绍lisp语言的指针和函数概念。</p>
-
-<h2 id="基础操作语法表">基础操作语法表</h2>
-
-<table>
-  <thead>
-    <tr>
-      <th style="text-align: left">Grammer</th>
-      <th>功能</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td style="text-align: left">car</td>
-      <td>选取列表首项</td>
-    </tr>
-    <tr>
-      <td style="text-align: left">cdr</td>
-      <td>选取列表非首项</td>
-    </tr>
-    <tr>
-      <td style="text-align: left">eq</td>
-      <td>判断元素是否相等</td>
-    </tr>
-    <tr>
-      <td style="text-align: left">if</td>
-      <td>条件分支</td>
-    </tr>
-    <tr>
-      <td style="text-align: left">atom</td>
-      <td>是否为叶节点(不可分割、组合的原子)</td>
-    </tr>
-    <tr>
-      <td style="text-align: left">quote</td>
-      <td>为符号增加指向自身的引用</td>
-    </tr>
-    <tr>
-      <td style="text-align: left">eval</td>
-      <td>返回符号的相邻引用值</td>
-    </tr>
-    <tr>
-      <td style="text-align: left">cons</td>
-      <td>连接对象</td>
-    </tr>
-    <tr>
-      <td style="text-align: left">set</td>
-      <td>设置符号指针</td>
-    </tr>
-    <tr>
-      <td style="text-align: left">lambda</td>
-      <td>设置匿名函数</td>
-    </tr>
-    <tr>
-      <td style="text-align: left">funcall</td>
-      <td>调用匿名函数</td>
-    </tr>
-  </tbody>
-</table>
-
-<h2 id="简介">简介</h2>
-
-<p>以下是lisp语言的基本形式。</p>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nv">symbol-1</span> <span class="nv">symbol-2</span> <span class="o">...</span><span class="p">)</span>
-</code></pre></div></div>
-
-<p>每一个符号都可以展开为其它基本形式，或者和其它符号构成新的表达式，从而形成嵌套结构。</p>
-
-<p>例如：</p>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nv">symbol-1</span> <span class="p">(</span><span class="nv">symbol-2</span> <span class="nv">symbol-3</span><span class="p">)</span> <span class="nv">symbol-4</span><span class="p">)</span>
-</code></pre></div></div>
-
-<p>如果我们用 <code class="language-plaintext highlighter-rouge">symbol-5</code> 指向 <code class="language-plaintext highlighter-rouge">(symbol-2 symbol-3)</code> 这个整体，那么上述表达等价于：</p>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nv">symbol-1</span> <span class="nv">symbol-5</span> <span class="nv">symbol-4</span><span class="p">)</span>
-</code></pre></div></div>
-
-<p>而如果我们用 <code class="language-plaintext highlighter-rouge">symbol-6</code> 指向 <code class="language-plaintext highlighter-rouge">(symbol-1 symbol-5 symbol-6)</code> 这个整体，那么上述表达等价于：</p>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">symbol-6</span>
-</code></pre></div></div>
-
-<p>如上所示，lisp程序的执行过程可以视为不断从里向外用新的符号替换原有表达式的过程。</p>
-
-<p>只不过，一般情况下，第一个符号一般用于方法和函数的描述，这种表达方式又称为 <code class="language-plaintext highlighter-rouge">前缀表达</code> 。</p>
-
-<h2 id="举例">举例</h2>
-
-<p>lisp程序的执行过程类似于上述简化过程，例如：</p>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">+</span> <span class="p">(</span><span class="nb">-</span> <span class="mi">3</span> <span class="mi">2</span><span class="p">)</span> <span class="mi">5</span><span class="p">)</span>
-</code></pre></div></div>
-
-<p><code class="language-plaintext highlighter-rouge">1</code> 等价于 <code class="language-plaintext highlighter-rouge">(- 3 2)</code>，进行替换得：</p>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">+</span> <span class="mi">1</span> <span class="mi">5</span><span class="p">)</span>
-</code></pre></div></div>
-
-<p><code class="language-plaintext highlighter-rouge">6</code> 等价于 <code class="language-plaintext highlighter-rouge">(+ 1 5)</code>，进行替换得：</p>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="mi">6</span>
-</code></pre></div></div>
-
-<p>所以，初始代码指向了 <code class="language-plaintext highlighter-rouge">6</code> 这个符号。</p>
-
-<h2 id="指针setquote-和-eval">指针：set,quote 和 eval</h2>
-
-<p>指针指的是，一个符号指向另一个符号的关系。</p>
-
-<p>如上述案例所示，符号有三种形式，在 <code class="language-plaintext highlighter-rouge">()</code> 内，被 <code class="language-plaintext highlighter-rouge">'</code> 引用，只有符号本身。</p>
-
-<p><code class="language-plaintext highlighter-rouge">set</code> 是用于规定指针的起点和终点。</p>
-
-<p><code class="language-plaintext highlighter-rouge">quote</code> 则用于创建指向符号自身的指针。</p>
-
-<p><code class="language-plaintext highlighter-rouge">eval</code> 用于获取符号指向的下一个符号。</p>
-
-<p>需要注意，elisp语言中数字和字符串的指针永远指向它自身。</p>
-
-<p>例如（以下等价的意义是说，等价的对象指针指向相同的目标）:</p>
-
-<p>等价于</p>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">+</span> <span class="mi">1</span> <span class="mi">3</span><span class="p">)</span>
-</code></pre></div></div>
-
-<p>等价于</p>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">eval</span> <span class="p">(</span><span class="nb">+</span> <span class="mi">1</span> <span class="mi">3</span><span class="p">))</span>
-</code></pre></div></div>
-
-<p>等价于</p>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">eval</span> <span class="p">(</span><span class="nb">eval</span> <span class="p">(</span><span class="nb">+</span> <span class="mi">1</span> <span class="mi">3</span><span class="p">)))</span>
-</code></pre></div></div>
-
-<p>等价于</p>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">eval</span> <span class="o">...</span><span class="p">(</span><span class="nb">eval</span> <span class="p">(</span><span class="nb">+</span> <span class="mi">1</span> <span class="mi">3</span><span class="p">))</span><span class="o">...</span><span class="p">)</span>
-</code></pre></div></div>
-
-<p>这是因为 <code class="language-plaintext highlighter-rouge">(+ 1 3)</code> 作为符号已经指向了 <code class="language-plaintext highlighter-rouge">4</code> 。无论 有多少个 <code class="language-plaintext highlighter-rouge">eval</code> 函数要求获取 <code class="language-plaintext highlighter-rouge">4</code> 指向的下一个符号，
-我们永远都会得到 <code class="language-plaintext highlighter-rouge">4</code> 。</p>
-
-<p><img src="/assets/post_images/image-20240415224131410.png" alt="" /></p>
-
-<p>相应的，利用 <code class="language-plaintext highlighter-rouge">quote</code> 函数，我们可以回避一个符号被迫指向它的指针目标。</p>
-
-<p>如果一次从内向外的函数调用处理符号 <code class="language-plaintext highlighter-rouge">x</code>，函数只包括 <code class="language-plaintext highlighter-rouge">quote</code> 和 <code class="language-plaintext highlighter-rouge">eval</code> 两项，并且每当 <code class="language-plaintext highlighter-rouge">eval</code> 被执行时，至少有一个 <code class="language-plaintext highlighter-rouge">quote</code> 被执行，那么无论这次函数调用有多长, <code class="language-plaintext highlighter-rouge">x</code> 被处理后所返回的符号，其指针路径永远 <strong>经过</strong>  <code class="language-plaintext highlighter-rouge">x</code>。</p>
-
-<p>例如：</p>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">eval</span> <span class="p">(</span><span class="k">quote</span> <span class="ss">'x</span><span class="p">))</span>
-<span class="c1">;;=&gt;x</span>
-</code></pre></div></div>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">eval</span> <span class="p">(</span><span class="k">quote</span> <span class="p">(</span><span class="k">quote</span> <span class="ss">'x</span><span class="p">)))</span>
-<span class="c1">;;=&gt;(quote x)</span>
-</code></pre></div></div>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">eval</span> <span class="p">(</span><span class="nb">eval</span> <span class="p">(</span><span class="k">quote</span> <span class="p">(</span><span class="k">quote</span> <span class="ss">'x</span><span class="p">))))</span>
-<span class="c1">;;=&gt;x</span>
-</code></pre></div></div>
-
-<p>可以观察到，eval一次仅仅消除一层quote。</p>
-
-<p><img src="/assets/post_images/image-20240415224150113.png" alt="" /></p>
-
-<p>而set可以为我们为符号设置一个特定的指针，以便其被执行时，指向特定符号。例如</p>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">set</span> <span class="ss">'x</span> <span class="s">"123123"</span><span class="p">)</span>
-</code></pre></div></div>
-
-<p>意味着符号 <code class="language-plaintext highlighter-rouge">x</code> 指向了 字串符号 <code class="language-plaintext highlighter-rouge">"123123"</code></p>
-
-<p><img src="/assets/post_images/image-20240415224204017.png" alt="" /></p>
-
-<h3 id="举例-1">举例</h3>
-
-<p>我们可以用 <code class="language-plaintext highlighter-rouge">set</code> 或 <code class="language-plaintext highlighter-rouge">约定</code> 关键字来设置一种替换过程：</p>
-
-<p>首先，我们约定：<code class="language-plaintext highlighter-rouge">f1</code> 指向 <code class="language-plaintext highlighter-rouge">(cons 'c nil)</code>，<code class="language-plaintext highlighter-rouge">f2</code> 指向 <code class="language-plaintext highlighter-rouge">(cons 'a (cons 'b (eval f1)))</code>， <code class="language-plaintext highlighter-rouge">f3</code> 指向 <code class="language-plaintext highlighter-rouge">(cons 'd (eval f2))</code>：</p>
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">set</span> <span class="ss">'f1</span> <span class="o">'</span><span class="p">(</span><span class="nb">cons</span> <span class="ss">'c</span> <span class="no">nil</span><span class="p">))</span>
-<span class="p">(</span><span class="nb">set</span> <span class="ss">'f2</span> <span class="o">'</span><span class="p">(</span><span class="nb">cons</span> <span class="ss">'a</span> <span class="p">(</span><span class="nb">cons</span> <span class="ss">'b</span> <span class="nv">f1</span><span class="p">)))</span>
-<span class="p">(</span><span class="nb">set</span> <span class="ss">'f3</span> <span class="o">'</span><span class="p">(</span><span class="nb">cons</span> <span class="ss">'d</span> <span class="p">(</span><span class="nb">eval</span> <span class="nv">f2</span><span class="p">)))</span>
-</code></pre></div></div>
-
-<p>（<code class="language-plaintext highlighter-rouge">cons</code> 的意义是把两个符号结合在一起。）</p>
-
-<p>分别执行 <code class="language-plaintext highlighter-rouge">f1</code> <code class="language-plaintext highlighter-rouge">f2</code> <code class="language-plaintext highlighter-rouge">f3</code></p>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">eval</span> <span class="nv">f1</span><span class="p">)</span>
-<span class="p">(</span><span class="nb">eval</span> <span class="nv">f2</span><span class="p">)</span>
-<span class="p">(</span><span class="nb">eval</span> <span class="nv">f3</span><span class="p">)</span>
-</code></pre></div></div>
-
-<p>得到：</p>
-
-<table>
-  <thead>
-    <tr>
-      <th>执行符号</th>
-      <th>执行结果</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>f3</td>
-      <td>(d a b c)</td>
-    </tr>
-    <tr>
-      <td>f2</td>
-      <td>(a b c)</td>
-    </tr>
-    <tr>
-      <td>f1</td>
-      <td>(c)</td>
-    </tr>
-  </tbody>
-</table>
-
-<p>现在我们约定另外两段代码：</p>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">set</span> <span class="ss">'F2</span> <span class="o">'</span><span class="p">(</span><span class="nb">cons</span> <span class="ss">'a</span> <span class="p">(</span><span class="nb">cons</span> <span class="ss">'b</span> <span class="p">(</span><span class="nb">cons</span> <span class="ss">'c</span> <span class="no">nil</span><span class="p">)))</span>
-<span class="p">(</span><span class="nb">set</span> <span class="ss">'F3</span> <span class="o">'</span><span class="p">(</span><span class="nb">cons</span> <span class="ss">'d</span> <span class="p">(</span><span class="nb">cons</span> <span class="ss">'a</span> <span class="p">(</span><span class="nb">cons</span> <span class="ss">'b</span> <span class="p">(</span><span class="nb">cons</span> <span class="ss">'c</span> <span class="no">nil</span><span class="p">)))))</span>
-</code></pre></div></div>
-
-<p>分别执行f3 F3 f2 F2，得到结果：</p>
-
-<table>
-  <thead>
-    <tr>
-      <th>执行符号</th>
-      <th>执行结果</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>f3, F3</td>
-      <td>(d a b c)</td>
-    </tr>
-    <tr>
-      <td>f2, F2</td>
-      <td>(a b c)</td>
-    </tr>
-  </tbody>
-</table>
-
-<p>以F3的执行过程为例，我们可以把F3的从内向外执行过程理解为：</p>
-
-<p>步骤一：</p>
-
-<p><img src="/assets/post_images/image-20240415224223342.png" alt="" /></p>
-
-<p>步骤二：</p>
-
-<p><img src="/assets/post_images/image-20240415224244826.png" alt="" /></p>
-
-<p>步骤三：</p>
-
-<p><img src="/assets/post_images/image-20240415224306562.png" alt="" /></p>
-
-<p>最后需要注意的是：</p>
-
-<p><code class="language-plaintext highlighter-rouge">(x ...)</code> 本身相当于以下 <code class="language-plaintext highlighter-rouge">eval</code> 语句：</p>
-
-<div class="language-emacs-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">funcall</span> <span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="nv">x</span> <span class="o">...</span><span class="p">)</span> <span class="p">(</span><span class="nb">eval</span> <span class="p">(</span><span class="nv">x</span> <span class="o">...</span><span class="p">)))</span> <span class="nv">x</span> <span class="o">...</span><span class="p">)</span>
-</code></pre></div></div>
-
-<p>不过，eval在何种程度上与<code class="language-plaintext highlighter-rouge">()</code>等价，quote在何种程度上与 <code class="language-plaintext highlighter-rouge">'</code> 等价，我暂时还没有理解清楚。</p>
-
-<h2 id="函数setfuncall和lambda">函数：set，funcall和lambda</h2>
-
-<p>如果我们从内向外把上述案例中 <code class="language-plaintext highlighter-rouge">cons</code> 语句中输入的字符提取出来，我们可以得到 <code class="language-plaintext highlighter-rouge">a b c d</code>。而执行结果则是： <code class="language-plaintext highlighter-rouge">(d a b c)</code> 。</p>
-
-<p>我们在一开始提到，每一个符号都可以展开为其它基本形式。</p>
-
-<p>那么，如果<code class="language-plaintext highlighter-rouge">a b c d</code> 具有以下指针形式如何呢？</p>
-
-<table>
-  <thead>
-    <tr>
-      <th>符号</th>
-      <th>指针目标1</th>
-      <th>指针目标2</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>a</td>
-      <td>1</td>
-      <td>A</td>
-    </tr>
-    <tr>
-      <td>b</td>
-      <td>2</td>
-      <td>B</td>
-    </tr>
-    <tr>
-      <td>c</td>
-      <td>3</td>
-      <td>C</td>
-    </tr>
-    <tr>
-      <td>d</td>
-      <td>4</td>
-      <td>D</td>
-    </tr>
-  </tbody>
-</table>
-
-<p>我们可以尝试以下代码：</p>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">set</span> <span class="ss">'a</span> <span class="mi">1</span><span class="p">)</span>
-<span class="p">(</span><span class="nb">set</span> <span class="ss">'b</span> <span class="mi">2</span><span class="p">)</span>
-<span class="p">(</span><span class="nb">set</span> <span class="ss">'c</span> <span class="mi">3</span><span class="p">)</span>
-<span class="p">(</span><span class="nb">set</span> <span class="ss">'d</span> <span class="mi">4</span><span class="p">)</span>
-<span class="p">(</span><span class="nb">set</span> <span class="ss">'F4</span> <span class="o">'</span><span class="p">(</span><span class="nb">cons</span> <span class="nv">d</span> <span class="p">(</span><span class="nb">cons</span> <span class="nv">c</span> <span class="p">(</span><span class="nb">cons</span> <span class="nv">b</span> <span class="p">(</span><span class="nb">cons</span> <span class="nv">a</span> <span class="no">nil</span><span class="p">)))))</span>
-<span class="p">(</span><span class="nb">eval</span> <span class="nv">F4</span><span class="p">)</span>
-<span class="c1">;;=&gt;(4 3 2 1)</span>
-
-<span class="p">(</span><span class="nb">set</span> <span class="ss">'a</span> <span class="nv">A</span><span class="p">)</span>
-<span class="p">(</span><span class="nb">set</span> <span class="ss">'b</span> <span class="nv">B</span><span class="p">)</span>
-<span class="p">(</span><span class="nb">set</span> <span class="ss">'c</span> <span class="nv">C</span><span class="p">)</span>
-<span class="p">(</span><span class="nb">set</span> <span class="ss">'d</span> <span class="nv">D</span><span class="p">)</span>
-<span class="p">(</span><span class="nb">set</span> <span class="ss">'F5</span> <span class="o">'</span><span class="p">(</span><span class="nb">cons</span> <span class="nv">d</span> <span class="p">(</span><span class="nb">cons</span> <span class="nv">c</span> <span class="p">(</span><span class="nb">cons</span> <span class="nv">b</span> <span class="p">(</span><span class="nb">cons</span> <span class="nv">a</span> <span class="no">nil</span><span class="p">)))))</span>
-<span class="p">(</span><span class="nb">eval</span> <span class="nv">F5</span><span class="p">)</span>
-<span class="c1">;;=&gt;(D A B C)</span>
-</code></pre></div></div>
-
-<p>（考虑一下 <code class="language-plaintext highlighter-rouge">F4</code> 和 <code class="language-plaintext highlighter-rouge">F3</code> 有什么不同，为什么不同？）</p>
-
-<p>可以看到，代码将输入字符 <code class="language-plaintext highlighter-rouge">1 2 3 4</code> 和 <code class="language-plaintext highlighter-rouge">A B C D</code>的最后一个元素放在第一位，按照新的顺序建立了列表 <code class="language-plaintext highlighter-rouge">(4 3 2 1)</code> 和 <code class="language-plaintext highlighter-rouge">(D A B C)</code>。</p>
-
-<p>换言之，如果我们希望 <strong>把某四个符号的第一个元素放在第一项并把它们组合在一起得到新的列表</strong> ，我们只需要通过 <code class="language-plaintext highlighter-rouge">set</code> 修改 <code class="language-plaintext highlighter-rouge">a b c d</code> 的指针，而不需要修改 <code class="language-plaintext highlighter-rouge">F5</code> 。在这里， <code class="language-plaintext highlighter-rouge">F5</code> 不再是一种指向特定符号的符号，它的指向相比于指针发生了一种根本性的转向。</p>
-
-<p>以F5为例我们尝试对比以下代码：</p>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">set</span> <span class="ss">'a</span> <span class="ss">'A</span><span class="p">)</span>
-<span class="p">(</span><span class="nb">eval</span> <span class="ss">'a</span><span class="p">)</span>
-<span class="c1">;;=&gt;A</span>
-</code></pre></div></div>
-
-<p>其中的指针关系可以用下图表示：</p>
-
-<p><img src="/assets/post_images/image-20240415224053549.png" alt="" /></p>
-
-<p>eval的结果和指针目标是相同的 <code class="language-plaintext highlighter-rouge">A</code>。</p>
-
-<p>但是 <code class="language-plaintext highlighter-rouge">f5</code> 的eval结果显然是 <code class="language-plaintext highlighter-rouge">a b c d</code> 以外的符号。指向关系如下图所示：</p>
-
-<p><img src="/assets/post_images/image-20240415224041011.png" alt="" /></p>
-
-<p>如果我们更换 符号 <code class="language-plaintext highlighter-rouge">a b c d</code> 所指向的对象，那么相应的输出结果也会改变：</p>
-
-<p><img src="/assets/post_images/image-20240415223958138.png" alt="" /></p>
-
-<p>这和我们对于函数的通常理解是一致的： <code class="language-plaintext highlighter-rouge">给定输入元素，进行处理，给定输出</code> 。那么，既然我们可以通过
- <code class="language-plaintext highlighter-rouge">set</code> 和 <code class="language-plaintext highlighter-rouge">eval</code> 构建出函数的模型，那么 <code class="language-plaintext highlighter-rouge">defun</code> 似乎便可以由 <code class="language-plaintext highlighter-rouge">set</code> 和 <code class="language-plaintext highlighter-rouge">eval</code> 的基本组合而替代。</p>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">set</span> <span class="ss">'x</span> <span class="mi">4</span><span class="p">)</span>
-<span class="p">(</span><span class="nb">set</span> <span class="ss">'plus-one</span> <span class="p">(</span><span class="nb">+</span> <span class="nv">x</span> <span class="mi">1</span><span class="p">))</span>
-<span class="p">(</span><span class="nb">eval</span> <span class="ss">'plus-one</span><span class="p">)</span>
-<span class="c1">;;=&gt;5</span>
-
-<span class="nv">plus-one</span>
-<span class="c1">;;=&gt;5</span>
-
-<span class="p">(</span><span class="nb">set</span> <span class="ss">'x</span> <span class="mi">9</span><span class="p">)</span>
-<span class="p">(</span><span class="nb">eval</span> <span class="ss">'plus-one</span><span class="p">)</span>
-<span class="c1">;;=&gt;10</span>
-
-<span class="nv">plus-one</span>
-<span class="c1">;;=&gt;10</span>
-</code></pre></div></div>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">defun</span> <span class="nv">plus-one</span> <span class="p">(</span><span class="nv">x</span><span class="p">)</span> <span class="p">(</span><span class="nb">+</span> <span class="nv">x</span> <span class="mi">1</span><span class="p">))</span>
-<span class="p">(</span><span class="nv">plus-one</span> <span class="mi">4</span><span class="p">)</span>
-<span class="c1">;;=&gt;5</span>
-
-<span class="p">(</span><span class="nv">plus-one</span> <span class="mi">9</span><span class="p">)</span>
-<span class="c1">;;=&gt;10</span>
-</code></pre></div></div>
-
-<p>但是这样有一个命名问题，如果多个函数都需要调用符号 <code class="language-plaintext highlighter-rouge">x</code> 该如何处理呢？</p>
-
-<p>例如我们要求把数字 <code class="language-plaintext highlighter-rouge">3 2 1</code> 分别加一后返回给 <code class="language-plaintext highlighter-rouge">z</code>：</p>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
-<span class="p">(</span><span class="nb">defun</span> <span class="nv">plus-one</span> <span class="p">(</span><span class="nv">x</span><span class="p">)</span> <span class="p">(</span><span class="nb">+</span> <span class="nv">x</span> <span class="mi">1</span><span class="p">))</span>
-<span class="p">(</span><span class="nb">defun</span> <span class="nv">sum-abc</span> <span class="p">(</span><span class="nv">a</span> <span class="nv">b</span> <span class="nv">c</span><span class="p">)</span> 
-	<span class="p">(</span><span class="nb">+</span> <span class="p">(</span><span class="nv">plus-one</span> <span class="nv">a</span><span class="p">)</span> 
-		<span class="p">(</span><span class="nv">plus-one</span> <span class="nv">b</span><span class="p">)</span> 
-		<span class="p">(</span><span class="nv">plus-one</span> <span class="nv">c</span><span class="p">)))</span>
-		
-<span class="p">(</span><span class="nb">set</span> <span class="nv">z</span> <span class="p">(</span><span class="nv">sum-abc</span> <span class="mi">3</span> <span class="mi">2</span> <span class="mi">1</span><span class="p">))</span>
-<span class="c1">;;=&gt;9</span>
-</code></pre></div></div>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">set</span> <span class="ss">'plus-one</span> <span class="o">'</span><span class="p">(</span><span class="nb">+</span> <span class="mi">1</span> <span class="p">(</span><span class="nb">eval</span> <span class="p">(</span><span class="nb">eval</span> <span class="nv">x</span><span class="p">))))</span>
-<span class="p">(</span><span class="nb">set</span> <span class="ss">'sum-abc</span> <span class="o">'</span><span class="p">(</span><span class="k">progn</span>
-	<span class="p">(</span><span class="nb">set</span> <span class="ss">'x</span> <span class="ss">'a</span><span class="p">)</span>
-	<span class="p">(</span><span class="nb">set</span> <span class="ss">'z</span> <span class="p">(</span><span class="nb">+</span> <span class="nv">z</span> <span class="p">(</span><span class="nb">eval</span> <span class="nv">plus-one</span><span class="p">)))</span>
-	<span class="p">(</span><span class="nb">set</span> <span class="ss">'x</span> <span class="ss">'b</span><span class="p">)</span>
-	<span class="p">(</span><span class="nb">set</span> <span class="ss">'z</span> <span class="p">(</span><span class="nb">+</span> <span class="nv">z</span> <span class="p">(</span><span class="nb">eval</span> <span class="nv">plus-one</span><span class="p">)))</span>
-	<span class="p">(</span><span class="nb">set</span> <span class="ss">'x</span> <span class="ss">'c</span><span class="p">)</span>
-	<span class="p">(</span><span class="nb">set</span> <span class="ss">'z</span> <span class="p">(</span><span class="nb">+</span> <span class="nv">z</span> <span class="p">(</span><span class="nb">eval</span> <span class="nv">plus-one</span><span class="p">)))</span>
-	<span class="p">))</span>
-
-<span class="p">(</span><span class="nb">set</span> <span class="ss">'a</span> <span class="mi">3</span><span class="p">)</span>
-<span class="p">(</span><span class="nb">set</span> <span class="ss">'b</span> <span class="mi">2</span><span class="p">)</span>
-<span class="p">(</span><span class="nb">set</span> <span class="ss">'c</span> <span class="mi">1</span><span class="p">)</span>
-<span class="p">(</span><span class="nb">set</span> <span class="ss">'z</span> <span class="mi">0</span><span class="p">)</span>
-<span class="p">(</span><span class="nb">eval</span> <span class="nv">sum-abc</span><span class="p">)</span>
-<span class="c1">;;=&gt;9</span>
-
-<span class="p">(</span><span class="nb">set</span> <span class="ss">'a</span> <span class="no">nil</span><span class="p">)</span>
-<span class="p">(</span><span class="nb">set</span> <span class="ss">'b</span> <span class="no">nil</span><span class="p">)</span>
-<span class="p">(</span><span class="nb">set</span> <span class="ss">'c</span> <span class="no">nil</span><span class="p">)</span>
-<span class="p">(</span><span class="nb">set</span> <span class="ss">'z</span> <span class="no">nil</span><span class="p">)</span>
-</code></pre></div></div>
-
-<p>对于单线程程序而言，由于每一次执行且只执行一个函数，所以，只要在每一次执行函数后，将 <code class="language-plaintext highlighter-rouge">x</code> 的值归为 <code class="language-plaintext highlighter-rouge">nil</code> 或者 <code class="language-plaintext highlighter-rouge">x</code> 本身似乎便令 <code class="language-plaintext highlighter-rouge">set</code>-<code class="language-plaintext highlighter-rouge">quote</code>-<code class="language-plaintext highlighter-rouge">eval</code> 实现与 <code class="language-plaintext highlighter-rouge">defun</code> 相同的功能。但是，为了输入变量，消除函数间影响而增加的 <code class="language-plaintext highlighter-rouge">set</code> 语句，以及为了令函数功能一般化而增加的 <code class="language-plaintext highlighter-rouge">quote</code> 和 <code class="language-plaintext highlighter-rouge">eval</code> 语句会增加相当程度的代码量。</p>
-
-<p>elisp语言提供了两个基本操作来减少这些工作量：</p>
-
-<p>首先是 <code class="language-plaintext highlighter-rouge">lambda</code> 对于 <code class="language-plaintext highlighter-rouge">quote</code> 和 <code class="language-plaintext highlighter-rouge">eval</code> 语句的避免。</p>
-
-<p>在 <code class="language-plaintext highlighter-rouge">set-quote-eval</code> 的函数实现中，我们通过 <code class="language-plaintext highlighter-rouge">quote</code> 避免函数 <code class="language-plaintext highlighter-rouge">plus-one</code> 在定义阶段被执行后指向符号结果。同时在函数 <code class="language-plaintext highlighter-rouge">sum-abc</code> 中我们通过 <code class="language-plaintext highlighter-rouge">eval</code> 语句调用函数 <code class="language-plaintext highlighter-rouge">plus-one</code> 返回相应结果。</p>
-
-<p>而如果我们使用 <code class="language-plaintext highlighter-rouge">lambda</code> 无名函数表达，同样的功能可以用以下代码实现：</p>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">;;plus-one</span>
-<span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="nv">x</span><span class="p">)</span> <span class="p">(</span><span class="nb">+</span> <span class="mi">1</span> <span class="nv">x</span><span class="p">))</span>
-<span class="c1">;;sum-abc</span>
-<span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="nv">a</span> <span class="nv">b</span> <span class="nv">c</span><span class="p">)</span> <span class="p">(</span><span class="nb">+</span> <span class="p">(</span><span class="nv">plus-one</span> <span class="nv">a</span><span class="p">)</span> <span class="p">(</span><span class="nv">plus-one</span> <span class="nv">b</span><span class="p">)</span> <span class="p">(</span><span class="nv">plus-one</span> <span class="nv">c</span><span class="p">)))</span>
-</code></pre></div></div>
-<p>这段代码存在两个错误，第一，lambda函数是无名函数，如果不设置指针指向它，是无法通过符号调用的，所以，函数 <code class="language-plaintext highlighter-rouge">plus-one</code> 需要增加 <code class="language-plaintext highlighter-rouge">set</code> 语句才能完成定义。第二，和基本操作或者 <code class="language-plaintext highlighter-rouge">defun</code> 可以直接作为前缀表达式的首项调用函数不同，通过 <code class="language-plaintext highlighter-rouge">set</code> 定义的 <code class="language-plaintext highlighter-rouge">lambda</code> 需要利用 <code class="language-plaintext highlighter-rouge">funcall</code> 才能进行调用。所以，上述代码应该改为：</p>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">set</span> <span class="ss">'plus-one</span> <span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="nv">x</span><span class="p">)</span> <span class="p">(</span><span class="nb">+</span> <span class="nv">x</span> <span class="mi">1</span><span class="p">)))</span>
-<span class="p">(</span><span class="nb">set</span> <span class="ss">'sum-abc</span> 
-	<span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="nv">a</span> <span class="nv">b</span> <span class="nv">c</span><span class="p">)</span>
-		<span class="p">(</span><span class="nb">+</span> <span class="p">(</span><span class="nb">funcall</span> <span class="nv">plus-one</span> <span class="nv">a</span><span class="p">)</span>
-			<span class="p">(</span><span class="nb">funcall</span> <span class="nv">plus-one</span> <span class="nv">b</span><span class="p">)</span>
-			<span class="p">(</span><span class="nb">funcall</span> <span class="nv">plus-one</span> <span class="nv">c</span><span class="p">))))</span>
-
-<span class="p">(</span><span class="nb">funcall</span> <span class="nv">sum-abc</span> <span class="mi">3</span> <span class="mi">2</span> <span class="mi">1</span><span class="p">)</span>
-<span class="c1">;;=&gt;9</span>
-</code></pre></div></div>
-
-<p>至少相比与 <code class="language-plaintext highlighter-rouge">set-quote-eval</code>实现，我们避免了重复设置指针来在函数 <code class="language-plaintext highlighter-rouge">sum-abc</code> 中调用函数 <code class="language-plaintext highlighter-rouge">plus-one</code>。</p>
-
-<p>从表达形式而言，符号 <code class="language-plaintext highlighter-rouge">funcall sum-abc</code> 函数调用则等价于 <code class="language-plaintext highlighter-rouge">defun</code> 实现中的 <code class="language-plaintext highlighter-rouge">sum-abc</code> 函数调用。</p>
-
-<p>到这里位置，本篇博客篇幅已经很长了。至于列表和分支语句，下一篇博客中再进行记录吧。</p>
-
-<p>（关于 F4 和 F3 的不同，不同点在于 <code class="language-plaintext highlighter-rouge">F4</code> 去除了符号 <code class="language-plaintext highlighter-rouge">a b c d</code> 的引用，从而使得 <code class="language-plaintext highlighter-rouge">F4</code> 处理的对象从 符号  <code class="language-plaintext highlighter-rouge">a b c d</code> 本身指向 <code class="language-plaintext highlighter-rouge">a b c d</code> 指向的符号。）</p>
-
-<h2 id="参考">参考</h2>
-
-<ul>
-  <li><a href="https://zh.wikipedia.org/wiki/LISP">中文维基：lisp</a></li>
-  <li><a href="https://www.gnu.org/software/emacs/manual/elisp.html">GNU: Emacs Lisp Refference Manual</a></li>
-</ul>]]></content><author><name>甲与</name></author><category term="lisp" /><summary type="html"><![CDATA[介绍lisp语言的指针和函数概念。]]></summary></entry><entry><title type="html">Emacs配置</title><link href="/emacs%E9%85%8D%E7%BD%AE/" rel="alternate" type="text/html" title="Emacs配置" /><published>2023-12-19T00:00:00+08:00</published><updated>2023-12-19T00:00:00+08:00</updated><id>/emacs%E9%85%8D%E7%BD%AE</id><content type="html" xml:base="/emacs%E9%85%8D%E7%BD%AE/"><![CDATA[<p>本笔记用于说明一些常用的emacs配置，emacs版本， snap-emacs-29 。</p>
-<h1 id="emacs29配置">emacs29配置</h1>
-
-<p>emacs是一个可利用elisp内置语言和elpa仓库进行自定义扩展的文本编辑器。</p>
-
-<ul>
-  <li>相关网站：
-    <ul>
-      <li><a href="https://www.gnu.org/software/emacs/">emacs官网</a></li>
-      <li><a href="https://zh.wikipedia.org/wiki/Emacs">维基：emacs</a></li>
-      <li><a href="https://emacs-china.org/">emacs-china论坛</a></li>
-      <li><a href="https://www.reddit.com/r/emacs/?rdt=50949">Reddit: emacs</a></li>
-    </ul>
-  </li>
-</ul>
-
-<p>emacs配置文件位于 <code class="language-plaintext highlighter-rouge">~/.emaca.d/init.el</code> 或 <code class="language-plaintext highlighter-rouge">~/.emacs</code> 中。</p>
-
-<h3 id="elpa-仓库配置">elpa 仓库配置</h3>
-
-<ul>
-  <li><a href="https://mirrors.tuna.tsinghua.edu.cn/help/elpa/">ELPA 镜像使用帮助</a></li>
-</ul>
-
-<div class="language-elisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">setq</span> <span class="nv">package-archives</span> <span class="o">'</span><span class="p">((</span><span class="s">"gnu"</span>    <span class="o">.</span> <span class="s">"http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/"</span><span class="p">)</span>
-                         <span class="p">(</span><span class="s">"nongnu"</span> <span class="o">.</span> <span class="s">"http://mirrors.tuna.tsinghua.edu.cn/elpa/nongnu/"</span><span class="p">)</span>
-                         <span class="p">(</span><span class="s">"melpa"</span>  <span class="o">.</span> <span class="s">"http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/"</span><span class="p">)))</span>
-<span class="p">(</span><span class="nv">package-initialize</span><span class="p">)</span> <span class="c1">;; You might already have this line</span>
-</code></pre></div></div>
-<h3 id="dashboard">Dashboard</h3>
-
-<p>一个面板，显示近期文件和书签。</p>
-
-<div class="language-elisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">use-package</span> <span class="nv">dashboard</span>
-  <span class="ss">:ensure</span> <span class="no">t</span>
-  <span class="ss">:config</span>
-  <span class="p">(</span><span class="nv">dashboard-setup-startup-hook</span><span class="p">))</span>
-</code></pre></div></div>
-
-<h3 id="valign">valign</h3>
-
-<p>当向org和markdown文本中的表格中插入一些中文文档时，表格无法对齐。
-valign插件可以辅助对齐。</p>
-
-<div class="language-elisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">;; use-package with package.el:</span>
-<span class="p">(</span><span class="nb">use-package</span> <span class="nv">valign</span>
-  <span class="ss">:ensure</span> <span class="no">t</span>
-  <span class="ss">:config</span>
-  <span class="p">(</span><span class="nv">add-hook</span> <span class="ss">'org-mode-hook</span> <span class="nf">#'</span><span class="nv">valign-mode</span><span class="p">)</span>
-  <span class="p">(</span><span class="nv">add-hook</span> <span class="ss">'markdown-mode-hook</span> <span class="nf">#'</span><span class="nv">valign-mode</span><span class="p">))</span>
-</code></pre></div></div>
-
-<h3 id="vertico">Vertico</h3>
-
-<p>在迷你窗口打开文件命令时增加相关显示。</p>
-
-<div class="language-elisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">use-package</span> <span class="nv">vertico</span>
-  <span class="ss">:ensure</span> <span class="no">t</span>
-  <span class="ss">:config</span>
-  <span class="p">(</span><span class="nv">add-hook</span> <span class="ss">'emaca-startup-hook</span> <span class="nf">#'</span><span class="nv">vertico-mode</span><span class="p">))</span>
-
-</code></pre></div></div>
-
-<h3 id="pyim">Pyim</h3>
-
-<p>中文输入法。</p>
-
-<div class="language-elisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">use-package</span> <span class="nv">pyim</span>
-  <span class="ss">:ensure</span> <span class="no">t</span>
-  <span class="ss">:config</span>
-  <span class="p">(</span><span class="nb">require</span> <span class="ss">'pyim</span><span class="p">)</span>
-  <span class="p">(</span><span class="nb">require</span> <span class="ss">'pyim-basedict</span><span class="p">)</span>
-  <span class="p">(</span><span class="nv">pyim-basedict-enable</span><span class="p">)</span>
-  <span class="p">(</span><span class="k">setq</span> <span class="nv">default-input-method</span> <span class="s">"pyim"</span><span class="p">)</span>
-  <span class="p">(</span><span class="nv">pyim-default-scheme</span> <span class="ss">'ziranma-shuangpin</span><span class="p">))</span>
-</code></pre></div></div>
-
-<h3 id="dracula-theme">dracula-theme</h3>
-
-<p>黑色主题，耐看。</p>
-
-<div class="language-elisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">use-package</span> <span class="nv">dracula-theme</span>
-  <span class="ss">:ensure</span> <span class="no">t</span>
-  <span class="ss">:config</span>
-  <span class="p">(</span><span class="nv">load-theme</span> <span class="ss">'dracula</span><span class="p">))</span>
-</code></pre></div></div>
-
-<h3 id="treemacs">treemacs</h3>
-
-<p>方便管理项目。</p>
-
-<h3 id="其它">其它</h3>
-
-<ul>
-  <li>透明显示</li>
-</ul>
-
-<div class="language-elisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">;;set transparent effect</span>
-<span class="p">(</span><span class="nv">global-set-key</span> <span class="nv">[</span><span class="p">(</span><span class="nv">f11</span><span class="p">)</span><span class="nv">]</span> <span class="ss">'loop-alpha</span><span class="p">)</span>
-<span class="p">(</span><span class="k">setq</span> <span class="nv">alpha-list</span> <span class="o">'</span><span class="p">((</span><span class="mi">100</span> <span class="mi">100</span><span class="p">)</span> <span class="p">(</span><span class="mi">95</span> <span class="mi">65</span><span class="p">)</span> <span class="p">(</span><span class="mi">85</span> <span class="mi">55</span><span class="p">)</span> <span class="p">(</span><span class="mi">75</span> <span class="mi">45</span><span class="p">)</span> <span class="p">(</span><span class="mi">65</span> <span class="mi">35</span><span class="p">)))</span>
-<span class="p">(</span><span class="nb">defun</span> <span class="nv">loop-alpha</span> <span class="p">()</span>
-  <span class="p">(</span><span class="nv">interactive</span><span class="p">)</span>
-  <span class="p">(</span><span class="k">let</span> <span class="p">((</span><span class="nv">h</span> <span class="p">(</span><span class="nb">car</span> <span class="nv">alpha-list</span><span class="p">)))</span>                <span class="c1">;; head value will set to</span>
-    <span class="p">((</span><span class="k">lambda</span> <span class="p">(</span><span class="nv">a</span> <span class="nv">ab</span><span class="p">)</span>
-       <span class="p">(</span><span class="nv">set-frame-parameter</span> <span class="p">(</span><span class="nv">selected-frame</span><span class="p">)</span> <span class="ss">'alpha</span> <span class="p">(</span><span class="nb">list</span> <span class="nv">a</span> <span class="nv">ab</span><span class="p">))</span>
-       <span class="p">(</span><span class="nv">add-to-list</span> <span class="ss">'default-frame-alist</span> <span class="p">(</span><span class="nb">cons</span> <span class="ss">'alpha</span> <span class="p">(</span><span class="nb">list</span> <span class="nv">a</span> <span class="nv">ab</span><span class="p">)))</span>
-       <span class="p">)</span> <span class="p">(</span><span class="nb">car</span> <span class="nv">h</span><span class="p">)</span> <span class="p">(</span><span class="nb">car</span> <span class="p">(</span><span class="nb">cdr</span> <span class="nv">h</span><span class="p">)))</span>
-    <span class="p">(</span><span class="k">setq</span> <span class="nv">alpha-list</span> <span class="p">(</span><span class="nb">cdr</span> <span class="p">(</span><span class="nb">append</span> <span class="nv">alpha-list</span> <span class="p">(</span><span class="nb">list</span> <span class="nv">h</span><span class="p">))))</span>
-    <span class="p">)</span>
-<span class="p">)</span>
-</code></pre></div></div>
-
-<ul>
-  <li>栏目隐藏</li>
-</ul>
-
-<div class="language-elisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">;;菜单栏隐藏</span>
-<span class="p">(</span><span class="nv">menu-bar-mode</span> <span class="mi">0</span><span class="p">)</span>
-<span class="c1">;;工具栏隐藏</span>
-<span class="p">(</span><span class="nv">tool-bar-mode</span> <span class="mi">0</span><span class="p">)</span>
-</code></pre></div></div>
-
-<ul>
-  <li>全屏</li>
-</ul>
-
-<div class="language-elisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nv">toggle-frame-fullscreen</span><span class="p">)</span>
-</code></pre></div></div>
-
-<h2 id="参考">参考</h2>
-
-<ul>
-  <li><a href="https://github.com/casouri/valign">Github:casouri/valign</a></li>
-  <li><a href="https://github.com/emacs-dashboard/emacs-dashboard">Github:emaca-dashboard/emaca-dashboard</a></li>
-  <li><a href="https://github.com/Alexander-Miller/treemacs">Github:Alexander-Miller/treemacs</a></li>
-  <li><a href="https://github.com/dracula/emacs">Github:dracula/emaca</a></li>
-  <li><a href="https://github.com/minad/vertico">Github:minad/vertico</a></li>
-  <li><a href="https://github.com/tumashu/pyim">Github:tumashu/pyim</a></li>
-  <li><a href="https://github.com/emacs-dashboard/emacs-dashboard">Github:emacs-dashboard/emacs-dashboard</a></li>
-  <li><a href="https://emacs-china.org/t/emacs/2405">Emacs-China:Emacs 透明窗口</a></li>
-</ul>]]></content><author><name>甲与</name></author><category term="配置" /><summary type="html"><![CDATA[本笔记用于说明一些常用的emacs配置，emacs版本， snap-emacs-29 。 emacs29配置]]></summary></entry></feed>
+</ul>]]></content><author><name>甲与</name></author><category term="语法" /><summary type="html"><![CDATA[介绍一下lisp语言的主语。]]></summary></entry></feed>

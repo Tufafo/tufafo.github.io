@@ -1,0 +1,972 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.24.0 by Michael Rose
+  Copyright 2013-2020 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="zh" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>关于我在配置hbase中的一些问题 - 甲与</title>
+<meta name="description" content="现在系统已经重装，所以再去探究错误的原因和处理方案已经意义不大。现在把当时的日志整理以下，用以备忘。">
+
+
+  <meta name="author" content="甲与">
+  
+  <meta property="article:author" content="甲与">
+  
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:site_name" content="甲与">
+<meta property="og:title" content="关于我在配置hbase中的一些问题">
+<meta property="og:url" content="/%E5%85%B3%E4%BA%8E%E6%88%91%E5%9C%A8%E9%85%8D%E7%BD%AEhbase%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98/">
+
+
+  <meta property="og:description" content="现在系统已经重装，所以再去探究错误的原因和处理方案已经意义不大。现在把当时的日志整理以下，用以备忘。">
+
+
+
+  <meta property="og:image" content="/assets/images/wallhaven-o5e1jm.png">
+
+
+
+
+
+  <meta property="article:published_time" content="2024-04-20T00:00:00+08:00">
+
+
+
+
+
+
+<link rel="canonical" href="/%E5%85%B3%E4%BA%8E%E6%88%91%E5%9C%A8%E9%85%8D%E7%BD%AEhbase%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98/">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": "甲与",
+      "url": "/"
+    
+  }
+</script>
+
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+
+  <link href="/feed.xml" type="application/atom+xml" rel="alternate" title="甲与 Feed">
+
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css"></noscript>
+
+
+
+    <!-- start custom head snippets -->
+
+<script type="text/javascript" async
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+  </head>
+
+  <body class="layout--single">
+    <nav class="skip-links">
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">转到主导航栏</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">转到内容</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">转到底部</a></li>
+  </ul>
+</nav>
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+        <a class="site-title" href="/">
+          甲与
+          
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/tags/">分类</a>
+            </li><li class="masthead__menu-item">
+              <a href="/year-archive/">归档</a>
+            </li></ul>
+        
+        <button class="search__toggle" type="button">
+          <span class="visually-hidden">切换搜索</span>
+          <i class="fas fa-search"></i>
+        </button>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">切换菜单</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+  
+
+
+
+
+
+
+
+<div class="page__hero"
+  style=" background-image: url('');"
+>
+  
+    <img src="/assets/images/wallhaven-o5e1jm.png" alt="关于我在配置hbase中的一些问题" class="page__hero-image">
+  
+  
+</div>
+
+
+
+
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person" class="h-card">
+
+  
+    <div class="author__avatar">
+      <a href="/">
+        <img src="/assets/images/6.png" alt="甲与" itemprop="image" class="u-photo">
+      </a>
+    </div>
+  
+
+  <div class="author__content">
+    <h3 class="author__name p-name" itemprop="name">
+      <a class="u-url" rel="me" href="/" itemprop="url">甲与</a>
+    </h3>
+    
+      <div class="author__bio p-note" itemprop="description">
+        <p>记录一些随想。</p>
+
+      </div>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">关注</button>
+    <ul class="author__urls social-icons">
+      
+
+      
+        
+          
+        
+          
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer me">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+
+  <article class="page h-entry" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="关于我在配置hbase中的一些问题">
+    <meta itemprop="description" content="现在系统已经重装，所以再去探究错误的原因和处理方案已经意义不大。现在把当时的日志整理以下，用以备忘。">
+    <meta itemprop="datePublished" content="2024-04-20T00:00:00+08:00">
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title p-name" itemprop="headline">
+            <a href="/%E5%85%B3%E4%BA%8E%E6%88%91%E5%9C%A8%E9%85%8D%E7%BD%AEhbase%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98/" class="u-url" itemprop="url">关于我在配置hbase中的一些问题
+</a>
+          </h1>
+          
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2024-04-20T00:00:00+08:00">April 20, 2024</time>
+      </span>
+    
+
+    
+
+    
+  </p>
+
+
+        </header>
+      
+
+      <section class="page__content e-content" itemprop="text">
+        
+          <aside class="sidebar__right ">
+            <nav class="toc">
+              <header><h4 class="nav__title"><i class="fas fa-cog"></i> 目录</h4></header>
+              <ul class="toc__menu"><li><a href="#问题一高cpu占用率">问题一：高CPU占用率</a></li><li><a href="#问题二hosts文件自动更改">问题二：hosts文件自动更改</a></li><li><a href="#问题三-节点丢失">问题三： 节点丢失</a></li><li><a href="#问题四命令行工具的使用">问题四：命令行工具的使用</a><ul><li><a href="#hdfs-使用方法">hdfs 使用方法</a></li><li><a href="#zookeeper-使用">zookeeper 使用</a></li></ul></li></ul>
+
+            </nav>
+          </aside>
+        
+        <p>现在系统已经重装，所以再去探究错误的原因和处理方案已经意义不大。现在把当时的日志整理以下，用以备忘。</p>
+
+<h3 id="问题一高cpu占用率">问题一：高CPU占用率</h3>
+
+<p>当我把hbase启动失败的两个节点放置几天后查看，发现：</p>
+
+<p><img src="/assets/post_images/image-20240417110959098.png" alt="" /></p>
+
+<p>由于节点流量是有上限的，每个月100G。</p>
+
+<p><img src="/assets/post_images/image-20240420095141618.png" alt="" />
+😮‍💨😮‍💨😮‍💨</p>
+
+<p>再对比一下性能消耗吧。</p>
+
+<p><img src="/assets/post_images/image-20240420095613423.png" alt="" /></p>
+
+<p>Hbase基于hadoop，而hadoop又是基于ssh协议进行文件传输，所以有时候top查看进程会发现sshd占用率高过100%。而minio就稳定得多。不过这种对比不能说明hadoop和minio的优劣，因为其中不包含只运行hadoop条件下的信息。不过hadoop还要连接到scala、Hive这些工具，进行csv到sql的文件转换，才能进行sql查询，相比之下，minio的确是要方便一些👍。</p>
+
+<h3 id="问题二hosts文件自动更改">问题二：hosts文件自动更改</h3>
+
+<p>当我启动zookeeper或重启之后，没过多久hosts文件自动清空并增加 <code class="language-plaintext highlighter-rouge">i a e</code>属性。</p>
+
+<p>当然重启还有一种情况，那就是 <code class="language-plaintext highlighter-rouge">hosts</code> 文件恢复默认配置。</p>
+
+<p>这可能和vps服务商的默认配置有关。</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">lsattr file-name</code> 查看属性</li>
+  <li><code class="language-plaintext highlighter-rouge">chattr +x file-name</code> 增加x属性</li>
+  <li><code class="language-plaintext highlighter-rouge">chattr -x file-name</code> 减少x属性</li>
+</ul>
+
+<p>举例：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>root@J:/etc# lsattr hosts
+<span class="nt">----ia--------e-----</span> hosts
+</code></pre></div></div>
+<p>i（immutable）：表示文件或目录是不可变的，即不能被修改、删除、重命名或链接。只有超级用户（root）可以修改或删除该文件或目录。</p>
+
+<p>a（append-only）：表示文件只能向其末尾追加数据，不能修改或删除文件中已有的数据。只有超级用户（root）可以修改或删除该文件。</p>
+
+<p>e（extend）：表示文件或目录使用了ACL（Access Control List，访问控制列表）来控制访问权限，允许对文件或目录设置更细粒度的权限控制。</p>
+
+<p>对策：</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>root@J:/etc# chattr -i hosts
+root@J:/etc# chattr -a hosts
+root@J:/etc# chattr -e hosts
+root@J:/etc# lsattr hosts
+-------------------- hosts
+</code></pre></div></div>
+
+<h3 id="问题三-节点丢失">问题三： 节点丢失</h3>
+
+<p>jps查看节点发现只有jps本身，重启系统格式化namenode之后一切节点正常，但是持续运行一段时间会发生节点丢失问题，不过hadoop的webUI和命令行工具都能正常运行，9870端口也显示两个服务器在线，不明白是为什么。</p>
+
+<h3 id="问题四命令行工具的使用">问题四：命令行工具的使用</h3>
+
+<p>hadoop和zookeeper都提供了命令行的操作工具，用来创建和查看文件。</p>
+
+<h4 id="hdfs-使用方法">hdfs 使用方法</h4>
+
+<ul>
+  <li>查看根目录
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>hdfs dfs -ls /
+</code></pre></div>    </div>
+  </li>
+  <li>创建文件夹
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>hdfs dfs <span class="nt">-mkdir</span> /G
+</code></pre></div>    </div>
+  </li>
+  <li>创建文件
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>hdfs dfs <span class="nt">-touch</span> /G/test.txt
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<h4 id="zookeeper-使用">zookeeper 使用</h4>
+
+<p>在ZooKeeper中，你可以使用命令行客户端（<code class="language-plaintext highlighter-rouge">zkCli.sh</code>）进行交互式操作。以下是一些常用的ZooKeeper命令行操作：</p>
+
+<ol>
+  <li><strong>连接到ZooKeeper服务器</strong>：
+    <ul>
+      <li>使用以下命令连接到ZooKeeper服务器：<code class="language-plaintext highlighter-rouge">./zkCli.sh -server &lt;ZooKeeper服务器地址&gt;:&lt;端口号&gt;</code></li>
+      <li>例如：<code class="language-plaintext highlighter-rouge">./zkCli.sh -server localhost:2181</code></li>
+    </ul>
+  </li>
+  <li><strong>基本操作</strong>：
+    <ul>
+      <li><strong>创建节点</strong>：<code class="language-plaintext highlighter-rouge">create /path data</code>
+        <ul>
+          <li>例如：<code class="language-plaintext highlighter-rouge">create /myNode "Hello World"</code></li>
+        </ul>
+      </li>
+      <li><strong>读取节点数据</strong>：<code class="language-plaintext highlighter-rouge">get /path</code>
+        <ul>
+          <li>例如：<code class="language-plaintext highlighter-rouge">get /myNode</code></li>
+        </ul>
+      </li>
+      <li><strong>更新节点数据</strong>：<code class="language-plaintext highlighter-rouge">set /path data</code>
+        <ul>
+          <li>例如：<code class="language-plaintext highlighter-rouge">set /myNode "New Data"</code></li>
+        </ul>
+      </li>
+      <li><strong>列出节点</strong>：<code class="language-plaintext highlighter-rouge">ls /path</code>
+        <ul>
+          <li>例如：<code class="language-plaintext highlighter-rouge">ls /</code></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><strong>监视节点</strong>：
+    <ul>
+      <li><strong>设置监视</strong>：<code class="language-plaintext highlighter-rouge">get /path true</code>
+        <ul>
+          <li>该命令将监视给定节点的变化。如果节点数据发生变化，客户端将收到通知。</li>
+        </ul>
+      </li>
+      <li><strong>取消监视</strong>：<code class="language-plaintext highlighter-rouge">rmr /path</code>
+        <ul>
+          <li>取消对节点的监视。</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><strong>删除节点</strong>：
+    <ul>
+      <li><strong>删除节点</strong>：<code class="language-plaintext highlighter-rouge">delete /path</code>
+        <ul>
+          <li>例如：<code class="language-plaintext highlighter-rouge">delete /myNode</code></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><strong>帮助</strong>：
+    <ul>
+      <li><strong>获取帮助</strong>：<code class="language-plaintext highlighter-rouge">help</code>
+        <ul>
+          <li>可以查看ZooKeeper命令行客户端的帮助信息。</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><strong>退出命令行客户端</strong>：
+    <ul>
+      <li><strong>退出</strong>：<code class="language-plaintext highlighter-rouge">quit</code> 或 <code class="language-plaintext highlighter-rouge">exit</code>
+        <ul>
+          <li>用于退出ZooKeeper命令行客户端。</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ol>
+
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+
+
+        
+
+  <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> 更新时间:</strong> <time class="dt-published" datetime="2024-04-20T00:00:00+08:00">April 20, 2024</time></p>
+
+      </footer>
+
+      
+
+      
+  <nav class="pagination">
+    
+      <a href="/segfault%E7%AE%80%E4%BB%8B/" class="pagination--pager" title="Segfault简介
+">上一页</a>
+    
+    
+      <a href="/%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8-minio-%E8%BF%9B%E8%A1%8C%E6%95%B0%E6%8D%AE%E5%BA%93%E6%9F%A5%E8%AF%A2/" class="pagination--pager" title="如何使用 minio 进行数据库查询
+">下一页</a>
+    
+  </nav>
+
+    </div>
+
+    
+  </article>
+
+  
+  
+    <div class="page__related">
+      <h2 class="page__related-title">猜您还喜欢</h2>
+      <div class="grid__wrapper">
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8-minio-%E8%BF%9B%E8%A1%8C%E6%95%B0%E6%8D%AE%E5%BA%93%E6%9F%A5%E8%AF%A2/" rel="permalink">如何使用 minio 进行数据库查询
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2024-04-20T00:00:00+08:00">April 20, 2024</time>
+      </span>
+    
+
+    
+
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">minio 提供了对s3存储对象的sql操作。一方面为了处理实验报告，另一方面也是为了增加可以使用的工具数量，所以需要增进对于mc sql的理解。
+</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/segfault%E7%AE%80%E4%BB%8B/" rel="permalink">Segfault简介
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2024-04-19T00:00:00+08:00">April 19, 2024</time>
+      </span>
+    
+
+    
+
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">记录一个可以免费使用vps的网站，segfault。
+</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/minio-%E7%9A%84%E9%85%8D%E7%BD%AE%E8%BF%87%E7%A8%8B/" rel="permalink">Minio 的配置过程
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2024-04-19T00:00:00+08:00">April 19, 2024</time>
+      </span>
+    
+
+    
+
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">如果只是想用分布式文件系统，其实hadoop也可以，但在配置hbase的过程中出现的节点丢失和高cpu占用率问题还是让我想尝试其它的分布式框架。这次记录minio的配置过程。
+</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/hbase-%E9%85%8D%E7%BD%AE-(%E5%A4%B1%E8%B4%A5)/" rel="permalink">Hbase 配置 (失败)
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2024-04-15T00:00:00+08:00">April 15, 2024</time>
+      </span>
+    
+
+    
+
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">目标
+</p>
+  </article>
+</div>
+
+        
+      </div>
+    </div>
+  
+  
+</div>
+
+    </div>
+
+    
+      <div class="search-content">
+        <div class="search-content__inner-wrap"><form class="search-content__form" onkeydown="return event.key != 'Enter';" role="search">
+    <label class="sr-only" for="search">
+      输入您要搜索的关键词...
+    </label>
+    <input type="search" id="search" class="search-input" tabindex="-1" placeholder="输入您要搜索的关键词..." />
+  </form>
+  <div id="results" class="results"></div></div>
+
+      </div>
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+ <script src="https://l2dwidget.js.org/lib/L2Dwidget.min.js"></script>
+ <script type="text/javascript">
+
+   function getRandomStringFromSet(stringSet) {
+       const randomIndex = Math.floor(Math.random() * stringSet.length);
+       return stringSet[randomIndex];
+   }
+   
+   // 指定字符串集合
+   const myStringSet = [
+
+
+       "常识只有一个问题——就是它不常见。\n– Milt Bryce，系统方法论之父", 
+       "想象力比知识重要。\n -爱因斯坦",
+       "问题是愿景和现实之间的差别。\n- 温伯格"
+       
+
+
+   ];
+
+   // 调用函数从指定字符串集合中随机返回一个字符串
+   const randomString = getRandomStringFromSet(myStringSet);
+   
+   L2Dwidget
+    .on('*', (name) => {
+        console.log('%c EVENT ' + '%c -> ' + name, 'background: #222; color: yellow', 'background: #fff; color: #000')
+    })
+    .init({
+	"model": {
+            "jsonPath": "https://unpkg.com/live2d-widget-model-hijiki@1.0.5/assets/hijiki.model.json",
+	    　　        "scale": 1
+        },
+        "display": {
+            "position": "right",
+            "width": 200,
+            "height": 300,
+　　        "hOffset": 0,
+            "vOffset": -20
+        },
+        "mobile": {
+            "show": true,
+            "scale": 0.5
+        },
+        "react": {
+            "opacityDefault": 0.8,
+            "opacityOnHover": 1
+        },
+        dialog: {
+            // 开启对话框
+            enable: true,
+	    width: 300, // Set the width of the dialogue box to 300px
+	    height: 500, // Set the height of the dialogue box to 200px
+            script: {
+		// 每空闲 10 秒钟，显示一条一言
+		'every idle 1s': randomString,
+		// 当触摸到星星图案
+		'hover .star': '星星在天上而你在我心里 (*/ω＼*)',
+		// 当触摸到角色身体
+		'tap body': randomString,
+		// 当触摸到角色头部
+		'tap face': '人家已经不是小孩子了！'
+            }
+        }
+        });
+    </script>
+
+
+ <script>
+   !function () {
+    function n(n, e, t) {
+        return n.getAttribute(e) || t
+    }
+ 
+    function e(n) {
+        return document.getElementsByTagName(n)
+    }
+ 
+    function t() {
+        var t = e("script"), o = t.length, i = t[o - 1];
+        return {l: o, z: n(i, "zIndex", -1), o: n(i, "opacity", .5), c: n(i, "color", "0, 191, 255"), n: n(i, "count", 99)}
+    }
+ 
+    function o() {
+        a = m.width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth, c = m.height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight
+    }
+ 
+    function i() {
+        r.clearRect(0, 0, a, c);
+        var n, e, t, o, m, l;
+        s.forEach(function (i, x) {
+            for (i.x += i.xa, i.y += i.ya, i.xa *= i.x > a || i.x < 0 ? -1 : 1, i.ya *= i.y > c || i.y < 0 ? -1 : 1, r.fillRect(i.x - .5, i.y - .5, 1, 1), e = x + 1; e < u.length; e++) n = u[e], null !== n.x && null !== n.y && (o = i.x - n.x, m = i.y - n.y, l = o * o + m * m, l < n.max && (n === y && l >= n.max / 2 && (i.x -= .03 * o, i.y -= .03 * m), t = (n.max - l) / n.max, r.beginPath(), r.lineWidth = t / 2, r.strokeStyle = "rgba(" + d.c + "," + (t + .2) + ")", r.moveTo(i.x, i.y), r.lineTo(n.x, n.y), r.stroke()))
+        }), x(i)
+    }
+ 
+    var a, c, u, m = document.createElement("canvas"), d = t(), l = "c_n" + d.l, r = m.getContext("2d"),
+        x = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || function (n) {
+            window.setTimeout(n, 1e3 / 45)
+        }, w = Math.random, y = {x: null, y: null, max: 2e4};
+    m.id = l, m.style.cssText = "position:fixed;top:0;left:0;z-index:" + d.z + ";opacity:" + d.o, e("body")[0].appendChild(m), o(), window.onresize = o, window.onmousemove = function (n) {
+        n = n || window.event, y.x = n.clientX, y.y = n.clientY
+    }, window.onmouseout = function () {
+        y.x = null, y.y = null
+    };
+    for (var s = [], f = 0; d.n > f; f++) {
+        var h = w() * a, g = w() * c, v = 2 * w() - 1, p = 2 * w() - 1;
+        s.push({x: h, y: g, xa: v, ya: p, max: 6e3})
+    }
+    u = s.concat([y]), setTimeout(function () {
+        i()
+    }, 100)
+}();
+ </script>
+
+ <script>
+function clickEffect() {
+  let balls = [];
+  let longPressed = false;
+  let longPress;
+  let multiplier = 0;
+  let width, height;
+  let origin;
+  let normal;
+  let ctx;
+  const colours = ["#F73859", "#14FFEC", "#00E0FF", "#FF99FE", "#FAF15D"];
+  const canvas = document.createElement("canvas");
+  document.body.appendChild(canvas);
+  canvas.setAttribute("style", "width: 100%; height: 100%; top: 0; left: 0; z-index: 99999; position: fixed; pointer-events: none;");
+  const pointer = document.createElement("span");
+  pointer.classList.add("pointer");
+  document.body.appendChild(pointer);
+ 
+  if (canvas.getContext && window.addEventListener) {
+    ctx = canvas.getContext("2d");
+    updateSize();
+    window.addEventListener('resize', updateSize, false);
+    loop();
+    window.addEventListener("mousedown", function(e) {
+      pushBalls(randBetween(10, 20), e.clientX, e.clientY);
+      document.body.classList.add("is-pressed");
+      longPress = setTimeout(function(){
+        document.body.classList.add("is-longpress");
+        longPressed = true;
+      }, 500);
+    }, false);
+    window.addEventListener("mouseup", function(e) {
+      clearInterval(longPress);
+      if (longPressed == true) {
+        document.body.classList.remove("is-longpress");
+        pushBalls(randBetween(50 + Math.ceil(multiplier), 100 + Math.ceil(multiplier)), e.clientX, e.clientY);
+        longPressed = false;
+      }
+      document.body.classList.remove("is-pressed");
+    }, false);
+    window.addEventListener("mousemove", function(e) {
+      let x = e.clientX;
+      let y = e.clientY;
+      pointer.style.top = y + "px";
+      pointer.style.left = x + "px";
+    }, false);
+  } else {
+    console.log("canvas or addEventListener is unsupported!");
+  }
+ 
+ 
+  function updateSize() {
+    canvas.width = window.innerWidth * 2;
+    canvas.height = window.innerHeight * 2;
+    canvas.style.width = window.innerWidth + 'px';
+    canvas.style.height = window.innerHeight + 'px';
+    ctx.scale(2, 2);
+    width = (canvas.width = window.innerWidth);
+    height = (canvas.height = window.innerHeight);
+    origin = {
+      x: width / 2,
+      y: height / 2
+    };
+    normal = {
+      x: width / 2,
+      y: height / 2
+    };
+  }
+  class Ball {
+    constructor(x = origin.x, y = origin.y) {
+      this.x = x;
+      this.y = y;
+      this.angle = Math.PI * 2 * Math.random();
+      if (longPressed == true) {
+        this.multiplier = randBetween(14 + multiplier, 15 + multiplier);
+      } else {
+        this.multiplier = randBetween(6, 12);
+      }
+      this.vx = (this.multiplier + Math.random() * 0.5) * Math.cos(this.angle);
+      this.vy = (this.multiplier + Math.random() * 0.5) * Math.sin(this.angle);
+      this.r = randBetween(8, 12) + 3 * Math.random();
+      this.color = colours[Math.floor(Math.random() * colours.length)];
+    }
+    update() {
+      this.x += this.vx - normal.x;
+      this.y += this.vy - normal.y;
+      normal.x = -2 / window.innerWidth * Math.sin(this.angle);
+      normal.y = -2 / window.innerHeight * Math.cos(this.angle);
+      this.r -= 0.3;
+      this.vx *= 0.9;
+      this.vy *= 0.9;
+    }
+  }
+ 
+  function pushBalls(count = 1, x = origin.x, y = origin.y) {
+    for (let i = 0; i < count; i++) {
+      balls.push(new Ball(x, y));
+    }
+  }
+ 
+  function randBetween(min, max) {
+    return Math.floor(Math.random() * max) + min;
+  }
+ 
+  function loop() {
+    ctx.fillStyle = "rgba(255, 255, 255, 0)";
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (let i = 0; i < balls.length; i++) {
+      let b = balls[i];
+      if (b.r < 0) continue;
+      ctx.fillStyle = b.color;
+      ctx.beginPath();
+      ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2, false);
+      ctx.fill();
+      b.update();
+    }
+    if (longPressed == true) {
+      multiplier += 0.2;
+    } else if (!longPressed && multiplier >= 0) {
+      multiplier -= 0.4;
+    }
+    removeBall();
+    requestAnimationFrame(loop);
+  }
+ 
+  function removeBall() {
+    for (let i = 0; i < balls.length; i++) {
+      let b = balls[i];
+      if (b.x + b.r < 0 || b.x - b.r > width || b.y + b.r < 0 || b.y - b.r > height || b.r < 0) {
+        balls.splice(i, 1);
+      }
+    }
+  }
+}
+clickEffect();//调用特效函数
+</script>
+<!-- end custom footer snippets -->
+
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+      <li><strong>关注:</strong></li>
+    
+
+    
+
+    
+      <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+    
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2024 甲与</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+
+
+
+
+<script src="/assets/js/lunr/lunr.min.js"></script>
+<script src="/assets/js/lunr/lunr-store.js"></script>
+<script src="/assets/js/lunr/lunr-en.js"></script>
+
+
+
+
+
+
+
+  </body>
+</html>
