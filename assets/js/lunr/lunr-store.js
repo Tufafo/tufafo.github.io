@@ -89,6 +89,12 @@ var store = [{
         "url": "/%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8-minio-%E8%BF%9B%E8%A1%8C%E6%95%B0%E6%8D%AE%E5%BA%93%E6%9F%A5%E8%AF%A2/",
         "teaser": null
       },{
+        "title": "Minio实训",
+        "excerpt":"目标 熟悉minio的配置过程和客户端操作 通过面向elisp的命令封装来模拟hbase以实现实训要求。 环境简介 由于之前配置hbase集群中，集群在sshd命令上消耗流量过高，vps流量超额欠费。现使用部署成本更加低廉的minio完成分布式实训任务。 MinIO 是一种高性能，兼容S3对象存储。特别是它的客户端mc内置了sql查询操作，使得可以直接在csv文件中进行查询。 环境：centos7。 服务器配置过程 单节点单磁盘 下载并安装minio wget https://dl.min.io/server/minio/release/linux-amd64/archive/minio-20240418190919.0.0-1.x86_64.rpm -O minio.rpm sudo yum install minio.rpm 创建数据文件夹 mkdir ~/minio minio server ~/minio --console-address :9001 一些常用的参数： --address &lt;address:port&gt;/&lt;:port&gt; 指定api端口 --console-address &lt;address:port&gt;/&lt;:port&gt; 指定webUI端口 访问 &lt;server-ip:9001&gt; ，查看minio登录页面。 输入账号密码，默认：minioadmin。 在 Administrator-Monitoring-Metrics 目录下可以看到当前各节点的工作状态。 单节点多磁盘 安装过程同上，但是启动不同。在linux中一般通过mount命令将磁盘挂载到某目录下。现在新建四个文件夹来代表不同节点。 mkdir ~/minios mkdir ~/minios/m1 mkdir ~/minios/m2 mkdir...","categories": [],
+        "tags": [],
+        "url": "/minio%E5%AE%9E%E8%AE%AD/",
+        "teaser": null
+      },{
     "title": "Portfolio",
     "excerpt":" ","url": "/portfolio/"
   },{
@@ -115,6 +121,9 @@ var store = [{
   },{
     "title": null,
     "excerpt":"","url": "/page3/"
+  },{
+    "title": null,
+    "excerpt":"","url": "/page4/"
   },{
     "title": null,
     "excerpt":"{% if page.xsl %} {% endif %} {% assign collections = site.collections | where_exp:'collection','collection.output != false' %}{% for collection in collections %}{% assign docs = collection.docs | where_exp:'doc','doc.sitemap != false' %}{% for doc in docs %} {{ doc.url | replace:'/index.html','/' | absolute_url | xml_escape }} {% if doc.last_modified_at or doc.date...","url": "/sitemap.xml"

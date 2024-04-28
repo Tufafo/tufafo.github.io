@@ -1,0 +1,1417 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.24.0 by Michael Rose
+  Copyright 2013-2020 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="zh" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>Minio实训 - 甲与</title>
+<meta name="description" content="目标">
+
+
+  <meta name="author" content="甲与">
+  
+  <meta property="article:author" content="甲与">
+  
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:site_name" content="甲与">
+<meta property="og:title" content="Minio实训">
+<meta property="og:url" content="/minio%E5%AE%9E%E8%AE%AD/">
+
+
+  <meta property="og:description" content="目标">
+
+
+
+  <meta property="og:image" content="/assets/images/wallhaven-o5e1jm.png">
+
+
+
+
+
+  <meta property="article:published_time" content="2024-04-27T00:00:00+08:00">
+
+
+
+
+
+
+<link rel="canonical" href="/minio%E5%AE%9E%E8%AE%AD/">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": "甲与",
+      "url": "/"
+    
+  }
+</script>
+
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+
+  <link href="/feed.xml" type="application/atom+xml" rel="alternate" title="甲与 Feed">
+
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css"></noscript>
+
+
+
+    <!-- start custom head snippets -->
+
+<script type="text/javascript" async
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+  </head>
+
+  <body class="layout--single">
+    <nav class="skip-links">
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">转到主导航栏</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">转到内容</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">转到底部</a></li>
+  </ul>
+</nav>
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+        <a class="site-title" href="/">
+          甲与
+          
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/tags/">分类</a>
+            </li><li class="masthead__menu-item">
+              <a href="/year-archive/">归档</a>
+            </li></ul>
+        
+        <button class="search__toggle" type="button">
+          <span class="visually-hidden">切换搜索</span>
+          <i class="fas fa-search"></i>
+        </button>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">切换菜单</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+  
+
+
+
+
+
+
+
+<div class="page__hero"
+  style=" background-image: url('');"
+>
+  
+    <img src="/assets/images/wallhaven-o5e1jm.png" alt="Minio实训" class="page__hero-image">
+  
+  
+</div>
+
+
+
+
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person" class="h-card">
+
+  
+    <div class="author__avatar">
+      <a href="/">
+        <img src="/assets/images/6.png" alt="甲与" itemprop="image" class="u-photo">
+      </a>
+    </div>
+  
+
+  <div class="author__content">
+    <h3 class="author__name p-name" itemprop="name">
+      <a class="u-url" rel="me" href="/" itemprop="url">甲与</a>
+    </h3>
+    
+      <div class="author__bio p-note" itemprop="description">
+        <p>记录一些随想。</p>
+
+      </div>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">关注</button>
+    <ul class="author__urls social-icons">
+      
+
+      
+        
+          
+        
+          
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer me">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+
+  <article class="page h-entry" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="Minio实训">
+    <meta itemprop="description" content="目标">
+    <meta itemprop="datePublished" content="2024-04-27T00:00:00+08:00">
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title p-name" itemprop="headline">
+            <a href="/minio%E5%AE%9E%E8%AE%AD/" class="u-url" itemprop="url">Minio实训
+</a>
+          </h1>
+          
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2024-04-27T00:00:00+08:00">April 27, 2024</time>
+      </span>
+    
+
+    
+
+    
+  </p>
+
+
+        </header>
+      
+
+      <section class="page__content e-content" itemprop="text">
+        
+          <aside class="sidebar__right ">
+            <nav class="toc">
+              <header><h4 class="nav__title"><i class="fas fa-cog"></i> 目录</h4></header>
+              <ul class="toc__menu"><li><a href="#目标">目标</a></li><li><a href="#环境简介">环境简介</a></li><li><a href="#服务器配置过程">服务器配置过程</a><ul><li><a href="#单节点单磁盘">单节点单磁盘</a></li><li><a href="#单节点多磁盘">单节点多磁盘</a></li></ul></li><li><a href="#多节点多磁盘失败">多节点多磁盘（失败）</a></li><li><a href="#客户端配置过程">客户端配置过程</a><ul><li><a href="#命令行端-mc">命令行端 MC</a></li><li><a href="#执行sql查询">执行sql查询</a></li></ul></li><li><a href="#在elisp中进行封装">在elisp中进行封装</a><ul><li><a href="#实训任务">实训任务</a></li><li><a href="#任务一设计表">任务一，设计表</a></li><li><a href="#任务二表格的创建和删除">任务二：表格的创建和删除</a></li><li><a href="#任务三查询指定时间版本的数据">任务三：查询指定时间版本的数据</a></li><li><a href="#任务四利用elisp函数封装创建表">任务四：利用elisp函数封装创建表</a></li><li><a href="#任务五通过elisp插入数据到表并查询">任务五：通过elisp插入数据到表并查询</a></li><li><a href="#任务六利用elisp合并数据">任务六：利用elisp合并数据</a></li></ul></li><li><a href="#总结">总结</a></li><li><a href="#参考">参考</a></li></ul>
+
+            </nav>
+          </aside>
+        
+        <h2 id="目标">目标</h2>
+
+<ul>
+  <li>熟悉minio的配置过程和客户端操作</li>
+  <li>通过面向elisp的命令封装来模拟hbase以实现实训要求。</li>
+</ul>
+
+<h2 id="环境简介">环境简介</h2>
+
+<p>由于之前配置hbase集群中，集群在sshd命令上消耗流量过高，vps流量超额欠费。现使用部署成本更加低廉的minio完成分布式实训任务。</p>
+
+<p><img src="/assets/post_images/image-20240420095141618.png" alt="" />
+<img src="/assets/post_images/image-20240420095613423.png" alt="" /></p>
+
+<p>MinIO 是一种高性能，兼容S3对象存储。特别是它的客户端mc内置了sql查询操作，使得可以直接在csv文件中进行查询。</p>
+
+<p>环境：centos7。</p>
+
+<h2 id="服务器配置过程">服务器配置过程</h2>
+
+<h3 id="单节点单磁盘">单节点单磁盘</h3>
+
+<ul>
+  <li>下载并安装minio</li>
+</ul>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>wget https://dl.min.io/server/minio/release/linux-amd64/archive/minio-20240418190919.0.0-1.x86_64.rpm <span class="nt">-O</span> minio.rpm
+<span class="nb">sudo </span>yum <span class="nb">install </span>minio.rpm
+</code></pre></div></div>
+
+<ul>
+  <li>创建数据文件夹</li>
+</ul>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">mkdir</span> ~/minio
+</code></pre></div></div>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>minio server ~/minio <span class="nt">--console-address</span> :9001
+</code></pre></div></div>
+
+<p>一些常用的参数：</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">--address &lt;address:port&gt;/&lt;:port&gt;</code> 指定api端口</li>
+  <li><code class="language-plaintext highlighter-rouge">--console-address &lt;address:port&gt;/&lt;:port&gt;</code> 指定webUI端口</li>
+</ul>
+
+<p>访问 <code class="language-plaintext highlighter-rouge">&lt;server-ip:9001&gt;</code> ，查看<code class="language-plaintext highlighter-rouge">minio</code>登录页面。
+<img src="/assets/post_images/image-20240427144736126.png" alt="" /></p>
+
+<p>输入账号密码，默认：<code class="language-plaintext highlighter-rouge">minioadmin</code>。</p>
+
+<p>在 <code class="language-plaintext highlighter-rouge">Administrator-Monitoring-Metrics</code> 目录下可以看到当前各节点的工作状态。</p>
+
+<p><img src="/assets/post_images/image-20240427144850027.png" alt="" /></p>
+
+<h3 id="单节点多磁盘">单节点多磁盘</h3>
+
+<p>安装过程同上，但是启动不同。在linux中一般通过<code class="language-plaintext highlighter-rouge">mount</code>命令将磁盘挂载到某目录下。现在新建四个文件夹来代表不同节点。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">mkdir</span> ~/minios
+<span class="nb">mkdir</span> ~/minios/m1
+<span class="nb">mkdir</span> ~/minios/m2
+<span class="nb">mkdir</span> ~/minios/m3
+<span class="nb">mkdir</span> ~/minios/m4
+</code></pre></div></div>
+
+<p>启动时，只需要将多个节点的序号放在大括号中即可。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>minio server ~/minios/m<span class="o">{</span>1...4<span class="o">}</span> <span class="nt">--console-address</span> :9001
+</code></pre></div></div>
+
+<p>访问服务器 <code class="language-plaintext highlighter-rouge">9001</code> 端口，可以看到，磁盘数从一增长为4：</p>
+
+<p><img src="/assets/post_images/image-20240427145838228.png" alt="" /></p>
+
+<h2 id="多节点多磁盘失败">多节点多磁盘（失败）</h2>
+
+<p><code class="language-plaintext highlighter-rouge">minio</code> 安装同上。</p>
+
+<p>在各个节点增加新的 <code class="language-plaintext highlighter-rouge">hosts</code> 映射到 <code class="language-plaintext highlighter-rouge">/etc/hosts</code> 文件中：</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ip1 n1
+ip2 n2
+</code></pre></div></div>
+
+<p>创建文件夹代表不同磁盘：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mkdir /data
+mkdir /data/data1
+mkdir /data/data2
+mkdir /data/data3
+mkdir /data/data4
+</code></pre></div></div>
+
+<p>设置环境变量：</p>
+
+<ul>
+  <li>在<code class="language-plaintext highlighter-rouge">~/.bashrc</code>中</li>
+</ul>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">export </span><span class="nv">MINIO_ACCESS_KEY</span><span class="o">=</span>minioadmin <span class="c"># 设置用户名</span>
+<span class="nb">export </span><span class="nv">MINIO_SECRET_KEY</span><span class="o">=</span>minioadmin <span class="c">#设置密码</span>
+<span class="nb">export </span><span class="nv">CI</span><span class="o">=</span><span class="nb">true</span> <span class="c"># 允许访问root磁盘</span>
+<span class="nb">export </span><span class="nv">MINIO_CI_CD</span><span class="o">=</span><span class="nb">true</span> <span class="c"># 允许访问root磁盘</span>
+</code></pre></div></div>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">source</span> ~/.bashrc
+</code></pre></div></div>
+
+<p>在各个服务器的命令行中启动 <code class="language-plaintext highlighter-rouge">minio</code>：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>minio server http://n<span class="o">{</span>1...2<span class="o">}</span>:9000/data/data<span class="o">{</span>1...4<span class="o">}</span> 
+</code></pre></div></div>
+
+<p>两次配置结果，第一次成功访问。后服务器过期，更换现vps厂商执行同样的命令出现错误：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>WARNING: MINIO_ACCESS_KEY and MINIO_SECRET_KEY are deprecated.
+         Please use MINIO_ROOT_USER and MINIO_ROOT_PASSWORD
+
+API: SYSTEM.peers
+Time: 07:08:56 UTC 04/27/2024
+Error: Expected number of all hosts <span class="o">(</span>2<span class="o">)</span> to be remote +1 <span class="o">(</span>2<span class="o">)</span> <span class="o">(</span><span class="k">*</span>errors.errorString<span class="o">)</span>
+       8: internal/logger/logger.go:259:logger.LogIf<span class="o">()</span>
+       7: cmd/logging.go:42:cmd.peersLogIf<span class="o">()</span>
+       6: cmd/peer-rest-client.go:631:cmd.newPeerRestClients<span class="o">()</span>
+       5: cmd/notification.go:1152:cmd.NewNotificationSys<span class="o">()</span>
+       4: cmd/server-main.go:400:cmd.initAllSubsystems<span class="o">()</span>
+       3: cmd/server-main.go:715:cmd.serverMain.func4<span class="o">()</span>
+       2: cmd/server-main.go:512:cmd.bootstrapTrace<span class="o">()</span>
+       1: cmd/server-main.go:714:cmd.serverMain<span class="o">()</span>
+ERROR Unable to configure server grid RPC services: grid: <span class="nb">local </span>host not found
+</code></pre></div></div>
+
+<p>解释：</p>
+
+<p>错误直接原因，无法配置服务网格的远程过程调用（RPC）服务，无法找到本地主机。</p>
+
+<p>很多VPS厂商会限制节点在内网中的通信，特别是这种廉价服务器，甚至没有独立的公网ip，只有五个端口到内网的映射。</p>
+
+<p><img src="/assets/post_images/image-20240427151348771.png" alt="" /></p>
+
+<p>端口映射的概念如下图所示：</p>
+
+<p><img src="/assets/post_images/image-20240427151517425.png" alt="" /></p>
+
+<p>这是新vps电商和旧vps电商在端口上的最大不同。但是在单个节点通过 <code class="language-plaintext highlighter-rouge">ssh</code> 和公网ip可以访问本节点或另一节点，均无问题。那么，如果<strong>更换为内网ip</strong>进行访问如何呢？</p>
+
+<p><img src="/assets/post_images/image-20240427152533333.png" alt="" /></p>
+
+<p><img src="/assets/post_images/image-20240427152630076.png" alt="" /></p>
+
+<p>更新两个节点中 <code class="language-plaintext highlighter-rouge">host</code> 文件中的映射关系。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>10.41.14.22 N1
+10.47.14.21 N2
+</code></pre></div></div>
+
+<p>但是重新启动依然出现错误：</p>
+
+<p><img src="/assets/post_images/image-20240427152845650.png" alt="" /></p>
+
+<p>至此，由于单节点多磁盘和单节点单磁盘的差别不大，此后由单节点多磁盘环境继续进行实验。</p>
+
+<p>不过要主要把进程挂载到后台。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">nohup </span>minio server ~/minios/m<span class="o">{</span>1...4<span class="o">}</span> <span class="nt">--console-address</span> :14216 <span class="nt">--address</span> :14215 &amp;
+</code></pre></div></div>
+
+<h2 id="客户端配置过程">客户端配置过程</h2>
+
+<h3 id="命令行端-mc">命令行端 MC</h3>
+
+<p>安装</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>wget https://dl.min.io/client/mc/release/linux-amd64/mc
+<span class="nb">chmod</span> +x mc
+<span class="nb">sudo mv </span>mc /usr/local/bin/mc
+</code></pre></div></div>
+
+<p>设置用户</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mc <span class="nb">alias set </span>m1 http://ip:9000 minioadmin minioadmin
+</code></pre></div></div>
+
+<p>操作：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mc <span class="nt">--help</span> 查看命令帮助
+</code></pre></div></div>
+
+<p>基本的路径格式是 <code class="language-plaintext highlighter-rouge">alias 设置的登录名+桶名+对象路径</code> 。</p>
+
+<p>创建桶</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mc mb m1/&lt;bucket-name&gt;
+</code></pre></div></div>
+
+<p><img src="/assets/post_images/image-20240427153758844.png" alt="" /></p>
+
+<p>上传文件</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">echo</span> <span class="s2">"I am a good student."</span> <span class="o">&gt;</span> test.txt
+mc put test.txt m1/stu
+</code></pre></div></div>
+
+<p>查看<code class="language-plaintext highlighter-rouge">stu</code> 目录下的文件：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mc <span class="nb">ls </span>m1/stu
+</code></pre></div></div>
+
+<p><img src="/assets/post_images/image-20240427153959611.png" alt="" /></p>
+
+<p>下载文件</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mc get m1/stu ./
+</code></pre></div></div>
+
+<p>其它</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>命令</th>
+      <th>描述</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">alias</code></td>
+      <td>在配置文件中管理服务器凭据</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">admin</code></td>
+      <td>管理MinIO服务器</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">anonymous</code></td>
+      <td>管理对存储桶和对象的匿名访问</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">batch</code></td>
+      <td>管理批处理作业</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">cp</code></td>
+      <td>复制对象</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">cat</code></td>
+      <td>显示对象内容</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">diff</code></td>
+      <td>列出两个存储桶之间对象名称、大小和日期的差异</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">du</code></td>
+      <td>递归总结磁盘使用情况</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">encrypt</code></td>
+      <td>管理存储桶加密配置</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">event</code></td>
+      <td>管理对象通知</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">find</code></td>
+      <td>搜索对象</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">get</code></td>
+      <td>将S3对象获取到本地</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">head</code></td>
+      <td>显示对象的前n行</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">ilm</code></td>
+      <td>管理存储桶生命周期</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">idp</code></td>
+      <td>管理MinIO身份提供者服务器配置</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">license</code></td>
+      <td>许可证相关命令</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">legalhold</code></td>
+      <td>管理对象的法律保留</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">ls</code></td>
+      <td>列出存储桶和对象</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">mb</code></td>
+      <td>创建一个存储桶</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">mv</code></td>
+      <td>移动对象</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">mirror</code></td>
+      <td>将对象同步到远程站点</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">od</code></td>
+      <td>测量单个流上传和下载</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">ping</code></td>
+      <td>执行存活性检查</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">pipe</code></td>
+      <td>将标准输入流传输到对象</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">put</code></td>
+      <td>将对象上传到存储桶</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">quota</code></td>
+      <td>管理存储桶配额</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">rm</code></td>
+      <td>删除对象</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">retention</code></td>
+      <td>为对象设置保留期</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">rb</code></td>
+      <td>删除一个存储桶</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">replicate</code></td>
+      <td>配置服务器端存储桶复制</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">ready</code></td>
+      <td>检查集群是否就绪</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">sql</code></td>
+      <td>在对象上运行SQL查询</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">stat</code></td>
+      <td>显示对象元数据</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">support</code></td>
+      <td>支持相关命令</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">share</code></td>
+      <td>生成临时访问对象的URL</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">tree</code></td>
+      <td>以树状格式列出存储桶和对象</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">tag</code></td>
+      <td>管理存储桶和对象的标签</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">undo</code></td>
+      <td>撤销PUT/DELETE操作</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">update</code></td>
+      <td>将mc更新到最新版本</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">version</code></td>
+      <td>管理存储桶版本控制</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">watch</code></td>
+      <td>监听对象通知事件</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="执行sql查询">执行sql查询</h3>
+
+<p>在 <code class="language-plaintext highlighter-rouge">Libre Office</code> 中创建表格，保存为 <code class="language-plaintext highlighter-rouge">.csv</code> 文件，上传到 ` minio-server` 中</p>
+
+<p><img src="/assets/post_images/image-20240427154434731.png" alt="" /></p>
+
+<p><img src="/assets/post_images/image-20240427154557914.png" alt="" /></p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mc put s1.csv m1/stu
+</code></pre></div></div>
+
+<p>查询文件</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mc sql <span class="nt">--recursive</span> <span class="nt">--query</span> <span class="s2">"select * from S3Object"</span> m1/stu/s1.csv
+</code></pre></div></div>
+
+<p><img src="/assets/post_images/image-20240427155030473.png" alt="" /></p>
+
+<p>增加查询条件：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mc sql <span class="nt">--recursive</span> <span class="nt">--query</span> <span class="s2">"select * from S3Object where </span><span class="se">\"</span><span class="s2">成绩</span><span class="se">\"</span><span class="s2"> &gt; 7"</span> m1/stu/s1.csv
+</code></pre></div></div>
+
+<p><img src="/assets/post_images/image-20240427155132623.png" alt="" /></p>
+
+<h2 id="在elisp中进行封装">在elisp中进行封装</h2>
+
+<p>函数：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="p">(</span><span class="nb">defun</span> <span class="nv">as-s3o-be-sq</span> <span class="p">(</span><span class="nv">s3o</span> <span class="nv">sq</span><span class="p">)</span>
+    <span class="s">"make a sq query to s3o on minio server.
+    The input of s3o should be a string path to s3o, and sq
+    should be a string of sql. This function will return query result as string"</span>
+    <span class="p">(</span><span class="nv">shell-command-to-string</span> <span class="p">(</span><span class="nb">format</span> <span class="s">"mc sql --recursive --query \"%s\" %s"</span> <span class="nv">sq</span> <span class="nv">s3o</span><span class="p">)))</span>
+</code></pre></div></div>
+
+<p>测试：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nv">as-s3o-be-sq</span> <span class="s">"m1/stu/s1.csv"</span> <span class="s">"select * from S3Object"</span><span class="p">)</span>
+<span class="c1">;=&gt;</span>
+<span class="c1">;张三,10</span>
+<span class="c1">;李四,8.9</span>
+<span class="c1">;王五,6.7</span>
+</code></pre></div></div>
+
+<p>至此，完成实训所需的基本构件已经完成。</p>
+
+<h3 id="实训任务">实训任务</h3>
+
+<h3 id="任务一设计表">任务一，设计表</h3>
+
+<p>统计长度：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">wc</span> <span class="nt">-l</span> stumer_in_out_details.txt 
+<span class="c">#975541 stumer_in_out_details.txt</span>
+</code></pre></div></div>
+
+<p>可以看到，一共975541行数据。由于minio会自动执行文件的分割编码和存储过程，并且考虑到文件格式和<code class="language-plaintext highlighter-rouge">csv</code>文件格式一致，直接改名为<code class="language-plaintext highlighter-rouge">csv</code> 文件，在首部增加属性行上传文件即可。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sed -i "1i\钞票冠字号,时间,用户ID,存取钞票银行" stumer_in_out_details.txt
+</code></pre></div></div>
+
+<p>插入效果如下：</p>
+
+<p><img src="/assets/post_images/image-20240427165407255.png" alt="" /></p>
+
+<p>上传文件：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">mv </span>stumer_in_out_details.txt stumer_in_out_details.csv
+mc put ./stumer_in_out_details.csv m1/stu/
+mc <span class="nb">head</span> <span class="nt">-n</span> 3 m1/stu/stumer_in_out_details.csv
+</code></pre></div></div>
+
+<p>封装命令到elisp中。</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">defun</span> <span class="nv">as-o-be-put</span> <span class="p">(</span><span class="nv">file</span> <span class="nv">path</span><span class="p">)</span>
+	<span class="s">"The first file be put to the path of Minio."</span>
+	<span class="p">(</span><span class="nv">shell-command</span> <span class="p">(</span><span class="nb">format</span> <span class="s">"mc put %s %s"</span> <span class="nv">file</span> <span class="nv">path</span><span class="p">)))</span>
+</code></pre></div></div>
+
+<h3 id="任务二表格的创建和删除">任务二：表格的创建和删除</h3>
+
+<p>考虑到在 Minio中数据表可以直接以csv形式存储，但却没有提供数据修改功能。所以一切的增删改功能都需要下载文件到本地修改。并且可以把一个”bucket“视为一个数据库，一个”object“视为一个表。而本地修改部分可以依赖<code class="language-plaintext highlighter-rouge">linux</code> 三剑客之一<code class="language-plaintext highlighter-rouge">sed</code>命令。</p>
+
+<p>创建命令：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">echo</span> <span class="s2">"&lt;attribute-name-1&gt;,&lt;attribute-name-2&gt;,..."</span> <span class="o">&gt;</span> &lt;table-name&gt;.csv
+mc put &lt;table-name&gt;.csv m1/&lt;db-name&gt;
+<span class="nb">rm</span> &lt;table-name&gt;.csv
+</code></pre></div></div>
+
+<p>删除命令：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mc <span class="nb">rm</span> &lt;table-path&gt;
+mc rb &lt;db-path&gt;
+</code></pre></div></div>
+
+<p>修改命令：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mc get &lt;table-path&gt; &lt;local-path&gt;
+<span class="nb">echo</span> <span class="s2">"&lt;new-datas&gt;"</span> <span class="o">&gt;&gt;</span> &lt;local-path&gt;/&lt;table-path&gt; <span class="c">#增加行</span>
+<span class="nb">sed</span> <span class="nt">-i</span> <span class="s1">'/pattern/d'</span> &lt;local-path&gt;/&lt;table-name&gt; <span class="c">#按照模式删除行</span>
+mc put &lt;local-path&gt;/&lt;table-name&gt; &lt;table-path&gt;
+</code></pre></div></div>
+
+<h3 id="任务三查询指定时间版本的数据">任务三：查询指定时间版本的数据</h3>
+
+<p>以csv文件保存的数据是一个不可分割的整体，没有办法单独为一行数据建立多个时间版本。最好的做法是在不同时间备份多个csv文件，通过<code class="language-plaintext highlighter-rouge">mc ls</code> 命令查看数据保存时间。并从中筛选需要的时间段。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mc <span class="nb">cp</span> &lt;table-path&gt; &lt;table-path&gt;-&lt;data&gt; <span class="c">#备份数据</span>
+mc sql <span class="nt">--recursive</span> <span class="nt">--query</span> <span class="s2">"&lt;sql&gt;"</span> &lt;table-path&gt;-&lt;data&gt;
+</code></pre></div></div>
+
+<h3 id="任务四利用elisp函数封装创建表">任务四：利用elisp函数封装创建表</h3>
+
+<p>函数：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">defun</span> <span class="nv">as-table-be-create-in</span> <span class="p">(</span><span class="nv">table-name</span> <span class="nv">attributes</span> <span class="nv">db-path</span><span class="p">)</span>
+	<span class="s">"Create the table in Minio"</span>
+	<span class="p">(</span><span class="nv">shell-command</span> <span class="p">(</span><span class="nb">format</span> <span class="s">"echo \"%s\" &gt; %s.csv 
+							 mc put %s.csv %s
+							 rm %s.csv"</span> 
+					<span class="nv">attributes</span> <span class="nv">table-name</span> <span class="nv">table-name</span> <span class="nv">db-path</span> <span class="nv">table-name</span><span class="p">)))</span>
+</code></pre></div></div>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">defun</span> <span class="nv">as-s3o-be-list</span> <span class="p">(</span><span class="nv">s3o-path</span><span class="p">)</span>
+	<span class="s">"ls the s3o in minio"</span>
+	<span class="p">(</span><span class="nv">shell-command-to-string</span> <span class="p">(</span><span class="nb">format</span> <span class="s">"mc ls %s"</span> <span class="nv">s3o-path</span><span class="p">)))</span>
+</code></pre></div></div>
+
+<p>测试：</p>
+
+<p><img src="/assets/post_images/image-20240427203158705.png" alt="" /></p>
+
+<h3 id="任务五通过elisp插入数据到表并查询">任务五：通过elisp插入数据到表并查询</h3>
+
+<p>函数：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="p">(</span><span class="nb">defun</span> <span class="nv">as-data-be-insert</span> <span class="p">(</span><span class="nv">data</span> <span class="nv">table-path</span><span class="p">)</span>
+    <span class="s">"insert data to minio table"</span>
+    <span class="p">(</span><span class="nv">shell-command</span> <span class="p">(</span><span class="nb">format</span>
+		    <span class="s">"mc get %s ./tmp.csv
+                     mc rm %s
+		     echo \"%s\" &gt;&gt; ./tmp.csv
+		     mc put ./tmp.csv %s
+		     rm ./tmp.csv"</span>
+		    <span class="nv">table-path</span> <span class="nv">table-path</span> <span class="nv">data</span> <span class="nv">table-path</span>
+		    <span class="p">)))</span>
+</code></pre></div></div>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="p">(</span><span class="nb">defun</span> <span class="nv">as-s3o-be-get-heads</span> <span class="p">(</span><span class="nv">s3o-path</span> <span class="nv">num</span><span class="p">)</span>
+      <span class="s">"get the head lines of s3o"</span>
+      <span class="p">(</span><span class="nv">shell-command-to-string</span> <span class="p">(</span><span class="nb">format</span> <span class="s">"mc head -n %d %s"</span> <span class="nv">num</span> <span class="nv">s3o-path</span><span class="p">)))</span>
+</code></pre></div></div>
+
+<p>测试：</p>
+
+<p><img src="/assets/post_images/image-20240427205605541.png" alt="" /></p>
+
+<h3 id="任务六利用elisp合并数据">任务六：利用elisp合并数据</h3>
+
+<p>按照原本的实训要求，此处应该为导入数据。但是考虑到minio中并不需要转换数据格式，所以与其刻意把数据导入elisp中，不如考虑如何合并两个表。假设表A和表B具有相同的结构，现在用elisp把它们合并到一起。</p>
+
+<p>函数：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="p">(</span><span class="nb">defun</span> <span class="nv">as-file-be-read</span> <span class="p">(</span><span class="nv">file</span><span class="p">)</span>
+    <span class="s">"fill be read to string"</span>
+    <span class="p">(</span><span class="nv">with-temp-buffer</span>
+      <span class="p">(</span><span class="nv">insert-file-contents</span> <span class="nv">file</span><span class="p">)</span>
+      <span class="p">(</span><span class="nv">buffer-string</span><span class="p">)))</span>
+  <span class="p">(</span><span class="nb">defun</span> <span class="nv">as-str-be-append</span> <span class="p">(</span><span class="nv">str</span> <span class="nv">file</span><span class="p">)</span>
+    <span class="s">"str be append to file"</span>
+    <span class="p">(</span><span class="nv">with-temp-buffer</span>
+      <span class="p">(</span><span class="nv">insert</span> <span class="nv">str</span><span class="p">)</span>
+      <span class="p">(</span><span class="nv">append-to-file</span> <span class="p">(</span><span class="nv">point-min</span><span class="p">)</span> <span class="p">(</span><span class="nv">point-max</span><span class="p">)</span> <span class="nv">file</span><span class="p">)))</span>
+  <span class="p">(</span><span class="nb">defun</span> <span class="nv">as-file-be-append</span> <span class="p">(</span><span class="nv">file-a</span> <span class="nv">file-b</span><span class="p">)</span>
+    <span class="s">"merge two files"</span>
+    <span class="p">(</span><span class="nv">as-str-be-append</span> <span class="p">(</span><span class="nv">as-file-be-read</span> <span class="nv">file-a</span><span class="p">)</span> <span class="nv">file-b</span><span class="p">))</span>
+  <span class="p">(</span><span class="nb">defun</span> <span class="nv">as-tables-be-merged</span> <span class="p">(</span><span class="nv">table-a</span> <span class="nv">table-b</span> <span class="nv">new-table</span><span class="p">)</span>
+    <span class="s">"Both table be merged into one."</span>
+    <span class="p">(</span><span class="nv">shell-command</span> <span class="p">(</span><span class="nv">concat</span>
+		    <span class="p">(</span><span class="nb">format</span> <span class="s">"mc get %s ./tba \n"</span> <span class="nv">table-a</span><span class="p">)</span>
+		    <span class="p">(</span><span class="nb">format</span> <span class="s">"mc get %s ./tbb \n"</span> <span class="nv">table-b</span><span class="p">)</span>
+		    <span class="p">(</span><span class="nb">format</span> <span class="s">"sed -i \"1d\" ./tba"</span><span class="p">)))</span>
+    <span class="p">(</span><span class="nv">as-file-be-append</span> <span class="s">"./tba"</span> <span class="s">"./tbb"</span><span class="p">)</span>
+    <span class="p">(</span><span class="nv">shell-command</span> <span class="p">(</span><span class="nb">format</span> <span class="s">"mc put ./tbb %s"</span> <span class="nv">new-table</span><span class="p">)</span>
+		   <span class="p">))</span>
+</code></pre></div></div>
+
+<p>测试：</p>
+
+<p><img src="/assets/post_images/image-20240427223026110.png" alt="" /></p>
+
+<h2 id="总结">总结</h2>
+
+<p>通过此次实验，丰富了elisp对bash和minio的接口、熟悉了分布式环境minio的配置过程。不过第二次部署多节点minio失败略感遗憾。</p>
+
+<h2 id="参考">参考</h2>
+
+<ul>
+  <li><a href="https://min.io/docs/minio/linux/operations/install-deploy-manage/deploy-minio-single-node-single-drive.html">Deploy MinIO: Single-Node Single-Drive</a></li>
+  <li>https://www.youtube.com/watch?v=zSKhvmWIO2k</li>
+  <li>https://min.io/docs/minio/linux/operations/install-deploy-manage/deploy-minio-multi-node-multi-drive.html</li>
+  <li>https://min.io/docs/minio/linux/operations/install-deploy-manage/deploy-minio-single-node-single-drive.html</li>
+  <li>https://min.io/docs/minio/linux/index.html#procedure</li>
+  <li>https://www.youtube.com/watch?v=fwoLEWYK-PE</li>
+</ul>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+
+
+        
+
+  <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> 更新时间:</strong> <time class="dt-published" datetime="2024-04-27T00:00:00+08:00">April 27, 2024</time></p>
+
+      </footer>
+
+      
+
+      
+  <nav class="pagination">
+    
+      <a href="/%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8-minio-%E8%BF%9B%E8%A1%8C%E6%95%B0%E6%8D%AE%E5%BA%93%E6%9F%A5%E8%AF%A2/" class="pagination--pager" title="如何使用 minio 进行数据库查询
+">上一页</a>
+    
+    
+      <a href="#" class="pagination--pager disabled">下一页</a>
+    
+  </nav>
+
+    </div>
+
+    
+  </article>
+
+  
+  
+    <div class="page__related">
+      <h2 class="page__related-title">猜您还喜欢</h2>
+      <div class="grid__wrapper">
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8-minio-%E8%BF%9B%E8%A1%8C%E6%95%B0%E6%8D%AE%E5%BA%93%E6%9F%A5%E8%AF%A2/" rel="permalink">如何使用 minio 进行数据库查询
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2024-04-20T00:00:00+08:00">April 20, 2024</time>
+      </span>
+    
+
+    
+
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">minio 提供了对s3存储对象的sql操作。一方面为了处理实验报告，另一方面也是为了增加可以使用的工具数量，所以需要增进对于mc sql的理解。
+</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/%E5%85%B3%E4%BA%8E%E6%88%91%E5%9C%A8%E9%85%8D%E7%BD%AEhbase%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98/" rel="permalink">关于我在配置hbase中的一些问题
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2024-04-20T00:00:00+08:00">April 20, 2024</time>
+      </span>
+    
+
+    
+
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">现在系统已经重装，所以再去探究错误的原因和处理方案已经意义不大。现在把当时的日志整理以下，用以备忘。
+</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/segfault%E7%AE%80%E4%BB%8B/" rel="permalink">Segfault简介
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2024-04-19T00:00:00+08:00">April 19, 2024</time>
+      </span>
+    
+
+    
+
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">记录一个可以免费使用vps的网站，segfault。
+</p>
+  </article>
+</div>
+
+        
+          
+
+
+
+<div class="grid__item">
+  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
+    
+    <h2 class="archive__item-title no_toc" itemprop="headline">
+      
+        <a href="/minio-%E7%9A%84%E9%85%8D%E7%BD%AE%E8%BF%87%E7%A8%8B/" rel="permalink">Minio 的配置过程
+</a>
+      
+    </h2>
+    
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2024-04-19T00:00:00+08:00">April 19, 2024</time>
+      </span>
+    
+
+    
+
+    
+  </p>
+
+
+    <p class="archive__item-excerpt" itemprop="description">如果只是想用分布式文件系统，其实hadoop也可以，但在配置hbase的过程中出现的节点丢失和高cpu占用率问题还是让我想尝试其它的分布式框架。这次记录minio的配置过程。
+</p>
+  </article>
+</div>
+
+        
+      </div>
+    </div>
+  
+  
+</div>
+
+    </div>
+
+    
+      <div class="search-content">
+        <div class="search-content__inner-wrap"><form class="search-content__form" onkeydown="return event.key != 'Enter';" role="search">
+    <label class="sr-only" for="search">
+      输入您要搜索的关键词...
+    </label>
+    <input type="search" id="search" class="search-input" tabindex="-1" placeholder="输入您要搜索的关键词..." />
+  </form>
+  <div id="results" class="results"></div></div>
+
+      </div>
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+ <script src="https://l2dwidget.js.org/lib/L2Dwidget.min.js"></script>
+ <script type="text/javascript">
+
+   function getRandomStringFromSet(stringSet) {
+       const randomIndex = Math.floor(Math.random() * stringSet.length);
+       return stringSet[randomIndex];
+   }
+   
+   // 指定字符串集合
+   const myStringSet = [
+
+
+       "常识只有一个问题——就是它不常见。\n– Milt Bryce，系统方法论之父", 
+       "想象力比知识重要。\n -爱因斯坦",
+       "问题是愿景和现实之间的差别。\n- 温伯格"
+       
+
+
+   ];
+
+   // 调用函数从指定字符串集合中随机返回一个字符串
+   const randomString = getRandomStringFromSet(myStringSet);
+   
+   L2Dwidget
+    .on('*', (name) => {
+        console.log('%c EVENT ' + '%c -> ' + name, 'background: #222; color: yellow', 'background: #fff; color: #000')
+    })
+    .init({
+	"model": {
+            "jsonPath": "https://unpkg.com/live2d-widget-model-hijiki@1.0.5/assets/hijiki.model.json",
+	    　　        "scale": 1
+        },
+        "display": {
+            "position": "right",
+            "width": 200,
+            "height": 300,
+　　        "hOffset": 0,
+            "vOffset": -20
+        },
+        "mobile": {
+            "show": true,
+            "scale": 0.5
+        },
+        "react": {
+            "opacityDefault": 0.8,
+            "opacityOnHover": 1
+        },
+        dialog: {
+            // 开启对话框
+            enable: true,
+	    width: 300, // Set the width of the dialogue box to 300px
+	    height: 500, // Set the height of the dialogue box to 200px
+            script: {
+		// 每空闲 10 秒钟，显示一条一言
+		'every idle 1s': randomString,
+		// 当触摸到星星图案
+		'hover .star': '星星在天上而你在我心里 (*/ω＼*)',
+		// 当触摸到角色身体
+		'tap body': randomString,
+		// 当触摸到角色头部
+		'tap face': '人家已经不是小孩子了！'
+            }
+        }
+        });
+    </script>
+
+
+ <script>
+   !function () {
+    function n(n, e, t) {
+        return n.getAttribute(e) || t
+    }
+ 
+    function e(n) {
+        return document.getElementsByTagName(n)
+    }
+ 
+    function t() {
+        var t = e("script"), o = t.length, i = t[o - 1];
+        return {l: o, z: n(i, "zIndex", -1), o: n(i, "opacity", .5), c: n(i, "color", "0, 191, 255"), n: n(i, "count", 99)}
+    }
+ 
+    function o() {
+        a = m.width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth, c = m.height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight
+    }
+ 
+    function i() {
+        r.clearRect(0, 0, a, c);
+        var n, e, t, o, m, l;
+        s.forEach(function (i, x) {
+            for (i.x += i.xa, i.y += i.ya, i.xa *= i.x > a || i.x < 0 ? -1 : 1, i.ya *= i.y > c || i.y < 0 ? -1 : 1, r.fillRect(i.x - .5, i.y - .5, 1, 1), e = x + 1; e < u.length; e++) n = u[e], null !== n.x && null !== n.y && (o = i.x - n.x, m = i.y - n.y, l = o * o + m * m, l < n.max && (n === y && l >= n.max / 2 && (i.x -= .03 * o, i.y -= .03 * m), t = (n.max - l) / n.max, r.beginPath(), r.lineWidth = t / 2, r.strokeStyle = "rgba(" + d.c + "," + (t + .2) + ")", r.moveTo(i.x, i.y), r.lineTo(n.x, n.y), r.stroke()))
+        }), x(i)
+    }
+ 
+    var a, c, u, m = document.createElement("canvas"), d = t(), l = "c_n" + d.l, r = m.getContext("2d"),
+        x = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || function (n) {
+            window.setTimeout(n, 1e3 / 45)
+        }, w = Math.random, y = {x: null, y: null, max: 2e4};
+    m.id = l, m.style.cssText = "position:fixed;top:0;left:0;z-index:" + d.z + ";opacity:" + d.o, e("body")[0].appendChild(m), o(), window.onresize = o, window.onmousemove = function (n) {
+        n = n || window.event, y.x = n.clientX, y.y = n.clientY
+    }, window.onmouseout = function () {
+        y.x = null, y.y = null
+    };
+    for (var s = [], f = 0; d.n > f; f++) {
+        var h = w() * a, g = w() * c, v = 2 * w() - 1, p = 2 * w() - 1;
+        s.push({x: h, y: g, xa: v, ya: p, max: 6e3})
+    }
+    u = s.concat([y]), setTimeout(function () {
+        i()
+    }, 100)
+}();
+ </script>
+
+ <script>
+function clickEffect() {
+  let balls = [];
+  let longPressed = false;
+  let longPress;
+  let multiplier = 0;
+  let width, height;
+  let origin;
+  let normal;
+  let ctx;
+  const colours = ["#F73859", "#14FFEC", "#00E0FF", "#FF99FE", "#FAF15D"];
+  const canvas = document.createElement("canvas");
+  document.body.appendChild(canvas);
+  canvas.setAttribute("style", "width: 100%; height: 100%; top: 0; left: 0; z-index: 99999; position: fixed; pointer-events: none;");
+  const pointer = document.createElement("span");
+  pointer.classList.add("pointer");
+  document.body.appendChild(pointer);
+ 
+  if (canvas.getContext && window.addEventListener) {
+    ctx = canvas.getContext("2d");
+    updateSize();
+    window.addEventListener('resize', updateSize, false);
+    loop();
+    window.addEventListener("mousedown", function(e) {
+      pushBalls(randBetween(10, 20), e.clientX, e.clientY);
+      document.body.classList.add("is-pressed");
+      longPress = setTimeout(function(){
+        document.body.classList.add("is-longpress");
+        longPressed = true;
+      }, 500);
+    }, false);
+    window.addEventListener("mouseup", function(e) {
+      clearInterval(longPress);
+      if (longPressed == true) {
+        document.body.classList.remove("is-longpress");
+        pushBalls(randBetween(50 + Math.ceil(multiplier), 100 + Math.ceil(multiplier)), e.clientX, e.clientY);
+        longPressed = false;
+      }
+      document.body.classList.remove("is-pressed");
+    }, false);
+    window.addEventListener("mousemove", function(e) {
+      let x = e.clientX;
+      let y = e.clientY;
+      pointer.style.top = y + "px";
+      pointer.style.left = x + "px";
+    }, false);
+  } else {
+    console.log("canvas or addEventListener is unsupported!");
+  }
+ 
+ 
+  function updateSize() {
+    canvas.width = window.innerWidth * 2;
+    canvas.height = window.innerHeight * 2;
+    canvas.style.width = window.innerWidth + 'px';
+    canvas.style.height = window.innerHeight + 'px';
+    ctx.scale(2, 2);
+    width = (canvas.width = window.innerWidth);
+    height = (canvas.height = window.innerHeight);
+    origin = {
+      x: width / 2,
+      y: height / 2
+    };
+    normal = {
+      x: width / 2,
+      y: height / 2
+    };
+  }
+  class Ball {
+    constructor(x = origin.x, y = origin.y) {
+      this.x = x;
+      this.y = y;
+      this.angle = Math.PI * 2 * Math.random();
+      if (longPressed == true) {
+        this.multiplier = randBetween(14 + multiplier, 15 + multiplier);
+      } else {
+        this.multiplier = randBetween(6, 12);
+      }
+      this.vx = (this.multiplier + Math.random() * 0.5) * Math.cos(this.angle);
+      this.vy = (this.multiplier + Math.random() * 0.5) * Math.sin(this.angle);
+      this.r = randBetween(8, 12) + 3 * Math.random();
+      this.color = colours[Math.floor(Math.random() * colours.length)];
+    }
+    update() {
+      this.x += this.vx - normal.x;
+      this.y += this.vy - normal.y;
+      normal.x = -2 / window.innerWidth * Math.sin(this.angle);
+      normal.y = -2 / window.innerHeight * Math.cos(this.angle);
+      this.r -= 0.3;
+      this.vx *= 0.9;
+      this.vy *= 0.9;
+    }
+  }
+ 
+  function pushBalls(count = 1, x = origin.x, y = origin.y) {
+    for (let i = 0; i < count; i++) {
+      balls.push(new Ball(x, y));
+    }
+  }
+ 
+  function randBetween(min, max) {
+    return Math.floor(Math.random() * max) + min;
+  }
+ 
+  function loop() {
+    ctx.fillStyle = "rgba(255, 255, 255, 0)";
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (let i = 0; i < balls.length; i++) {
+      let b = balls[i];
+      if (b.r < 0) continue;
+      ctx.fillStyle = b.color;
+      ctx.beginPath();
+      ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2, false);
+      ctx.fill();
+      b.update();
+    }
+    if (longPressed == true) {
+      multiplier += 0.2;
+    } else if (!longPressed && multiplier >= 0) {
+      multiplier -= 0.4;
+    }
+    removeBall();
+    requestAnimationFrame(loop);
+  }
+ 
+  function removeBall() {
+    for (let i = 0; i < balls.length; i++) {
+      let b = balls[i];
+      if (b.x + b.r < 0 || b.x - b.r > width || b.y + b.r < 0 || b.y - b.r > height || b.r < 0) {
+        balls.splice(i, 1);
+      }
+    }
+  }
+}
+clickEffect();//调用特效函数
+</script>
+<!-- end custom footer snippets -->
+
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+      <li><strong>关注:</strong></li>
+    
+
+    
+
+    
+      <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+    
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2024 甲与</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+
+
+
+
+<script src="/assets/js/lunr/lunr.min.js"></script>
+<script src="/assets/js/lunr/lunr-store.js"></script>
+<script src="/assets/js/lunr/lunr-en.js"></script>
+
+
+
+
+
+
+
+  </body>
+</html>

@@ -1,4 +1,603 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.3">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2024-04-20T18:05:32+08:00</updated><id>/feed.xml</id><title type="html">甲与</title><author><name>甲与</name></author><entry><title type="html">关于我在配置hbase中的一些问题</title><link href="/%E5%85%B3%E4%BA%8E%E6%88%91%E5%9C%A8%E9%85%8D%E7%BD%AEhbase%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98/" rel="alternate" type="text/html" title="关于我在配置hbase中的一些问题" /><published>2024-04-20T00:00:00+08:00</published><updated>2024-04-20T00:00:00+08:00</updated><id>/%E5%85%B3%E4%BA%8E%E6%88%91%E5%9C%A8%E9%85%8D%E7%BD%AEhbase%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98</id><content type="html" xml:base="/%E5%85%B3%E4%BA%8E%E6%88%91%E5%9C%A8%E9%85%8D%E7%BD%AEhbase%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98/"><![CDATA[<p>现在系统已经重装，所以再去探究错误的原因和处理方案已经意义不大。现在把当时的日志整理以下，用以备忘。</p>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.3">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2024-04-28T08:41:23+08:00</updated><id>/feed.xml</id><title type="html">甲与</title><author><name>甲与</name></author><entry><title type="html">Minio实训</title><link href="/minio%E5%AE%9E%E8%AE%AD/" rel="alternate" type="text/html" title="Minio实训" /><published>2024-04-27T00:00:00+08:00</published><updated>2024-04-27T00:00:00+08:00</updated><id>/minio%E5%AE%9E%E8%AE%AD</id><content type="html" xml:base="/minio%E5%AE%9E%E8%AE%AD/"><![CDATA[<h2 id="目标">目标</h2>
+
+<ul>
+  <li>熟悉minio的配置过程和客户端操作</li>
+  <li>通过面向elisp的命令封装来模拟hbase以实现实训要求。</li>
+</ul>
+
+<h2 id="环境简介">环境简介</h2>
+
+<p>由于之前配置hbase集群中，集群在sshd命令上消耗流量过高，vps流量超额欠费。现使用部署成本更加低廉的minio完成分布式实训任务。</p>
+
+<p><img src="/assets/post_images/image-20240420095141618.png" alt="" />
+<img src="/assets/post_images/image-20240420095613423.png" alt="" /></p>
+
+<p>MinIO 是一种高性能，兼容S3对象存储。特别是它的客户端mc内置了sql查询操作，使得可以直接在csv文件中进行查询。</p>
+
+<p>环境：centos7。</p>
+
+<h2 id="服务器配置过程">服务器配置过程</h2>
+
+<h3 id="单节点单磁盘">单节点单磁盘</h3>
+
+<ul>
+  <li>下载并安装minio</li>
+</ul>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>wget https://dl.min.io/server/minio/release/linux-amd64/archive/minio-20240418190919.0.0-1.x86_64.rpm <span class="nt">-O</span> minio.rpm
+<span class="nb">sudo </span>yum <span class="nb">install </span>minio.rpm
+</code></pre></div></div>
+
+<ul>
+  <li>创建数据文件夹</li>
+</ul>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">mkdir</span> ~/minio
+</code></pre></div></div>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>minio server ~/minio <span class="nt">--console-address</span> :9001
+</code></pre></div></div>
+
+<p>一些常用的参数：</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">--address &lt;address:port&gt;/&lt;:port&gt;</code> 指定api端口</li>
+  <li><code class="language-plaintext highlighter-rouge">--console-address &lt;address:port&gt;/&lt;:port&gt;</code> 指定webUI端口</li>
+</ul>
+
+<p>访问 <code class="language-plaintext highlighter-rouge">&lt;server-ip:9001&gt;</code> ，查看<code class="language-plaintext highlighter-rouge">minio</code>登录页面。
+<img src="/assets/post_images/image-20240427144736126.png" alt="" /></p>
+
+<p>输入账号密码，默认：<code class="language-plaintext highlighter-rouge">minioadmin</code>。</p>
+
+<p>在 <code class="language-plaintext highlighter-rouge">Administrator-Monitoring-Metrics</code> 目录下可以看到当前各节点的工作状态。</p>
+
+<p><img src="/assets/post_images/image-20240427144850027.png" alt="" /></p>
+
+<h3 id="单节点多磁盘">单节点多磁盘</h3>
+
+<p>安装过程同上，但是启动不同。在linux中一般通过<code class="language-plaintext highlighter-rouge">mount</code>命令将磁盘挂载到某目录下。现在新建四个文件夹来代表不同节点。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">mkdir</span> ~/minios
+<span class="nb">mkdir</span> ~/minios/m1
+<span class="nb">mkdir</span> ~/minios/m2
+<span class="nb">mkdir</span> ~/minios/m3
+<span class="nb">mkdir</span> ~/minios/m4
+</code></pre></div></div>
+
+<p>启动时，只需要将多个节点的序号放在大括号中即可。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>minio server ~/minios/m<span class="o">{</span>1...4<span class="o">}</span> <span class="nt">--console-address</span> :9001
+</code></pre></div></div>
+
+<p>访问服务器 <code class="language-plaintext highlighter-rouge">9001</code> 端口，可以看到，磁盘数从一增长为4：</p>
+
+<p><img src="/assets/post_images/image-20240427145838228.png" alt="" /></p>
+
+<h2 id="多节点多磁盘失败">多节点多磁盘（失败）</h2>
+
+<p><code class="language-plaintext highlighter-rouge">minio</code> 安装同上。</p>
+
+<p>在各个节点增加新的 <code class="language-plaintext highlighter-rouge">hosts</code> 映射到 <code class="language-plaintext highlighter-rouge">/etc/hosts</code> 文件中：</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ip1 n1
+ip2 n2
+</code></pre></div></div>
+
+<p>创建文件夹代表不同磁盘：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mkdir /data
+mkdir /data/data1
+mkdir /data/data2
+mkdir /data/data3
+mkdir /data/data4
+</code></pre></div></div>
+
+<p>设置环境变量：</p>
+
+<ul>
+  <li>在<code class="language-plaintext highlighter-rouge">~/.bashrc</code>中</li>
+</ul>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">export </span><span class="nv">MINIO_ACCESS_KEY</span><span class="o">=</span>minioadmin <span class="c"># 设置用户名</span>
+<span class="nb">export </span><span class="nv">MINIO_SECRET_KEY</span><span class="o">=</span>minioadmin <span class="c">#设置密码</span>
+<span class="nb">export </span><span class="nv">CI</span><span class="o">=</span><span class="nb">true</span> <span class="c"># 允许访问root磁盘</span>
+<span class="nb">export </span><span class="nv">MINIO_CI_CD</span><span class="o">=</span><span class="nb">true</span> <span class="c"># 允许访问root磁盘</span>
+</code></pre></div></div>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">source</span> ~/.bashrc
+</code></pre></div></div>
+
+<p>在各个服务器的命令行中启动 <code class="language-plaintext highlighter-rouge">minio</code>：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>minio server http://n<span class="o">{</span>1...2<span class="o">}</span>:9000/data/data<span class="o">{</span>1...4<span class="o">}</span> 
+</code></pre></div></div>
+
+<p>两次配置结果，第一次成功访问。后服务器过期，更换现vps厂商执行同样的命令出现错误：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>WARNING: MINIO_ACCESS_KEY and MINIO_SECRET_KEY are deprecated.
+         Please use MINIO_ROOT_USER and MINIO_ROOT_PASSWORD
+
+API: SYSTEM.peers
+Time: 07:08:56 UTC 04/27/2024
+Error: Expected number of all hosts <span class="o">(</span>2<span class="o">)</span> to be remote +1 <span class="o">(</span>2<span class="o">)</span> <span class="o">(</span><span class="k">*</span>errors.errorString<span class="o">)</span>
+       8: internal/logger/logger.go:259:logger.LogIf<span class="o">()</span>
+       7: cmd/logging.go:42:cmd.peersLogIf<span class="o">()</span>
+       6: cmd/peer-rest-client.go:631:cmd.newPeerRestClients<span class="o">()</span>
+       5: cmd/notification.go:1152:cmd.NewNotificationSys<span class="o">()</span>
+       4: cmd/server-main.go:400:cmd.initAllSubsystems<span class="o">()</span>
+       3: cmd/server-main.go:715:cmd.serverMain.func4<span class="o">()</span>
+       2: cmd/server-main.go:512:cmd.bootstrapTrace<span class="o">()</span>
+       1: cmd/server-main.go:714:cmd.serverMain<span class="o">()</span>
+ERROR Unable to configure server grid RPC services: grid: <span class="nb">local </span>host not found
+</code></pre></div></div>
+
+<p>解释：</p>
+
+<p>错误直接原因，无法配置服务网格的远程过程调用（RPC）服务，无法找到本地主机。</p>
+
+<p>很多VPS厂商会限制节点在内网中的通信，特别是这种廉价服务器，甚至没有独立的公网ip，只有五个端口到内网的映射。</p>
+
+<p><img src="/assets/post_images/image-20240427151348771.png" alt="" /></p>
+
+<p>端口映射的概念如下图所示：</p>
+
+<p><img src="/assets/post_images/image-20240427151517425.png" alt="" /></p>
+
+<p>这是新vps电商和旧vps电商在端口上的最大不同。但是在单个节点通过 <code class="language-plaintext highlighter-rouge">ssh</code> 和公网ip可以访问本节点或另一节点，均无问题。那么，如果<strong>更换为内网ip</strong>进行访问如何呢？</p>
+
+<p><img src="/assets/post_images/image-20240427152533333.png" alt="" /></p>
+
+<p><img src="/assets/post_images/image-20240427152630076.png" alt="" /></p>
+
+<p>更新两个节点中 <code class="language-plaintext highlighter-rouge">host</code> 文件中的映射关系。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>10.41.14.22 N1
+10.47.14.21 N2
+</code></pre></div></div>
+
+<p>但是重新启动依然出现错误：</p>
+
+<p><img src="/assets/post_images/image-20240427152845650.png" alt="" /></p>
+
+<p>至此，由于单节点多磁盘和单节点单磁盘的差别不大，此后由单节点多磁盘环境继续进行实验。</p>
+
+<p>不过要主要把进程挂载到后台。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">nohup </span>minio server ~/minios/m<span class="o">{</span>1...4<span class="o">}</span> <span class="nt">--console-address</span> :14216 <span class="nt">--address</span> :14215 &amp;
+</code></pre></div></div>
+
+<h2 id="客户端配置过程">客户端配置过程</h2>
+
+<h3 id="命令行端-mc">命令行端 MC</h3>
+
+<p>安装</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>wget https://dl.min.io/client/mc/release/linux-amd64/mc
+<span class="nb">chmod</span> +x mc
+<span class="nb">sudo mv </span>mc /usr/local/bin/mc
+</code></pre></div></div>
+
+<p>设置用户</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mc <span class="nb">alias set </span>m1 http://ip:9000 minioadmin minioadmin
+</code></pre></div></div>
+
+<p>操作：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mc <span class="nt">--help</span> 查看命令帮助
+</code></pre></div></div>
+
+<p>基本的路径格式是 <code class="language-plaintext highlighter-rouge">alias 设置的登录名+桶名+对象路径</code> 。</p>
+
+<p>创建桶</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mc mb m1/&lt;bucket-name&gt;
+</code></pre></div></div>
+
+<p><img src="/assets/post_images/image-20240427153758844.png" alt="" /></p>
+
+<p>上传文件</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">echo</span> <span class="s2">"I am a good student."</span> <span class="o">&gt;</span> test.txt
+mc put test.txt m1/stu
+</code></pre></div></div>
+
+<p>查看<code class="language-plaintext highlighter-rouge">stu</code> 目录下的文件：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mc <span class="nb">ls </span>m1/stu
+</code></pre></div></div>
+
+<p><img src="/assets/post_images/image-20240427153959611.png" alt="" /></p>
+
+<p>下载文件</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mc get m1/stu ./
+</code></pre></div></div>
+
+<p>其它</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>命令</th>
+      <th>描述</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">alias</code></td>
+      <td>在配置文件中管理服务器凭据</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">admin</code></td>
+      <td>管理MinIO服务器</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">anonymous</code></td>
+      <td>管理对存储桶和对象的匿名访问</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">batch</code></td>
+      <td>管理批处理作业</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">cp</code></td>
+      <td>复制对象</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">cat</code></td>
+      <td>显示对象内容</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">diff</code></td>
+      <td>列出两个存储桶之间对象名称、大小和日期的差异</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">du</code></td>
+      <td>递归总结磁盘使用情况</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">encrypt</code></td>
+      <td>管理存储桶加密配置</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">event</code></td>
+      <td>管理对象通知</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">find</code></td>
+      <td>搜索对象</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">get</code></td>
+      <td>将S3对象获取到本地</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">head</code></td>
+      <td>显示对象的前n行</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">ilm</code></td>
+      <td>管理存储桶生命周期</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">idp</code></td>
+      <td>管理MinIO身份提供者服务器配置</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">license</code></td>
+      <td>许可证相关命令</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">legalhold</code></td>
+      <td>管理对象的法律保留</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">ls</code></td>
+      <td>列出存储桶和对象</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">mb</code></td>
+      <td>创建一个存储桶</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">mv</code></td>
+      <td>移动对象</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">mirror</code></td>
+      <td>将对象同步到远程站点</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">od</code></td>
+      <td>测量单个流上传和下载</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">ping</code></td>
+      <td>执行存活性检查</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">pipe</code></td>
+      <td>将标准输入流传输到对象</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">put</code></td>
+      <td>将对象上传到存储桶</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">quota</code></td>
+      <td>管理存储桶配额</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">rm</code></td>
+      <td>删除对象</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">retention</code></td>
+      <td>为对象设置保留期</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">rb</code></td>
+      <td>删除一个存储桶</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">replicate</code></td>
+      <td>配置服务器端存储桶复制</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">ready</code></td>
+      <td>检查集群是否就绪</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">sql</code></td>
+      <td>在对象上运行SQL查询</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">stat</code></td>
+      <td>显示对象元数据</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">support</code></td>
+      <td>支持相关命令</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">share</code></td>
+      <td>生成临时访问对象的URL</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">tree</code></td>
+      <td>以树状格式列出存储桶和对象</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">tag</code></td>
+      <td>管理存储桶和对象的标签</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">undo</code></td>
+      <td>撤销PUT/DELETE操作</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">update</code></td>
+      <td>将mc更新到最新版本</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">version</code></td>
+      <td>管理存储桶版本控制</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">watch</code></td>
+      <td>监听对象通知事件</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="执行sql查询">执行sql查询</h3>
+
+<p>在 <code class="language-plaintext highlighter-rouge">Libre Office</code> 中创建表格，保存为 <code class="language-plaintext highlighter-rouge">.csv</code> 文件，上传到 ` minio-server` 中</p>
+
+<p><img src="/assets/post_images/image-20240427154434731.png" alt="" /></p>
+
+<p><img src="/assets/post_images/image-20240427154557914.png" alt="" /></p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mc put s1.csv m1/stu
+</code></pre></div></div>
+
+<p>查询文件</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mc sql <span class="nt">--recursive</span> <span class="nt">--query</span> <span class="s2">"select * from S3Object"</span> m1/stu/s1.csv
+</code></pre></div></div>
+
+<p><img src="/assets/post_images/image-20240427155030473.png" alt="" /></p>
+
+<p>增加查询条件：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mc sql <span class="nt">--recursive</span> <span class="nt">--query</span> <span class="s2">"select * from S3Object where </span><span class="se">\"</span><span class="s2">成绩</span><span class="se">\"</span><span class="s2"> &gt; 7"</span> m1/stu/s1.csv
+</code></pre></div></div>
+
+<p><img src="/assets/post_images/image-20240427155132623.png" alt="" /></p>
+
+<h2 id="在elisp中进行封装">在elisp中进行封装</h2>
+
+<p>函数：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="p">(</span><span class="nb">defun</span> <span class="nv">as-s3o-be-sq</span> <span class="p">(</span><span class="nv">s3o</span> <span class="nv">sq</span><span class="p">)</span>
+    <span class="s">"make a sq query to s3o on minio server.
+    The input of s3o should be a string path to s3o, and sq
+    should be a string of sql. This function will return query result as string"</span>
+    <span class="p">(</span><span class="nv">shell-command-to-string</span> <span class="p">(</span><span class="nb">format</span> <span class="s">"mc sql --recursive --query \"%s\" %s"</span> <span class="nv">sq</span> <span class="nv">s3o</span><span class="p">)))</span>
+</code></pre></div></div>
+
+<p>测试：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nv">as-s3o-be-sq</span> <span class="s">"m1/stu/s1.csv"</span> <span class="s">"select * from S3Object"</span><span class="p">)</span>
+<span class="c1">;=&gt;</span>
+<span class="c1">;张三,10</span>
+<span class="c1">;李四,8.9</span>
+<span class="c1">;王五,6.7</span>
+</code></pre></div></div>
+
+<p>至此，完成实训所需的基本构件已经完成。</p>
+
+<h3 id="实训任务">实训任务</h3>
+
+<h3 id="任务一设计表">任务一，设计表</h3>
+
+<p>统计长度：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">wc</span> <span class="nt">-l</span> stumer_in_out_details.txt 
+<span class="c">#975541 stumer_in_out_details.txt</span>
+</code></pre></div></div>
+
+<p>可以看到，一共975541行数据。由于minio会自动执行文件的分割编码和存储过程，并且考虑到文件格式和<code class="language-plaintext highlighter-rouge">csv</code>文件格式一致，直接改名为<code class="language-plaintext highlighter-rouge">csv</code> 文件，在首部增加属性行上传文件即可。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sed -i "1i\钞票冠字号,时间,用户ID,存取钞票银行" stumer_in_out_details.txt
+</code></pre></div></div>
+
+<p>插入效果如下：</p>
+
+<p><img src="/assets/post_images/image-20240427165407255.png" alt="" /></p>
+
+<p>上传文件：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">mv </span>stumer_in_out_details.txt stumer_in_out_details.csv
+mc put ./stumer_in_out_details.csv m1/stu/
+mc <span class="nb">head</span> <span class="nt">-n</span> 3 m1/stu/stumer_in_out_details.csv
+</code></pre></div></div>
+
+<p>封装命令到elisp中。</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">defun</span> <span class="nv">as-o-be-put</span> <span class="p">(</span><span class="nv">file</span> <span class="nv">path</span><span class="p">)</span>
+	<span class="s">"The first file be put to the path of Minio."</span>
+	<span class="p">(</span><span class="nv">shell-command</span> <span class="p">(</span><span class="nb">format</span> <span class="s">"mc put %s %s"</span> <span class="nv">file</span> <span class="nv">path</span><span class="p">)))</span>
+</code></pre></div></div>
+
+<h3 id="任务二表格的创建和删除">任务二：表格的创建和删除</h3>
+
+<p>考虑到在 Minio中数据表可以直接以csv形式存储，但却没有提供数据修改功能。所以一切的增删改功能都需要下载文件到本地修改。并且可以把一个”bucket“视为一个数据库，一个”object“视为一个表。而本地修改部分可以依赖<code class="language-plaintext highlighter-rouge">linux</code> 三剑客之一<code class="language-plaintext highlighter-rouge">sed</code>命令。</p>
+
+<p>创建命令：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">echo</span> <span class="s2">"&lt;attribute-name-1&gt;,&lt;attribute-name-2&gt;,..."</span> <span class="o">&gt;</span> &lt;table-name&gt;.csv
+mc put &lt;table-name&gt;.csv m1/&lt;db-name&gt;
+<span class="nb">rm</span> &lt;table-name&gt;.csv
+</code></pre></div></div>
+
+<p>删除命令：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mc <span class="nb">rm</span> &lt;table-path&gt;
+mc rb &lt;db-path&gt;
+</code></pre></div></div>
+
+<p>修改命令：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mc get &lt;table-path&gt; &lt;local-path&gt;
+<span class="nb">echo</span> <span class="s2">"&lt;new-datas&gt;"</span> <span class="o">&gt;&gt;</span> &lt;local-path&gt;/&lt;table-path&gt; <span class="c">#增加行</span>
+<span class="nb">sed</span> <span class="nt">-i</span> <span class="s1">'/pattern/d'</span> &lt;local-path&gt;/&lt;table-name&gt; <span class="c">#按照模式删除行</span>
+mc put &lt;local-path&gt;/&lt;table-name&gt; &lt;table-path&gt;
+</code></pre></div></div>
+
+<h3 id="任务三查询指定时间版本的数据">任务三：查询指定时间版本的数据</h3>
+
+<p>以csv文件保存的数据是一个不可分割的整体，没有办法单独为一行数据建立多个时间版本。最好的做法是在不同时间备份多个csv文件，通过<code class="language-plaintext highlighter-rouge">mc ls</code> 命令查看数据保存时间。并从中筛选需要的时间段。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mc <span class="nb">cp</span> &lt;table-path&gt; &lt;table-path&gt;-&lt;data&gt; <span class="c">#备份数据</span>
+mc sql <span class="nt">--recursive</span> <span class="nt">--query</span> <span class="s2">"&lt;sql&gt;"</span> &lt;table-path&gt;-&lt;data&gt;
+</code></pre></div></div>
+
+<h3 id="任务四利用elisp函数封装创建表">任务四：利用elisp函数封装创建表</h3>
+
+<p>函数：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">defun</span> <span class="nv">as-table-be-create-in</span> <span class="p">(</span><span class="nv">table-name</span> <span class="nv">attributes</span> <span class="nv">db-path</span><span class="p">)</span>
+	<span class="s">"Create the table in Minio"</span>
+	<span class="p">(</span><span class="nv">shell-command</span> <span class="p">(</span><span class="nb">format</span> <span class="s">"echo \"%s\" &gt; %s.csv 
+							 mc put %s.csv %s
+							 rm %s.csv"</span> 
+					<span class="nv">attributes</span> <span class="nv">table-name</span> <span class="nv">table-name</span> <span class="nv">db-path</span> <span class="nv">table-name</span><span class="p">)))</span>
+</code></pre></div></div>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">defun</span> <span class="nv">as-s3o-be-list</span> <span class="p">(</span><span class="nv">s3o-path</span><span class="p">)</span>
+	<span class="s">"ls the s3o in minio"</span>
+	<span class="p">(</span><span class="nv">shell-command-to-string</span> <span class="p">(</span><span class="nb">format</span> <span class="s">"mc ls %s"</span> <span class="nv">s3o-path</span><span class="p">)))</span>
+</code></pre></div></div>
+
+<p>测试：</p>
+
+<p><img src="/assets/post_images/image-20240427203158705.png" alt="" /></p>
+
+<h3 id="任务五通过elisp插入数据到表并查询">任务五：通过elisp插入数据到表并查询</h3>
+
+<p>函数：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="p">(</span><span class="nb">defun</span> <span class="nv">as-data-be-insert</span> <span class="p">(</span><span class="nv">data</span> <span class="nv">table-path</span><span class="p">)</span>
+    <span class="s">"insert data to minio table"</span>
+    <span class="p">(</span><span class="nv">shell-command</span> <span class="p">(</span><span class="nb">format</span>
+		    <span class="s">"mc get %s ./tmp.csv
+                     mc rm %s
+		     echo \"%s\" &gt;&gt; ./tmp.csv
+		     mc put ./tmp.csv %s
+		     rm ./tmp.csv"</span>
+		    <span class="nv">table-path</span> <span class="nv">table-path</span> <span class="nv">data</span> <span class="nv">table-path</span>
+		    <span class="p">)))</span>
+</code></pre></div></div>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="p">(</span><span class="nb">defun</span> <span class="nv">as-s3o-be-get-heads</span> <span class="p">(</span><span class="nv">s3o-path</span> <span class="nv">num</span><span class="p">)</span>
+      <span class="s">"get the head lines of s3o"</span>
+      <span class="p">(</span><span class="nv">shell-command-to-string</span> <span class="p">(</span><span class="nb">format</span> <span class="s">"mc head -n %d %s"</span> <span class="nv">num</span> <span class="nv">s3o-path</span><span class="p">)))</span>
+</code></pre></div></div>
+
+<p>测试：</p>
+
+<p><img src="/assets/post_images/image-20240427205605541.png" alt="" /></p>
+
+<h3 id="任务六利用elisp合并数据">任务六：利用elisp合并数据</h3>
+
+<p>按照原本的实训要求，此处应该为导入数据。但是考虑到minio中并不需要转换数据格式，所以与其刻意把数据导入elisp中，不如考虑如何合并两个表。假设表A和表B具有相同的结构，现在用elisp把它们合并到一起。</p>
+
+<p>函数：</p>
+
+<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="p">(</span><span class="nb">defun</span> <span class="nv">as-file-be-read</span> <span class="p">(</span><span class="nv">file</span><span class="p">)</span>
+    <span class="s">"fill be read to string"</span>
+    <span class="p">(</span><span class="nv">with-temp-buffer</span>
+      <span class="p">(</span><span class="nv">insert-file-contents</span> <span class="nv">file</span><span class="p">)</span>
+      <span class="p">(</span><span class="nv">buffer-string</span><span class="p">)))</span>
+  <span class="p">(</span><span class="nb">defun</span> <span class="nv">as-str-be-append</span> <span class="p">(</span><span class="nv">str</span> <span class="nv">file</span><span class="p">)</span>
+    <span class="s">"str be append to file"</span>
+    <span class="p">(</span><span class="nv">with-temp-buffer</span>
+      <span class="p">(</span><span class="nv">insert</span> <span class="nv">str</span><span class="p">)</span>
+      <span class="p">(</span><span class="nv">append-to-file</span> <span class="p">(</span><span class="nv">point-min</span><span class="p">)</span> <span class="p">(</span><span class="nv">point-max</span><span class="p">)</span> <span class="nv">file</span><span class="p">)))</span>
+  <span class="p">(</span><span class="nb">defun</span> <span class="nv">as-file-be-append</span> <span class="p">(</span><span class="nv">file-a</span> <span class="nv">file-b</span><span class="p">)</span>
+    <span class="s">"merge two files"</span>
+    <span class="p">(</span><span class="nv">as-str-be-append</span> <span class="p">(</span><span class="nv">as-file-be-read</span> <span class="nv">file-a</span><span class="p">)</span> <span class="nv">file-b</span><span class="p">))</span>
+  <span class="p">(</span><span class="nb">defun</span> <span class="nv">as-tables-be-merged</span> <span class="p">(</span><span class="nv">table-a</span> <span class="nv">table-b</span> <span class="nv">new-table</span><span class="p">)</span>
+    <span class="s">"Both table be merged into one."</span>
+    <span class="p">(</span><span class="nv">shell-command</span> <span class="p">(</span><span class="nv">concat</span>
+		    <span class="p">(</span><span class="nb">format</span> <span class="s">"mc get %s ./tba \n"</span> <span class="nv">table-a</span><span class="p">)</span>
+		    <span class="p">(</span><span class="nb">format</span> <span class="s">"mc get %s ./tbb \n"</span> <span class="nv">table-b</span><span class="p">)</span>
+		    <span class="p">(</span><span class="nb">format</span> <span class="s">"sed -i \"1d\" ./tba"</span><span class="p">)))</span>
+    <span class="p">(</span><span class="nv">as-file-be-append</span> <span class="s">"./tba"</span> <span class="s">"./tbb"</span><span class="p">)</span>
+    <span class="p">(</span><span class="nv">shell-command</span> <span class="p">(</span><span class="nb">format</span> <span class="s">"mc put ./tbb %s"</span> <span class="nv">new-table</span><span class="p">)</span>
+		   <span class="p">))</span>
+</code></pre></div></div>
+
+<p>测试：</p>
+
+<p><img src="/assets/post_images/image-20240427223026110.png" alt="" /></p>
+
+<h2 id="总结">总结</h2>
+
+<p>通过此次实验，丰富了elisp对bash和minio的接口、熟悉了分布式环境minio的配置过程。不过第二次部署多节点minio失败略感遗憾。</p>
+
+<h2 id="参考">参考</h2>
+
+<ul>
+  <li><a href="https://min.io/docs/minio/linux/operations/install-deploy-manage/deploy-minio-single-node-single-drive.html">Deploy MinIO: Single-Node Single-Drive</a></li>
+  <li>https://www.youtube.com/watch?v=zSKhvmWIO2k</li>
+  <li>https://min.io/docs/minio/linux/operations/install-deploy-manage/deploy-minio-multi-node-multi-drive.html</li>
+  <li>https://min.io/docs/minio/linux/operations/install-deploy-manage/deploy-minio-single-node-single-drive.html</li>
+  <li>https://min.io/docs/minio/linux/index.html#procedure</li>
+  <li>https://www.youtube.com/watch?v=fwoLEWYK-PE</li>
+</ul>]]></content><author><name>甲与</name></author><summary type="html"><![CDATA[目标]]></summary></entry><entry><title type="html">关于我在配置hbase中的一些问题</title><link href="/%E5%85%B3%E4%BA%8E%E6%88%91%E5%9C%A8%E9%85%8D%E7%BD%AEhbase%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98/" rel="alternate" type="text/html" title="关于我在配置hbase中的一些问题" /><published>2024-04-20T00:00:00+08:00</published><updated>2024-04-20T00:00:00+08:00</updated><id>/%E5%85%B3%E4%BA%8E%E6%88%91%E5%9C%A8%E9%85%8D%E7%BD%AEhbase%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98</id><content type="html" xml:base="/%E5%85%B3%E4%BA%8E%E6%88%91%E5%9C%A8%E9%85%8D%E7%BD%AEhbase%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98/"><![CDATA[<p>现在系统已经重装，所以再去探究错误的原因和处理方案已经意义不大。现在把当时的日志整理以下，用以备忘。</p>
 
 <h3 id="问题一高cpu占用率">问题一：高CPU占用率</h3>
 
@@ -2434,149 +3033,4 @@ apt <span class="nb">install </span>certbot
 
 <p><a href="https://www.systutorials.com/docs/linux/man/8-a2ensite/">a2ensite (8) - Linux Manuals</a></p>
 
-<p><a href="https://github.com/certbot/certbot/issues/3854">github: “The requested apache plugin does not appear to be installed” on raspbian</a></p>]]></content><author><name>甲与</name></author><category term="配置" /><summary type="html"><![CDATA[calibre-server是一种非常便利的线上电子阅读服务。 之前的服务器到期了，现在重新配置了calibre-server，整理一下操作步骤。]]></summary></entry><entry><title type="html">Lisp基础语法：主语</title><link href="/lisp%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95-%E4%B8%BB%E8%AF%AD/" rel="alternate" type="text/html" title="Lisp基础语法：主语" /><published>2024-01-02T00:00:00+08:00</published><updated>2024-01-02T00:00:00+08:00</updated><id>/lisp%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95%EF%BC%9A%E4%B8%BB%E8%AF%AD</id><content type="html" xml:base="/lisp%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95-%E4%B8%BB%E8%AF%AD/"><![CDATA[<p>介绍一下lisp语言的主语。</p>
-
-<h2 id="前缀表达">前缀表达</h2>
-
-<p>前缀表达，又称波兰表示法（Polish notation），s表达式，操作符置于操作数前，例如：</p>
-
-\[\text{+ 2 17 = 19}\]
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">+</span> <span class="mi">2</span> <span class="mi">17</span><span class="p">)</span>
-<span class="c1">;;=&gt;19</span>
-</code></pre></div></div>
-
-<p>如果仅仅是数字或者逻辑运算转换了一种表达方式，也许继续使用前缀表达是更好的。
-但是如何在自然语言的角度去理解呢？
-一般的自然语言语句一般有以下三种形式：</p>
-
-<ol>
-  <li>主语－谓语－宾语</li>
-  <li>主语－谓语</li>
-  <li>谓语</li>
-</ol>
-
-<p>试想一个基本的对话场景：</p>
-
-<p>甲：吃饭了吗？
-乙：吃了。</p>
-
-<p>乙的话，说完整了，是：我吃过饭了。</p>
-
-<p>把谓词对应于function，主语和宾语对应于variable，而 <code class="language-plaintext highlighter-rouge">吃了</code> 作为接收我和饭的谓语，以lisp的前缀表达形式，可以表示为：</p>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="err">吃了</span> <span class="err">我</span> <span class="err">饭</span><span class="p">)</span>
-</code></pre></div></div>
-
-<p>或者</p>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="err">吃了</span> <span class="err">饭</span> <span class="err">我</span><span class="p">)</span>
-</code></pre></div></div>
-
-<p>问题在于，第几个参数成为主语。前缀表达 <code class="language-plaintext highlighter-rouge">+ 2 19</code> 是不必在意这个问题的。是 <code class="language-plaintext highlighter-rouge">2</code> 努力令自身补充了 <code class="language-plaintext highlighter-rouge">19</code> 这个数值，还是 <code class="language-plaintext highlighter-rouge">19</code> 稍稍增加了 <code class="language-plaintext highlighter-rouge">2</code> 这个数值，因为加法交换律的缘故，只要它们的结果都是 <code class="language-plaintext highlighter-rouge">19</code>，算术者便通通视为等价的。</p>
-
-<p>但是，<code class="language-plaintext highlighter-rouge">饭吃了我</code> 和 <code class="language-plaintext highlighter-rouge">我吃了饭</code> 对于准备吃饭的人来说，意义则尤为不同且重大。</p>
-
-<h2 id="人与数字">人与数字</h2>
-
-<p>那么，存在于在列表中的元素，究竟是真实的人，还是抽象的数字？</p>
-
-<p>对于是人的情况，比如甲把他所有的密码记在一张纸上，那么纸作为列表而单个密码作为元素：当甲访问网站x输入密码时，不是密码凭空地出现在了网站的输入栏，而是乙从他记录的密码中，选择了与网站x匹配的密码，输入到网站x的输入栏中。对于密码列表，是密码列表被选出了与网站x匹配的元素，对于网站，是网站被输入了与用户甲匹配的账户信息。</p>
-
-<p>而对于是数字的情况，会存在一个脱离了人的生命而存在的数字吗？ <code class="language-plaintext highlighter-rouge">13</code> 这个数字或许是普遍存在的，只要这世上有多于 <code class="language-plaintext highlighter-rouge">13</code> 个行星，多于 <code class="language-plaintext highlighter-rouge">13</code> 棵树木，似乎便可认为这世界包含了数字 <code class="language-plaintext highlighter-rouge">13</code> 。但是，存在于世界中的 <code class="language-plaintext highlighter-rouge">13</code> 和存在于我们头脑中的 <code class="language-plaintext highlighter-rouge">13</code> 会是同一种事物吗？有什么理由能够说明，当世界的 <code class="language-plaintext highlighter-rouge">13</code> 个行星遇到第 <code class="language-plaintext highlighter-rouge">14</code> 个行星时，便包含了 <code class="language-plaintext highlighter-rouge">14</code> ？如果这 <code class="language-plaintext highlighter-rouge">13</code> 个行星会因为遇到第 <code class="language-plaintext highlighter-rouge">14</code> 个行星而毁灭，只留下第 <code class="language-plaintext highlighter-rouge">14</code> 个行星，那么这个世界便是不包含 <code class="language-plaintext highlighter-rouge">14</code> 的，对它而言 $13+1=1$。而通常认为 $13+1=14$ 的我们如果既不是被毁灭的十三个行星，也不是被留下的一个行星，那么我们又有什么理由认为，我们对这个世界经历 $13+1=1$的过程是有意义的呢？我们有什么理由认为，我们存在于这个世界呢？</p>
-
-<p>至少对于数字的情况，我们可以理解到，人会因为参与各种事物的交互产生存在于世界的意义，而因为失去同各种事物的交互而失去存在于世界的意义。如果人具有存在于世界的意义，那么人至少要参与到同世界内的某种事物的交互中。</p>
-
-<p>因此，综合元素为人和数字两种情形而言，如果一个列表和别的什么列表发生了交互，从而使自身失去、得到元素或改变了已有的元素，该列表便在程序的世界中产生了意义——它可能影响到其它列表，或被其它列表所影响。并且，提到列表影响其它列表，和它被其它列表所影响，是不同的。</p>
-
-<p>对此，在lisp语言中，我想至少要能区分正在参与到程序中的列表，以及程序所包含的列表，而且以一种足够直观的形式加以表达。例如：</p>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="err">我</span> <span class="err">吃</span> <span class="err">饭</span><span class="p">)</span>
-</code></pre></div></div>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="err">饭</span> <span class="err">被吃</span> <span class="err">我</span><span class="p">)</span>
-</code></pre></div></div>
-
-<p>好像不太通顺，借助一下英文的表达：</p>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nv">Rice</span> <span class="nv">is-eaten-by</span> <span class="nv">me</span><span class="p">)</span>
-</code></pre></div></div>
-
-<p>完美。</p>
-
-<h2 id="child-ref-sky">Child ref sky</h2>
-
-<p>然而lisp语言不存在该语序的直接实现，对此，可以设置一个宏语句，把第一个参数设置为主语，其余的参数设置为可能的宾语。而在所有的字母中，我个人认为字母 <code class="language-plaintext highlighter-rouge">o</code> 在形状上是最完美的。</p>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">defmacro</span> <span class="nv">o</span> <span class="p">(</span><span class="nv">mio</span> <span class="nv">ili</span> <span class="k">&amp;rest</span> <span class="nv">vio</span><span class="p">)</span>
-	<span class="o">`</span><span class="p">(</span><span class="nv">ili</span> <span class="nv">mio</span> <span class="o">,@</span><span class="nv">vio</span><span class="p">))</span>
-</code></pre></div></div>
-<p>暂时称这种倒置了第一个参数和谓词的语句为 <code class="language-plaintext highlighter-rouge">自然语句</code> ，或者 <code class="language-plaintext highlighter-rouge">o语句</code> 吧。</p>
-
-<p>于是重新看一看lisp的基础原语，也许 <code class="language-plaintext highlighter-rouge">set</code> 更换为 <code class="language-plaintext highlighter-rouge">is</code> 更加通顺呢？ <code class="language-plaintext highlighter-rouge">set</code> 的意义是设置，但是对于自然语句 <code class="language-plaintext highlighter-rouge">(o 'x set 1)</code> 而言，<code class="language-plaintext highlighter-rouge">x 设置 1</code> 这种句式是很蹩脚的。或者我们换一个例子 <code class="language-plaintext highlighter-rouge">(o '孩子 set '天空)</code> ：难道我们可以说， <code class="language-plaintext highlighter-rouge">孩子设置天空</code> 吗？天空可以通过向地面降下暴雨或冰雪来抑制生命的繁衍，亦或以阳光雨露滋润生命的成长。但是同样生活在地面的 <code class="language-plaintext highlighter-rouge">孩子</code> 有什么能力去设置这样的 <code class="language-plaintext highlighter-rouge">天空</code> 呢？难道更加自然的画面不是孩子在生命被暴雨或冰雪抑制之余，<code class="language-plaintext highlighter-rouge">望向</code> 了 <code class="language-plaintext highlighter-rouge">天空</code> 吗？或者他们的手 <code class="language-plaintext highlighter-rouge">指向</code> 了 <code class="language-plaintext highlighter-rouge">天空</code> ？</p>
-
-<p>而按照 <code class="language-plaintext highlighter-rouge">s表达式</code> ，自然语句<code class="language-plaintext highlighter-rouge">(o '孩子 set '天空)</code> 对应着 <code class="language-plaintext highlighter-rouge">(set '孩子 '天空)</code> 。 <code class="language-plaintext highlighter-rouge">set</code> 的意义是令第一个符号指向第二个符号，这样在 <code class="language-plaintext highlighter-rouge">s 表达式</code> 中，我们便要说：<code class="language-plaintext highlighter-rouge">设置孩子指向天空</code>，或者 <code class="language-plaintext highlighter-rouge">设置孩子望向天空</code> 。这竟好似一种外在的诱惑，或者某种权威式的强制的命令，以役使孩子以他们期待的形式同天空发生关系一样。难道这外在的程序，还能比真正的 <code class="language-plaintext highlighter-rouge">天空</code> 更加宽广辽远吗？能够被命令着望向的 <code class="language-plaintext highlighter-rouge">天空</code> ，果真会是真正的 <code class="language-plaintext highlighter-rouge">天空</code> 吗？</p>
-
-<p>如果对于每位孩子而言，存在一片真正可供他们自由飞翔的天空，我想这会比那一片片被命令或诱惑了的天空更接近他们自然而然所望向的远方。</p>
-
-<p>不是因为某种外在的诱惑或命令，而是因为它自然而言朝向了什么。英语中有个词组 <code class="language-plaintext highlighter-rouge">refer to sth</code> ，意思是：</p>
-
-<blockquote>
-  <p>to look at, or tell someone else to look at, a book or similar record in order to find information and help</p>
-</blockquote>
-
-<p>为了简便起见，缩写为，<code class="language-plaintext highlighter-rouge">ref</code>。那么刚刚的语句便可以表达为： <code class="language-plaintext highlighter-rouge">(o child ref sky)</code> 。</p>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">defmacro</span> <span class="nv">ref</span> <span class="p">(</span><span class="nv">var</span> <span class="nv">value</span><span class="p">)</span>
-	<span class="o">`</span><span class="p">(</span><span class="nb">setf</span> <span class="o">,</span><span class="nv">var</span> <span class="o">,</span><span class="nv">value</span><span class="p">))</span>
-</code></pre></div></div>
-
-<h2 id="as--to-dobe-done--by-">as … to do/be done … by …</h2>
-
-<p>而回到 <code class="language-plaintext highlighter-rouge">week</code> 的例子中，试想不是 <code class="language-plaintext highlighter-rouge">(select week 2)</code> 这样，<code class="language-plaintext highlighter-rouge">选择了一周的第二天</code>，而是 <code class="language-plaintext highlighter-rouge">一周作为列表根据数字2被选择出来具有温度的第二天之元素</code>，也就意味着：</p>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nv">week</span> <span class="nv">as-list-be-select-element-by-position</span> <span class="mi">2</span><span class="p">)</span>
-</code></pre></div></div>
-
-<p>给予一种实现：</p>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nv">o</span> <span class="nv">as-list-be-select-element-by-position</span> <span class="nv">loy</span> <span class="p">(</span><span class="nb">list</span> <span class="nb">position</span><span class="p">)</span>
-   <span class="s">"列表根据位置被选择元素"</span>
-   <span class="p">(</span><span class="nv">o</span> <span class="p">(</span><span class="nv">o</span> <span class="nb">list</span> <span class="nb">eq</span> <span class="no">nil</span><span class="p">)</span> <span class="nv">then</span> <span class="no">nil</span>
-      <span class="p">(</span><span class="nv">o</span> <span class="p">(</span><span class="nv">o</span> <span class="nb">position</span> <span class="nb">=</span> <span class="mi">1</span><span class="p">)</span> <span class="nv">then</span>
-         <span class="p">(</span><span class="nv">o</span> <span class="nb">list</span> <span class="nv">ri</span><span class="p">)</span>
-         <span class="p">(</span><span class="nv">o</span> <span class="p">(</span><span class="nv">o</span> <span class="nb">list</span> <span class="nv">cori</span><span class="p">)</span> <span class="nv">as-list-be-select-element-by-position</span> <span class="p">(</span><span class="nv">o</span> <span class="nb">position</span> <span class="nb">-</span> <span class="mi">1</span><span class="p">)))))</span>
-<span class="c1">;;(o '(a b c d) as-list-be-select-element-by-position 2)</span>
-<span class="c1">;;=&gt;b</span>
-</code></pre></div></div>
-
-<p>其中，<code class="language-plaintext highlighter-rouge">loy</code> 是 <code class="language-plaintext highlighter-rouge">defun</code> 的倒装，<code class="language-plaintext highlighter-rouge">ri</code> 是 <code class="language-plaintext highlighter-rouge">car</code> 的倒装，<code class="language-plaintext highlighter-rouge">cori</code> 是 <code class="language-plaintext highlighter-rouge">cdr</code> 的倒装，<code class="language-plaintext highlighter-rouge">then</code> 是 <code class="language-plaintext highlighter-rouge">if</code> 的倒装。</p>
-
-<p>在s表达式中，等价于</p>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">defun</span> <span class="nv">select</span> <span class="p">(</span><span class="nb">list</span> <span class="nb">position</span><span class="p">)</span>
-	<span class="p">(</span><span class="k">if</span> <span class="p">(</span><span class="nb">eq</span> <span class="nb">list</span> <span class="no">nil</span><span class="p">)</span> <span class="no">nil</span>
-		<span class="p">(</span><span class="k">if</span> <span class="p">(</span><span class="nb">=</span> <span class="nb">position</span> <span class="mi">1</span><span class="p">)</span>
-			<span class="p">(</span><span class="nb">car</span> <span class="nb">list</span><span class="p">)</span>
-		 <span class="p">(</span><span class="nv">select</span> <span class="p">(</span><span class="nb">position</span> <span class="nb">cdr</span><span class="p">)</span> <span class="p">(</span><span class="nb">-</span> <span class="nb">position</span> <span class="mi">1</span><span class="p">)))))</span>
-<span class="c1">;;(select '(a b c d) 2)</span>
-<span class="c1">;;=&gt;b</span>
-</code></pre></div></div>
-
-<p>当然，如果需要也可以把 <code class="language-plaintext highlighter-rouge">as-list-be-select-element-by-position</code> 缩写为 <code class="language-plaintext highlighter-rouge">be-select</code>。但是这样要如何区分 <code class="language-plaintext highlighter-rouge">as-string-be-select-substring-by-start-end</code> 以及 <code class="language-plaintext highlighter-rouge">as-number-list-be-select-max-number</code> 这些同样被选择，但是输入和输出类型和选择具体功能不同的函数呢？或者，如何证明，作为列表被选择比作为字串或作为数字列表被选择的优先级更高，以至于要它竟然要占用 <code class="language-plaintext highlighter-rouge">be-select</code> 这样精简的符号？如果不能，那么为什么要冒着浪费 <code class="language-plaintext highlighter-rouge">更精简的符号</code> 的选择空间的风险进行预设呢？既然一切都是 <code class="language-plaintext highlighter-rouge">Child ref sky.</code></p>
-
-<p>那么，<code class="language-plaintext highlighter-rouge">be-select</code> 这样的 <code class="language-plaintext highlighter-rouge">精简符号</code> 又为什么不能根据即时的执行和编写需求，进行灵活的指向关系改变呢？</p>
-
-<p>精简的符号意味着更加快速的思考，而冗长的符号意味着更加精确的语义。对比认知科学中 <code class="language-plaintext highlighter-rouge">系统一</code> 和 <code class="language-plaintext highlighter-rouge">系统二</code> 的概念，也许应当存在一种可以整合这两种符号的编程范式？</p>
-
-<p>如果我们把 <code class="language-plaintext highlighter-rouge">be-select</code> 这样的精简符号的组合称为 <code class="language-plaintext highlighter-rouge">架构类</code> 函数，那么 <code class="language-plaintext highlighter-rouge">as-list-be-select-element-by-position</code> <code class="language-plaintext highlighter-rouge">as-string-be-select-substring-by-start-end</code> <code class="language-plaintext highlighter-rouge">as-number-list-be-select-max-number</code> 无疑都是它的一种实现。一方面，这并不意味着作为 <code class="language-plaintext highlighter-rouge">架构类</code> 函数的 <code class="language-plaintext highlighter-rouge">be-select</code> 不可被执行了，可以根据语境进行设置，特别是对于一次执行且直执行一个函数的单线程而言。比较令人担忧的可能是，会不会出现当高级函数调用多个低级函数时，出现低级函数集合对于 <code class="language-plaintext highlighter-rouge">be-select</code> 的访问冲突？</p>
-
-<p>另外，<code class="language-plaintext highlighter-rouge">as ...</code> 声明了主语的类型，这里的类型不一定是 <code class="language-plaintext highlighter-rouge">cons</code> <code class="language-plaintext highlighter-rouge">number</code> <code class="language-plaintext highlighter-rouge">string</code> 这些基础类型，也可以是 <code class="language-plaintext highlighter-rouge">table</code> <code class="language-plaintext highlighter-rouge">string-list</code> 这些自建类型。换言之 <code class="language-plaintext highlighter-rouge">作为...做/被做...根据...</code> 是自然语句的一种普遍的命名方式，例如：<code class="language-plaintext highlighter-rouge">as-table-be-select-column-by-position-list</code> <code class="language-plaintext highlighter-rouge">as-table-be-select-row-by-position</code> 。如果从主语的角度而言，<code class="language-plaintext highlighter-rouge">架构类函数</code> 和 <code class="language-plaintext highlighter-rouge">实现类函数</code> 之间的关系显然不是单继承的，只要考虑到任何一种作为自然语句主语的对象都有可能 <code class="language-plaintext highlighter-rouge">得到</code> <code class="language-plaintext highlighter-rouge">失去</code> 或 <code class="language-plaintext highlighter-rouge">改变</code> 什么的话。</p>
-
-<h2 id="参考">参考</h2>
-
-<ul>
-  <li><a href="https://zh.m.wikipedia.org/wiki/%E6%B3%A2%E5%85%B0%E8%A1%A8%E7%A4%BA%E6%B3%95">维基百科：波兰表示法</a></li>
-  <li><a href="https://zh.m.wikipedia.org/wiki/%E9%80%86%E6%B3%A2%E5%85%B0%E8%A1%A8%E7%A4%BA%E6%B3%95">维基百科：逆波兰表示法</a></li>
-  <li><a href="https://zh.m.wikipedia.org/wiki/%E9%80%86%E6%B3%A2%E5%85%B0%E8%A1%A8%E7%A4%BA%E6%B3%95">维基百科：S表达式</a></li>
-</ul>]]></content><author><name>甲与</name></author><category term="语法" /><summary type="html"><![CDATA[介绍一下lisp语言的主语。]]></summary></entry></feed>
+<p><a href="https://github.com/certbot/certbot/issues/3854">github: “The requested apache plugin does not appear to be installed” on raspbian</a></p>]]></content><author><name>甲与</name></author><category term="配置" /><summary type="html"><![CDATA[calibre-server是一种非常便利的线上电子阅读服务。 之前的服务器到期了，现在重新配置了calibre-server，整理一下操作步骤。]]></summary></entry></feed>

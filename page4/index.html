@@ -9,24 +9,20 @@
   <head>
     <meta charset="utf-8">
 
-<!-- begin _includes/seo.html --><title>如何使用 minio 进行数据库查询 - 甲与</title>
-<meta name="description" content="minio 提供了对s3存储对象的sql操作。一方面为了处理实验报告，另一方面也是为了增加可以使用的工具数量，所以需要增进对于mc sql的理解。">
+<!-- begin _includes/seo.html --><title>甲与 - 页面 4</title>
+<meta name="description" content="">
 
 
   <meta name="author" content="甲与">
   
-  <meta property="article:author" content="甲与">
-  
 
 
-<meta property="og:type" content="article">
+<meta property="og:type" content="website">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:site_name" content="甲与">
-<meta property="og:title" content="如何使用 minio 进行数据库查询">
-<meta property="og:url" content="/%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8-minio-%E8%BF%9B%E8%A1%8C%E6%95%B0%E6%8D%AE%E5%BA%93%E6%9F%A5%E8%AF%A2/">
+<meta property="og:title" content="甲与">
+<meta property="og:url" content="/page4/">
 
-
-  <meta property="og:description" content="minio 提供了对s3存储对象的sql操作。一方面为了处理实验报告，另一方面也是为了增加可以使用的工具数量，所以需要增进对于mc sql的理解。">
 
 
 
@@ -36,15 +32,15 @@
 
 
 
-  <meta property="article:published_time" content="2024-04-20T00:00:00+08:00">
 
 
 
 
 
+<link rel="canonical" href="/page4/">
 
-<link rel="canonical" href="/%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8-minio-%E8%BF%9B%E8%A1%8C%E6%95%B0%E6%8D%AE%E5%BA%93%E6%9F%A5%E8%AF%A2/">
 
+  <link rel="prev" href="/page3/">
 
 
 
@@ -99,7 +95,7 @@
 
   </head>
 
-  <body class="layout--single">
+  <body class="layout--home">
     <nav class="skip-links">
   <ul>
     <li><a href="#site-nav" class="screen-reader-shortcut">转到主导航栏</a></li>
@@ -155,12 +151,10 @@
   style=" background-image: url('');"
 >
   
-    <img src="/assets/images/wallhaven-o5e1jm.png" alt="如何使用 minio 进行数据库查询" class="page__hero-image">
+    <img src="/assets/images/wallhaven-o5e1jm.png" alt="" class="page__hero-image">
   
   
 </div>
-
-
 
 
 
@@ -271,207 +265,29 @@
 
 
 
-  <article class="page h-entry" itemscope itemtype="https://schema.org/CreativeWork">
-    <meta itemprop="headline" content="如何使用 minio 进行数据库查询">
-    <meta itemprop="description" content="minio 提供了对s3存储对象的sql操作。一方面为了处理实验报告，另一方面也是为了增加可以使用的工具数量，所以需要增进对于mc sql的理解。">
-    <meta itemprop="datePublished" content="2024-04-20T00:00:00+08:00">
+  <div class="archive">
+    
+      <h1 id="page-title" class="page__title"></h1>
+    
     
 
-    <div class="page__inner-wrap">
-      
-        <header>
-          <h1 id="page-title" class="page__title p-name" itemprop="headline">
-            <a href="/%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8-minio-%E8%BF%9B%E8%A1%8C%E6%95%B0%E6%8D%AE%E5%BA%93%E6%9F%A5%E8%AF%A2/" class="u-url" itemprop="url">如何使用 minio 进行数据库查询
-</a>
-          </h1>
-          
-
-  <p class="page__meta">
-    
-      
-      <span class="page__meta-date">
-        <i class="far fa-calendar-alt" aria-hidden="true"></i>
-        
-        <time datetime="2024-04-20T00:00:00+08:00">April 20, 2024</time>
-      </span>
-    
-
-    
-
-    
-  </p>
+<h3 class="archive__subtitle">最新文章</h3>
 
 
-        </header>
-      
 
-      <section class="page__content e-content" itemprop="text">
-        
-          <aside class="sidebar__right ">
-            <nav class="toc">
-              <header><h4 class="nav__title"><i class="fas fa-cog"></i> 目录</h4></header>
-              <ul class="toc__menu"><li><a href="#s3-是什么">s3 是什么？</a></li><li><a href="#可以把minio上的何种对象视为s3对象">可以把minio上的何种对象视为s3对象？</a></li><li><a href="#可以如何操作s3">可以如何操作S3？</a><ul><li><a href="#sql-操作">sql 操作</a></li></ul></li><li><a href="#如何把mc的sql操作封装到emacs中">如何把mc的sql操作封装到emacs中？</a></li><li><a href="#参考">参考</a></li></ul>
 
-            </nav>
-          </aside>
-        
-        <p>minio 提供了对s3存储对象的sql操作。一方面为了处理实验报告，另一方面也是为了增加可以使用的工具数量，所以需要增进对于<code class="language-plaintext highlighter-rouge">mc sql</code>的理解。</p>
-
-<p>本篇博客处理以下几个问题：</p>
-
-<ul>
-  <li>s3 是什么？</li>
-  <li>minio 上的何种对象可以视为 s3 对象？</li>
-  <li>如何操作 S3 对象？</li>
-  <li>如何把这种查询封装到emacs中？</li>
-</ul>
-
-<h2 id="s3-是什么"><code class="language-plaintext highlighter-rouge">s3</code> 是什么？</h2>
-
-<blockquote>
-  <p>Amazon Simple Storage Service（Amazon S3）是一种对象存储服务，提供行业领先的可扩展性、数据可用性、安全性和性能。各种规模和行业的客户都可以使用 Amazon S3 存储和保护任意数量的数据，用于数据湖、网站、移动应用程序、备份和恢复、归档、企业应用程序、IoT 设备和大数据分析。Amazon S3 提供了管理功能，使您可以优化、组织和配置对数据的访问，以满足您的特定业务、组织和合规性要求。</p>
-</blockquote>
-
-<p>所以，S3, 全称Simple Storage Service，直译简单存储服务。那么 <code class="language-plaintext highlighter-rouge">S3 Object</code> 就是简单存储服务对象。</p>
-
-<p>另外需要注意，s3o 文件一般要下载到本地进行处理，然后上传进行覆盖。</p>
-
-<h2 id="可以把minio上的何种对象视为s3对象">可以把minio上的何种对象视为<code class="language-plaintext highlighter-rouge">s3对象</code>？</h2>
-
-<p><code class="language-plaintext highlighter-rouge">mc sql --help</code> 看看文档。</p>
-
-<p><img src="/assets/post_images/image-20240420090054853.png" alt="" /></p>
-
-<p>所以，可以把<code class="language-plaintext highlighter-rouge">csv</code>文件理解为一种<code class="language-plaintext highlighter-rouge">s3 Object</code>的实例。确实足够简单😊。</p>
-
-<p>那只要把bash命令封装到elisp中就可以了。不过在这之前要先熟悉一下 csv文件的基本操作。</p>
-
-<h2 id="可以如何操作s3">可以如何操作S3？</h2>
-
-<p>打开 <code class="language-plaintext highlighter-rouge">Libreoffice</code> 创建几个数据，</p>
-
-<p><img src="/assets/post_images/image-20240420090847909.png" alt="" /></p>
-
-<p>按默认格式存储为csv文件 <code class="language-plaintext highlighter-rouge">stu.csv</code>，打开emacs看看：</p>
-
-<p><img src="/assets/post_images/image-20240420091006763.png" alt="" /></p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>mc mb minio-server/csv
-<span class="nv">$ </span>mc put stu.csv minio-server/csv
-</code></pre></div></div>
-
-<h3 id="sql-操作">sql 操作</h3>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ mc sql --recursive --query "select * from S3Object" minio-server/csv/stu.csv
-张三,100
-李四,50
-王五,60
-</code></pre></div></div>
-
-<p>好棒👍。来增加几个查询条件看看吧。</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$mc</span> sql <span class="nt">--recursive</span> <span class="nt">--query</span> <span class="s2">"select * from S3Object where </span><span class="se">\"</span><span class="s2">成绩</span><span class="se">\"</span><span class="s2">=100"</span> minio-server/csv/stu.csv
-张三,100
-<span class="nv">$mc</span> sql <span class="nt">--recursive</span> <span class="nt">--query</span> <span class="s2">"select * from S3Object where </span><span class="se">\"</span><span class="s2">成绩</span><span class="se">\"</span><span class="s2">&gt;=60"</span> minio-server/csv/stu.csv
-张三,100
-王五,60
-</code></pre></div></div>
-
-<p>漂亮🎉。</p>
-
-<h2 id="如何把mc的sql操作封装到emacs中">如何把mc的sql操作封装到emacs中？</h2>
-
-<p>按照主语表达法，<code class="language-plaintext highlighter-rouge">(as-s3o-be-sq file-name sql-sentence)</code> 就可以获取数据了。其中<code class="language-plaintext highlighter-rouge">sq</code>的意义是，<code class="language-plaintext highlighter-rouge">structured query</code>，因为<code class="language-plaintext highlighter-rouge">sql</code>的全称是：<code class="language-plaintext highlighter-rouge">structured query language</code>。（所以实际上说<code class="language-plaintext highlighter-rouge">使用sql语言</code> 这种说法是不正确的，什么是<code class="language-plaintext highlighter-rouge">language语言</code>呢？）不过这样的限制也很明显，最多只能查询一个表，所以表和表的连接基本上就不用考虑了。</p>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="p">(</span><span class="nb">defun</span> <span class="nv">as-s3o-be-sq</span> <span class="p">(</span><span class="nv">s3o</span> <span class="nv">sq</span><span class="p">)</span>
-      <span class="s">"make a sq query to s3o on minio server. The input of s3o should be a string path to s3o, and sq should be a string of sql. This function will return query result as string"</span>
-      <span class="p">(</span><span class="nv">shell-command</span> <span class="p">(</span><span class="nb">format</span> <span class="s">"mc sql --recursive --query \"%s\" %s"</span> <span class="nv">s3o</span> <span class="nv">sq</span><span class="p">)))</span>
-      
-</code></pre></div></div>
-
-<div class="language-lisp highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="p">(</span><span class="nv">as-s3o-be-sq</span> <span class="s">"select * from S3Object"</span> <span class="s">"minio-server/csv/stu.csv"</span><span class="p">)</span>
-</code></pre></div></div>
-
-<p>结果<strong>返回0 而Message 中则返回查询结果</strong>。</p>
-
-<p>嗯……<code class="language-plaintext highlighter-rouge">shell-command</code> 会返回退出码，<code class="language-plaintext highlighter-rouge">shell-command-to-string</code> 才能获得<code class="language-plaintext highlighter-rouge">shell</code> 的输出结果。</p>
-
-<p>改一下：</p>
-
-<p><img src="/assets/post_images/image-20240420094006548.png" alt="" /></p>
-
-<p>完美🎉🎉。</p>
-
-<h2 id="参考">参考</h2>
-
-<ul>
-  <li>https://docs.aws.amazon.com/zh_cn/AmazonS3/latest/userguide/Welcome.html</li>
-</ul>
-
-        
-      </section>
-
-      <footer class="page__meta">
-        
-        
+<div class="entries-list">
   
-
-
-  
-
-  <p class="page__taxonomy">
-    <strong><i class="fas fa-fw fa-tags" aria-hidden="true"></i> 标签: </strong>
-    <span itemprop="keywords">
     
-      <a href="/tags/#minio" class="page__taxonomy-item p-category" rel="tag">minio</a>
-    
-    </span>
-  </p>
 
 
 
-
-        
-
-  <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> 更新时间:</strong> <time class="dt-published" datetime="2024-04-20T00:00:00+08:00">April 20, 2024</time></p>
-
-      </footer>
-
-      
-
-      
-  <nav class="pagination">
-    
-      <a href="/%E5%85%B3%E4%BA%8E%E6%88%91%E5%9C%A8%E9%85%8D%E7%BD%AEhbase%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98/" class="pagination--pager" title="关于我在配置hbase中的一些问题
-">上一页</a>
-    
-    
-      <a href="/minio%E5%AE%9E%E8%AE%AD/" class="pagination--pager" title="Minio实训
-">下一页</a>
-    
-  </nav>
-
-    </div>
-
-    
-  </article>
-
-  
-  
-    <div class="page__related">
-      <h2 class="page__related-title">猜您还喜欢</h2>
-      <div class="grid__wrapper">
-        
-          
-
-
-
-<div class="grid__item">
+<div class="list__item">
   <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
     
     <h2 class="archive__item-title no_toc" itemprop="headline">
       
-        <a href="/minio%E5%AE%9E%E8%AE%AD/" rel="permalink">Minio实训
+        <a href="/trilium%E9%85%8D%E7%BD%AE/" rel="permalink">Trilium配置
 </a>
       
     </h2>
@@ -483,7 +299,7 @@
       <span class="page__meta-date">
         <i class="far fa-calendar-alt" aria-hidden="true"></i>
         
-        <time datetime="2024-04-27T00:00:00+08:00">April 27, 2024</time>
+        <time datetime="2023-12-17T00:00:00+08:00">December 17, 2023</time>
       </span>
     
 
@@ -493,129 +309,71 @@
   </p>
 
 
-    <p class="archive__item-excerpt" itemprop="description">目标
+    <p class="archive__item-excerpt" itemprop="description">Trilium 是一个便捷的笔记软件。本篇博客记录trilium的配置过程。
 </p>
   </article>
 </div>
 
-        
-          
-
-
-
-<div class="grid__item">
-  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
-    
-    <h2 class="archive__item-title no_toc" itemprop="headline">
-      
-        <a href="/%E5%85%B3%E4%BA%8E%E6%88%91%E5%9C%A8%E9%85%8D%E7%BD%AEhbase%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98/" rel="permalink">关于我在配置hbase中的一些问题
-</a>
-      
-    </h2>
-    
-
-  <p class="page__meta">
-    
-      
-      <span class="page__meta-date">
-        <i class="far fa-calendar-alt" aria-hidden="true"></i>
-        
-        <time datetime="2024-04-20T00:00:00+08:00">April 20, 2024</time>
-      </span>
-    
-
-    
-
-    
-  </p>
-
-
-    <p class="archive__item-excerpt" itemprop="description">现在系统已经重装，所以再去探究错误的原因和处理方案已经意义不大。现在把当时的日志整理以下，用以备忘。
-</p>
-  </article>
-</div>
-
-        
-          
-
-
-
-<div class="grid__item">
-  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
-    
-    <h2 class="archive__item-title no_toc" itemprop="headline">
-      
-        <a href="/segfault%E7%AE%80%E4%BB%8B/" rel="permalink">Segfault简介
-</a>
-      
-    </h2>
-    
-
-  <p class="page__meta">
-    
-      
-      <span class="page__meta-date">
-        <i class="far fa-calendar-alt" aria-hidden="true"></i>
-        
-        <time datetime="2024-04-19T00:00:00+08:00">April 19, 2024</time>
-      </span>
-    
-
-    
-
-    
-  </p>
-
-
-    <p class="archive__item-excerpt" itemprop="description">记录一个可以免费使用vps的网站，segfault。
-</p>
-  </article>
-</div>
-
-        
-          
-
-
-
-<div class="grid__item">
-  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
-    
-    <h2 class="archive__item-title no_toc" itemprop="headline">
-      
-        <a href="/minio-%E7%9A%84%E9%85%8D%E7%BD%AE%E8%BF%87%E7%A8%8B/" rel="permalink">Minio 的配置过程
-</a>
-      
-    </h2>
-    
-
-  <p class="page__meta">
-    
-      
-      <span class="page__meta-date">
-        <i class="far fa-calendar-alt" aria-hidden="true"></i>
-        
-        <time datetime="2024-04-19T00:00:00+08:00">April 19, 2024</time>
-      </span>
-    
-
-    
-
-    
-  </p>
-
-
-    <p class="archive__item-excerpt" itemprop="description">如果只是想用分布式文件系统，其实hadoop也可以，但在配置hbase的过程中出现的节点丢失和高cpu占用率问题还是让我想尝试其它的分布式框架。这次记录minio的配置过程。
-</p>
-  </article>
-</div>
-
-        
-      </div>
-    </div>
-  
   
 </div>
 
+
+<nav class="pagination">
+  
+  <ul>
+    
+    
+      
+        <li><a href="/page3/">上一页</a></li>
+      
+    
+
+    
+    
+      <li><a href="/">1</a></li>
+    
+
+    
+    
+
+    
+    
+    
+
+    
+      
+        
+        
+        
+        <li><a href="/page2/">2</a></li>
+      
+    
+      
+        
+        
+        
+        <li><a href="/page3/">3</a></li>
+      
+    
+
+    
+    
+
+    
+      <li><a href="#" class="disabled current">4</a></li>
+    
+
+    
+    
+      <li><a href="#" class="disabled"><span aria-hidden="true">下一页</span></a></li>
+    
+  </ul>
+</nav>
+
+
+
+  </div>
+</div>
     </div>
 
     
