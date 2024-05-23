@@ -96,7 +96,7 @@ var store = [{
         "teaser": null
       },{
         "title": "测试",
-        "excerpt":"This is a test of elisp.   test   (+ 2 3) ;;=&gt;5   这是一份测试文档   测试   12312321312  ","categories": [],
+        "excerpt":"This is a test of elisp.   test   (+ 2 3) ;;=&gt;5   这是一份测试文档   测试   测试  ","categories": [],
         "tags": ["测试"],
         "url": "/%E6%B5%8B%E8%AF%95/",
         "teaser": null
